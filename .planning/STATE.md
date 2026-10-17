@@ -48,6 +48,7 @@ Recent decisions affecting current work:
 - [Roadmap] Settings IA (P3) precedes the primitive layer (P4) and the surface revamp (P5) — tab ids are simultaneously translation keys, profile permission keys and deep-link state, and consolidation moves tab files
 - [Roadmap] Accessibility lands as primitives hooks (P4) plus a dedicated verification phase (P6) — Bits UI is the strategy; the phase is evidence, not aspiration
 - [Roadmap] Bundle budget is established in P2 and tracked through P7 — the renderer is one library-mode IIFE bundle with no code splitting, shared with every output window
+- [Autonomous] UI-SPEC generation scoped to Phases 4 and 5 only. The `ui-plan-gate` returns `frontend: true` for every phase because it matches the word "component" in the ROADMAP goals — a false positive. P1 is a toolchain upgrade with zero visual change; P2's acceptance test is literally "nothing changed", so a design contract there would contradict the phase. P3 is structural (no styling), P6 is verification, P7 is docs. P4 (primitive layer) and P5 (Settings revamp) do get UI-SPECs.
 
 ### Pending Todos
 

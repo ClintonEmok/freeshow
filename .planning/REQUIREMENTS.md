@@ -11,7 +11,7 @@ Requirements for this milestone. Each maps to a roadmap phase. All are Settings-
 ### Toolchain
 
 - [ ] **TOOL-01**: Renderer runs on Svelte 5 in legacy mode with no component rewrites — only mount sites and config change
-- [ ] **TOOL-02**: Renderer builds on Vite 7 (not 8) preserving the IIFE library bundle shared by the main window and every output window
+- [ ] **TOOL-02**: Renderer builds on Vite 8 (not 7) preserving the IIFE library bundle shared by the main window and every output window
 - [ ] **TOOL-03**: TypeScript 5.9, svelte-check, the Svelte ESLint plugin, and Vitest are upgraded together with no loss of existing checks
 - [ ] **TOOL-04**: Packaged artifacts still build and run on Windows, macOS, and Linux, and the output window renders identically to before
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Milestone 1 puts a real design system under FreeShow's Settings surface without touching the one thing that must not break: the live output path. The renderer bundle is shared, byte for byte, between the main window and every projector output, so this milestone is sequenced as two foundation phases with output-neutral acceptance tests, three surface phases that change what an operator sees, and two closing phases that verify and document. Phase 1 moves the build platform (Svelte 5 legacy mode, Vite 7, TypeScript 5.9) with zero component-syntax rewrites. Phase 2 is where the milestone's highest-severity hazard is settled — Tailwind v4 with Preflight omitted and a token bridge that keeps legacy `--primary`/`--secondary` meanings frozen while adding a semantic namespace. Phases 3–5 restructure Settings, build the primitive layer, and swap every control. Phases 6–7 prove accessibility to WCAG 2.2 AA and publish the patterns so later surfaces can reuse them. Two phases (1 and 2) deliver no user-visible capability — that is correct for this shape of work.
+Milestone 1 puts a real design system under FreeShow's Settings surface without touching the one thing that must not break: the live output path. The renderer bundle is shared, byte for byte, between the main window and every projector output, so this milestone is sequenced as two foundation phases with output-neutral acceptance tests, three surface phases that change what an operator sees, and two closing phases that verify and document. Phase 1 moves the build platform (Svelte 5 legacy mode, Vite 8, TypeScript 5.9) with zero component-syntax rewrites. Phase 2 is where the milestone's highest-severity hazard is settled — Tailwind v4 with Preflight omitted and a token bridge that keeps legacy `--primary`/`--secondary` meanings frozen while adding a semantic namespace. Phases 3–5 restructure Settings, build the primitive layer, and swap every control. Phases 6–7 prove accessibility to WCAG 2.2 AA and publish the patterns so later surfaces can reuse them. Two phases (1 and 2) deliver no user-visible capability — that is correct for this shape of work.
 
 ## Phases
 
@@ -12,7 +12,7 @@ Milestone 1 puts a real design system under FreeShow's Settings surface without 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Toolchain Gate** - Svelte 5 (legacy mode) + Vite 7 + TypeScript 5.9, with zero component rewrites and the output window unchanged
+- [ ] **Phase 1: Toolchain Gate** - Svelte 5 (legacy mode) + Vite 8 + TypeScript 5.9, with zero component rewrites and the output window unchanged
 - [ ] **Phase 2: Design-Token Foundation** - Isolated Tailwind v4 + token bridge; acceptance test is "nothing changed"
 - [ ] **Phase 3: Settings IA & Flows** - Consolidate and regroup Settings navigation; migrate tab ids without breaking deep-links or permissions
 - [ ] **Phase 4: Primitive Layer** - `components/ui/**` on shadcn-svelte + Bits UI, and the `components/input/` wrappers rebuilt on it
@@ -23,7 +23,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Phase Details
 
 ### Phase 1: Toolchain Gate
-**Goal**: The renderer builds and ships on Svelte 5 (legacy mode) + Vite 7 + TypeScript 5.9 with zero component-syntax rewrites, and packaged builds on Windows, macOS and Linux still render the output window exactly as before.
+**Goal**: The renderer builds and ships on Svelte 5 (legacy mode) + Vite 8 + TypeScript 5.9 with zero component-syntax rewrites, and packaged builds on Windows, macOS and Linux still render the output window exactly as before.
 **Depends on**: Nothing (first phase)
 **Requirements**: TOOL-01, TOOL-02, TOOL-03, TOOL-04
 **Success Criteria** (what must be TRUE):
@@ -32,13 +32,17 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A production build emits exactly one CSS asset renamed to `bundle.css`, `public/index.html` references an existing non-empty `bundle.js` and `bundle.css`, and the `postBuild.js` / `cleanBuilds.js` literal string contracts hold without throwing `"Dev script path changed!"` (TOOL-02)
   4. `svelte-check`, the Svelte ESLint plugin and Vitest all run and report no new errors or failures versus the pre-upgrade baseline — no existing check was dropped or silently converted to non-blocking (TOOL-03)
   5. Release smoke checklist green on packaged Windows, macOS and Linux artifacts: launch app, open Settings, open an output, play a song, import a file — with `better-sqlite3`, `@discordjs/opus` and `osr-capture` loading on each platform (TOOL-04)
-**Plans**: 4 plans
+**Plans**: 5 plans
 
 Plans:
-- [ ] 01-01: Stand up the release smoke checklist and the output-window pixel-diff baseline *before* any dependency change
-- [ ] 01-02: Vite 7 + `@sveltejs/vite-plugin-svelte` 6 (still compiling the existing Svelte components); build-output assertion guarding the `postBuild`/`cleanBuilds` string contracts and the single-CSS-asset rule
-- [ ] 01-03: Svelte 5 legacy mode — `mount()` at the six entry sites, `svelte-preprocess` replaced by `vitePreprocess()`, Terser validated against Svelte 5 output
-- [ ] 01-04: TypeScript 5.9, `@tsconfig/svelte`, `svelte-check`, `eslint-plugin-svelte` (replacing the Svelte-3-only `eslint-plugin-svelte3`) and Vitest, with no loss of existing checks; cross-OS packaged build validation
+- [ ] 01-01: Freeze the toolchain, pin the `svelte-check` baseline command, record all five pre-upgrade baselines, and stand up the output-window pixel-diff gate with a committed 1920x1080 baseline — all *before* any dependency change
+- [ ] 01-02: Pre-bump hardening — `cssFileName` + API-agnostic `assetFileNames` on both library-mode configs, `scripts/assertBuildOutput.js` wired into `postbuild`, `terser` declared, and the Svelte lint job migrated to `eslint-plugin-svelte@3` flat config with `svelte/valid-compile` kept alive
+- [ ] 01-03: The atomic toolchain swap — `svelte@5`, `@sveltejs/vite-plugin-svelte@7`, `vite@8`, `typescript@5.9`, `@tsconfig/svelte@5`, `svelte-check@4` and `vitest@4` in one install; `mount()` at the six entry sites; `vitePreprocess()`; the `a11y_` code rename; the tsconfig pins; the eight type-only import fixes
+- [ ] 01-04: Post-upgrade parity — `svelte-check`, all four lint jobs, Vitest, Prettier and the check inventory measured against the recorded baselines; the source-unchanged, entry-site, build-contract and pixel gates re-run; every new finding driven to zero
+- [ ] 01-05: Cross-OS packaged validation — packaging exercised on all three platforms in `build.yml`, the Linux virtual screen widened to 1920x1080, a smoke spec that proves the operator flow and exercises `better-sqlite3`/`@discordjs/opus`/`osr-capture` for real, and the executed release smoke checklist
+
+**Decomposition note (deviation from the original four-plan sketch, forced by the dependency graph):**
+The original 01-02/01-03 split ("Vite first, still on Svelte 3" then "Svelte 5") is not achievable. Verified against the npm registry while planning: `@sveltejs/vite-plugin-svelte@7.1.2` peers `vite ^8.0.0` **and** `svelte ^5.46.4`; plugin 6 peers `svelte ^5.0.0`; plugins 4 and 5 require Svelte 5; and plugin `2.5.3` is the last Svelte-3-capable release. Separately, `svelte-check@4.7.7` peers `typescript ^5 || ^6` while `svelte-check@2.10.3` peers `svelte ^3.24.0`, so no `svelte-check` release supports Svelte 5 with TypeScript 4.9 — and dropping it would lose a check TOOL-03 forbids losing. `vitest@4.1.12` peers `vite ^6 || ^7 || ^8`. The Svelte/Vite/TypeScript/`svelte-check`/Vitest quintuple is therefore one atomic install landing in 01-03. The inverse is also true and was exploited: the Svelte **lint** migration (`eslint-plugin-svelte@3.23.1` peers `svelte ^3.37 || ^4 || ^5`; `typescript-eslint@8.71.2` peers `typescript >=4.8.4 <6.1.0`) is version-independent, so it moves *earlier*, into 01-02, which also removes `eslint-plugin-svelte3`'s `svelte ^3.2.0` peer before the Svelte 5 install.
 
 ### Phase 2: Design-Token Foundation
 **Goal**: A semantic token namespace exists, driven by the existing theme system, with Tailwind v4 wired in isolation — and nothing an operator sees changes.
@@ -157,7 +161,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Toolchain Gate | 0/4 | Not started | - |
+| 1. Toolchain Gate | 0/5 | Not started | - |
 | 2. Design-Token Foundation | 0/4 | Not started | - |
 | 3. Settings IA & Flows | 0/3 | Not started | - |
 | 4. Primitive Layer | 0/4 | Not started | - |
