@@ -91,15 +91,20 @@ export function getServerViteConfig(serverId, production = process.env.NODE_ENV 
                 entry: resolve(root, `src/server/${serverId}/main.ts`),
                 name: serverId,
                 formats: ["iife"],
-                fileName: () => "client.js"
+                fileName: () => "client.js",
+                // each server's index.html links "styles.css" by literal name (and Vite 6+ would otherwise derive "freeshow.css")
+                cssFileName: "styles"
             },
             rollupOptions: {
                 output: {
                     assetFileNames: (assetInfo) => {
-                        if (assetInfo.name.endsWith(".css")) {
+                        // Rollup 4 moved asset names to `names[]` and deprecated `name`; read both so neither version throws
+                        const names = assetInfo.names ?? (assetInfo.name ? [assetInfo.name] : [])
+                        const name = names[0] ?? ""
+                        if (name.endsWith(".css")) {
                             return "styles.css"
                         }
-                        return assetInfo.name
+                        return name
                     }
                 }
             },

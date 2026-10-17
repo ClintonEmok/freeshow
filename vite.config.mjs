@@ -25,17 +25,22 @@ export default defineConfig({
                   entry: "src/frontend/main.ts",
                   name: "freeshow",
                   formats: ["iife"],
-                  fileName: () => "bundle.js"
+                  fileName: () => "bundle.js",
+                  // Vite 6+ names library CSS from this instead of deriving it from package.json "name" (which would give "freeshow.css")
+                  cssFileName: "bundle"
               },
               outDir: "public/build",
               emptyOutDir: false,
               rollupOptions: {
                   output: {
                       assetFileNames: (assetInfo) => {
-                          if (assetInfo.name.endsWith(".css")) {
+                          // Rollup 4 moved asset names to `names[]` and deprecated `name`; read both so neither version throws
+                          const names = assetInfo.names ?? (assetInfo.name ? [assetInfo.name] : [])
+                          const name = names[0] ?? ""
+                          if (name.endsWith(".css")) {
                               return "bundle.css"
                           }
-                          return assetInfo.name
+                          return name
                       }
                   }
               }
