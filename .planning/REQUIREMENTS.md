@@ -106,20 +106,46 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TOOL-01 to TOOL-04 | TBD | Pending |
-| TOKN-01 to TOKN-04 | TBD | Pending |
-| PRIM-01 to PRIM-03 | TBD | Pending |
-| NAV-01 to NAV-03 | TBD | Pending |
-| A11Y-01 to A11Y-08 | TBD | Pending |
-| IA-01 to IA-04 | TBD | Pending |
-| STAT-01 to STAT-03 | TBD | Pending |
-| DOCS-01, SAFE-01, SAFE-02 | TBD | Pending |
+| TOOL-01 | Phase 1 — Toolchain Gate | Pending |
+| TOOL-02 | Phase 1 — Toolchain Gate | Pending |
+| TOOL-03 | Phase 1 — Toolchain Gate | Pending |
+| TOOL-04 | Phase 1 — Toolchain Gate | Pending |
+| TOKN-01 | Phase 2 — Design-Token Foundation | Pending |
+| TOKN-02 | Phase 2 — Design-Token Foundation | Pending |
+| TOKN-03 | Phase 2 — Design-Token Foundation | Pending |
+| TOKN-04 | Phase 2 — Design-Token Foundation | Pending |
+| IA-01 | Phase 3 — Settings IA & Flows | Pending |
+| IA-02 | Phase 3 — Settings IA & Flows | Pending |
+| IA-03 | Phase 3 — Settings IA & Flows | Pending |
+| IA-04 | Phase 3 — Settings IA & Flows | Pending |
+| PRIM-01 | Phase 4 — Primitive Layer | Pending |
+| PRIM-02 | Phase 4 — Primitive Layer | Pending |
+| PRIM-03 | Phase 4 — Primitive Layer | Pending |
+| NAV-01 | Phase 5 — Settings Surface Revamp | Pending |
+| NAV-02 | Phase 5 — Settings Surface Revamp | Pending |
+| NAV-03 | Phase 5 — Settings Surface Revamp | Pending |
+| STAT-01 | Phase 5 — Settings Surface Revamp | Pending |
+| STAT-02 | Phase 5 — Settings Surface Revamp | Pending |
+| STAT-03 | Phase 5 — Settings Surface Revamp | Pending |
+| A11Y-01 | Phase 6 — Accessibility Hardening | Pending |
+| A11Y-02 | Phase 6 — Accessibility Hardening | Pending |
+| A11Y-03 | Phase 6 — Accessibility Hardening | Pending |
+| A11Y-04 | Phase 6 — Accessibility Hardening | Pending |
+| A11Y-05 | Phase 6 — Accessibility Hardening | Pending |
+| A11Y-06 | Phase 6 — Accessibility Hardening | Pending |
+| A11Y-07 | Phase 6 — Accessibility Hardening | Pending |
+| A11Y-08 | Phase 6 — Accessibility Hardening | Pending |
+| DOCS-01 | Phase 7 — Extensibility Proof & Delivery | Pending |
+| SAFE-01 | Phase 7 — Extensibility Proof & Delivery | Pending |
+| SAFE-02 | Phase 7 — Extensibility Proof & Delivery | Pending |
 
 **Coverage:**
-- v1 requirements: 33 total
-- Mapped to phases: 0
-- Unmapped: 33 ⚠️ (pending roadmap)
+- v1 requirements: 32 total
+- Mapped to phases: 32
+- Unmapped: 0 ✓
+
+**Note on the count:** this file previously stated 33 v1 requirements. The enumerated v1 list contains **32** distinct REQ-IDs — the eight `A11Y-01`…`A11Y-08` ids contain digits and were excluded by the original tally. The v2 list (SEARCH, LINK, RESET, ADV, VALID, PREVIEW, MOTION — 7 ids) is out of scope for this milestone. Coverage above is 32/32.
 
 ---
 *Requirements defined: 2026-10-17*
-*Last updated: 2026-10-17 after initial definition*
+*Last updated: 2026-10-17 — traceability mapped to Milestone 1 roadmap phases (32/32 covered)*
