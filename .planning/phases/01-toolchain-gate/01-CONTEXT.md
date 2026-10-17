@@ -23,8 +23,8 @@ All implementation choices are at the agent's discretion — pure infrastructure
 
 ### Hard Constraints (from Phase 1 research — treat as decided)
 - **Svelte 5 in legacy mode only.** Existing `export let` (317 files), `$:` (419), `on:` (404), `<slot>` (37), `createEventDispatcher` (77), `bind:` (170) all keep working untouched. The repo contains **zero** uses of `svelte/internal`, `svelte/compiler`, `SvelteComponentTyped`, `$$restProps`, `<svelte:options>`, or `.$set`, so no component rewrite is required.
-- **Vite target is 7.x, not 8.x.** Vite 8 replaces Rollup with Rolldown (`rolldown@1.0.0-rc.x`, `lightningcss`, `@oxc-project/runtime`). The renderer builds as a single IIFE `build.lib` bundle shared by the main window and every output window — exactly the shape a bundler swap breaks. Vite 7 keeps Rollup 4, matching the repo's server builds.
-- **`@sveltejs/vite-plugin-svelte` must be the 6.x line.** 7.x peers `vite: ^8.0.0`; 6.x peers `vite: ^6.3.0 || ^7.0.0`. Selecting Vite 7 forces plugin 6.x.
+- **Vite target is 8.x with `@sveltejs/vite-plugin-svelte` 7.x — REVISED by upstream evidence.** The earlier registry-only analysis preferred Vite 7 + plugin 6 (Rolldown risk on the IIFE `build.lib` bundle). The upstream `svelte5` branch disproves that concern for this repo: it ships Vite `^8.0.16` + plugin `^7.1.2` with the IIFE lib build intact, given the `assetInfo.names?.[0]` fix. Go to 8 so the toolchain is not migrated twice. (Plugin 7 peers `vite: ^8.0.0`; plugin 6 peers `^6.3.0 || ^7.0.0` — the pairing is forced either way.)
+- **Asset-name API, a11y code rename, and `vitePreprocess()` are mandatory compat fixes.** See Prior Art above for the exact edits; omitting any one fails silently rather than loudly.
 - **TypeScript target is 5.9.x.** TS 7.0.2 is the native Go port and is excluded by both peers: `svelte-check@4.7.7` accepts `typescript ^5 || ^6`, `@typescript-eslint/parser` accepts `>=4.8.4 <6.1.0`. (TS 6.0.3 is the technical ceiling if 5.9 causes trouble; 5.9.3 is the conservative pick.)
 - **`svelte-preprocess` → `vitePreprocess()`.** `svelte.config.mjs` currently uses `svelte-preprocess` with a per-mode tsconfig; `vite.config.mjs` already uses `vitePreprocess()`. Both must end coherent.
 - **Do not let the Svelte 4 legacy shadcn path substitute for this phase.** That line is frozen (Tailwind 3, `bits-ui@0.22`) and would defer, not avoid, this work.
@@ -63,6 +63,34 @@ All implementation choices are at the agent's discretion — pure infrastructure
 
 </code_context>
 
+<prior_art>
+## Prior Art — Upstream `svelte5` Branch (CRITICAL — read first)
+
+**Source:** `https://github.com/ChurchApps/FreeShow.git`, branch `svelte5` @ `644e6b1` (Jul 27 2026), fetched read-only into `refs/remotes/upstream/svelte5`. Merge-base is `e12355a1` (Jun 10 2026); the branch is **2 commits** from that base while `main` is **35 commits** ahead. It is an unmerged, focused migration attempt built against older code — treat it as a **validated recipe, not a merge target**. Re-apply its approach on top of current `main`; do not merge it.
+
+### What upstream proved works — ADOPT THESE
+- **Vite 8 + `@sveltejs/vite-plugin-svelte` 7.** `vite ^8.0.16`, plugin `^7.1.2`, `svelte ^5.56.3`, `typescript ^5.9.3`, `svelte-check ^4.6.0`, `vitest ^4.1.9`, `@tsconfig/svelte ^5.0.0`. **This supersedes the research's Vite 7 recommendation** — the IIFE `build.lib` renderer bundle builds on Vite 8 once the asset-name API is fixed, and going straight to 8 avoids a second migration later.
+- **Asset-name API change (Vite 8 / Rollup 4):** `assetFileNames` must read `assetInfo.names?.[0]`; `assetInfo.name` no longer exists. Keep the hook — it is what still guarantees a single `bundle.css`:
+  `const name = assetInfo.names?.[0] ?? ""` → `if (name.endsWith(".css")) return "bundle.css"` → `return name`.
+- **A11y warning-code rename:** Svelte 5 renamed `a11y-*` → `a11y_*`. Both `vite.config.mjs` and `config/building/vite.config.servers.mjs` must change `startsWith("a11y-")` → `startsWith("a11y_")` or the suppression silently stops working.
+- **`vitePreprocess()` everywhere:** `svelte.config.mjs` drops `svelte-preprocess` + the per-mode tsconfig indirection and becomes just `preprocess: vitePreprocess()`; `config/building/vite.config.servers.mjs` does the same. `svelte-preprocess` and `rollup-plugin-svelte` are removed.
+- **`@tsconfig/svelte@5` + explicit `"strict": false`.** v5 enables `strict` (incl. `noImplicitAny`). `src/frontend/tsconfig.json` (and the server tsconfig) must pin `"strict": false` explicitly with a comment, alongside the project's existing explicit opt-ins. Without this, `svelte-check` error counts explode and TOOL-03 fails.
+- **Playwright harness repairs — the best available starting point for the safety net.** `config/testing/start.test.ts`:
+  - A splash/loading window opens first, so `firstWindow()` can return the splash. Select the real window by polling `electronApp.windows().find(w => w.url().includes("index.html"))`, max 20 × 500 ms, `firstWindow()` as fallback.
+  - The first-run Initialize popup is conditional — guard with `if ((await setupStart.count()) > 0)` so repeat runs don't hang.
+  - `playwright.config.ts` gets `timeout: 90_000` (the E2E walks the whole app with built-in delays).
+- **`@rollup/plugin-terser` 0.4.4 → 1.0.0**; `svelte-inspector` (the `vassbo/svelte-inspector` fork) removed.
+
+### Where upstream is WRONG — DO NOT COPY
+- **They deleted Svelte linting instead of migrating it.** `lint:svelte` was dropped from the `lint` script, `config/linting/eslint.svelte.js` was deleted (−45 lines), and `eslint-plugin-svelte3` removed with **no replacement plugin**. That is exactly what TOOL-03 forbids ("no existing check was dropped"). Migrate to `eslint-plugin-svelte` (flat-config only; `svelte/valid-compile` must be enabled explicitly because v3 removed it from `recommended`) and keep the check green.
+- They did not set `cssFileName`; they rely solely on the `assetFileNames` hook. Set it in both configs as belt-and-braces — the four server apps' `index.html` files link `styles.css` by name.
+- `config/building/rollup.config.mjs:188` still uses the old `a11y-` prefix on their branch — fix it here too if that file is still live.
+
+### Consequence for this phase
+Re-apply upstream's recipe on top of current `main`, then go further than upstream did: preserve the lint check, add the pinned baseline measurement (`svelte-check` resolves no tsconfig on current `main` — no root tsconfig, and `test:svelte` is unpinned under `continue-on-error`), and build the output-window pixel gate upstream never attempted.
+
+</prior_art>
+
 <specifics>
 ## Specific Ideas
 
@@ -79,7 +107,8 @@ No specific requirements — infrastructure phase. Follow the five ROADMAP succe
 <deferred>
 ## Deferred Ideas
 
-- Vite 8 / Rolldown + `@sveltejs/vite-plugin-svelte` 7 — a separate, testable change *after* Phase 1's regression net exists.
+- Vite 8 / Rolldown + `@sveltejs/vite-plugin-svelte` 7 — **RESOLVED: promoted into scope** (see Prior Art). Upstream evidence supersedes the earlier "defer until after Phase 1" call.
+- Merging the upstream `svelte5` branch directly — rejected: 35 commits stale, only 2 commits of its own, and it drops the Svelte lint check.
 - TypeScript 6.x — optional bump once 5.9 is proven; 6.0.3 is the peer-allowed ceiling.
 - Frontend TypeScript `strict` burn-down (~2,733 `any`) — its own future effort, explicitly out of scope.
 - Making the two non-blocking CI checks blocking — PITFALLS recommends flipping them for touched paths; confirm with the user before changing CI behaviour.
