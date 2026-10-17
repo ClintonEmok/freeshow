@@ -30,22 +30,33 @@ The interface around that — settings, editors, control surfaces — must never
 
 ### Active
 
-<!-- This milestone: Settings UX/UI revamp on a shadcn-based design system. -->
+<!-- Milestone 1 (current): design-system foundation + Settings revamp. Milestone 2: AI improvements. -->
 
-- [ ] Establish shadcn-based design-system foundations: design tokens, theming, and reusable UI primitives
-- [ ] Upgrade the renderer from Svelte 3 to the Svelte version required by the chosen shadcn path (research-gated)
-- [ ] Introduce Tailwind CSS alongside/replacing the current scoped-CSS approach for new UI
-- [ ] Revamp the Settings surface using the new primitives (tabs, inputs, rows, lists, controls)
-- [ ] Improve accessibility across Settings: keyboard navigation, focus management, contrast, touch targets
-- [ ] Improve Settings information architecture and flows (not styling alone)
-- [ ] Prove the component layer is extensible — documented patterns reusable by later surfaces
+**Milestone 1 — Design-system foundation + Settings revamp (current)**
+
+- [ ] Upgrade the toolchain as its own phase: Svelte 3→5 (legacy mode), Vite, TypeScript 5.9, svelte-check/ESLint/Vitest — must end shippable with the output path untouched
+- [ ] Introduce Tailwind CSS with isolation: no Preflight, no `:root` `@theme`, scoped so nothing leaks into output/projector windows
+- [ ] Reconcile design tokens with the existing theme system — freeze legacy `--primary`/`--secondary`/`--accent` names, add a new semantic namespace, derive missing roles (border/muted/card/ring/destructive) from existing themes
+- [ ] Build reusable UI primitives (`components/ui/**`) on shadcn-svelte + Bits UI, replacing the ~9 control wrappers in `src/frontend/components/input/`
+- [ ] Revamp the Settings surface using the new primitives — all 21 tabs reached through the shared wrapper layer
+- [ ] Improve accessibility across Settings: keyboard navigation, visible focus, accessible names/roles, contrast, target size, reflow
+- [ ] Improve Settings information architecture and flows (not styling alone) — including the nonsensical/misleading buttons and layout identified by the user
+- [ ] Prove the component layer is extensible, with a component gallery and documented patterns reusable by later surfaces
+
+**Milestone 2 — AI improvements (planned, not yet scoped)**
+
+- [ ] Polish the AI model-selection UI/UX — STT, LLM, and local model management currently feel unpolished (user's primary complaint)
+- [ ] Improve the transcription pipeline (Nemotron STT) — reliability and operator experience
+- [ ] Improve auto-scripture — it already exists (`src/frontend/ai/scripture/`, ~2,000 lines); raise detection accuracy and the operator flow
+- [ ] Investigate and build an AI layout designer — extends the existing LLM `ChatAction` slide/template/overlay creation; feasibility research required before committing
 
 ### Out of Scope
 
-- App-wide revamp of all 464 components — this milestone is Settings only; other surfaces are later milestones
-- Revamping the output/projector rendering path (`Output.svelte`) — live-presentation-critical, separate high-risk milestone
+- App-wide revamp of all 464 components in *this* milestone — beyond Settings, surfaces roll out in later milestones
+- Revamping the output/projector rendering path (`Output.svelte`) — live-presentation-critical; the bundle is shared, so it must be *protected*, not redesigned
 - Rewriting the Electron main process or IPC contract — no UI dependency
 - Revamping the remote/stage/controller server apps — separate later milestone
+- Design-system work for the AI surfaces in this milestone — deliberately sequenced after the foundation (Milestone 2)
 - Changing the shadcn *library* itself / contributing upstream — use as-is
 
 ## Context
@@ -55,8 +66,16 @@ The interface around that — settings, editors, control surfaces — must never
 - **Settings surface:** `src/frontend/components/settings/` — `Settings.svelte`, `SettingsTabs.svelte`, `SettingsTools.svelte`, `Screens.svelte` plus 21 tab files under `tabs/` (~4,900 lines). Control primitives live in `src/frontend/components/input/` (~640 lines: `Input.svelte`, `InputRow.svelte`, `Inputs.svelte`, `DynamicList.svelte`, `Tabs.svelte`, `Title.svelte`, `List.svelte`, `HRule.svelte`, `FloatingInputs.svelte`).
 - **Why Settings first:** it exercises the widest variety of controls (text, number, color, toggle, dropdown, reorderable lists, nested tabs), so it stress-tests the design system with the lowest blast radius on the live output path.
 - **shadcn constraint:** shadcn-svelte requires Svelte 5 (current) or Svelte 4 (legacy line) plus Tailwind CSS and bits-ui. FreeShow on Svelte 3 means adoption is a framework-migration decision, not a drop-in. User has confirmed shadcn is the target, adopted incrementally across milestones.
+- **Research findings (see `.planning/research/`):**
+  - Svelte 5 **legacy mode** keeps `export let`, `$:`, `on:`, `<slot>`, `createEventDispatcher`, and `bind:` working — the repo uses none of the removed internals, so the mechanical change is ~6 `new App` → `mount()` sites plus config. The Svelte-4 legacy shadcn line is frozen (Tailwind 3, `bits-ui@0.22`) and is a dead end by construction.
+  - FreeShow is **already token-based**: `updateThemeValues()` (`src/frontend/utils/updateSettings.ts:253`) writes `--primary`/`--secondary`/`--text` to `documentElement`, referenced ~1,318 times. The work is namespace reconciliation, not token introduction.
+  - **Token names collide with inverted meanings** — FreeShow `--primary` is a dark surface (`#242832`); shadcn's is the brand CTA. FreeShow `--secondary` is brand pink (`#F0008C`); shadcn's is a muted surface. Overwriting unmapped would silently repaint ~600 reads across 351 components.
+  - **Main and output/projector windows share `public/index.html`** (`src/electron/index.ts:265-285`), so Tailwind Preflight and `:root` `@theme` would run inside live projection. Isolation must be decided before any class is written.
+  - Tailwind v4 output is `@layer`-ed while `global.css` and the 351 scoped styles are unlayered, so utilities *cannot* restyle existing elements in place. Coexistence rule: **swap, don't restyle**.
+  - `updateThemeValues` is a single choke point (8 call sites) that can delegate to a framework-free `design/tokens.ts` — startable before the Svelte gate.
 - **Known debt relevant to UI work:** frontend `strict` is disabled with ~2,733 `: any` usages; god modules up to ~3,000 lines; 12 test files for ~1,013 sources; CI is manual-only with non-blocking checks. See `.planning/codebase/CONCERNS.md`.
 - **Existing theming:** Settings already has a `Theme` tab and `defaultThemes.ts` — the new token layer must reconcile with, not bypass, the existing theme feature.
+- **Existing AI surface (Milestone 2 scope):** STT via local Nemotron (`src/electron/ai/stt/`), auto-scripture detection (~2,000 lines in `src/frontend/ai/scripture/`), an LLM chat that can already create slides/templates/overlays (`ChatAction.ts`), and 4 LLM providers. Most of Milestone 2 is improving what exists, plus one genuinely new feature (AI layout designer).
 
 ## Constraints
 
@@ -72,8 +91,12 @@ The interface around that — settings, editors, control surfaces — must never
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Adopt shadcn (incrementally, across milestones) | User explicitly wants shadcn; Svelte 3 blocks direct use, so adoption is staged rather than big-bang | — Pending |
+| Take the Svelte 5 path in **legacy mode**, not the Svelte 4 legacy shadcn line | Svelte 5 legacy mode collapses rewrite cost to ~6 mount sites; the Svelte 4 line is frozen (Tailwind 3, `bits-ui@0.22`) and would need three chained migrations later | — Pending |
+| Freeze legacy token names; add a new semantic namespace | `--primary`/`--secondary` have inverted meanings vs. shadcn; overwriting unmapped would silently repaint ~1,318 var() reads | — Pending |
+| Omit Tailwind Preflight; isolate new CSS from `:root` | Main and output/projector windows share `public/index.html`; preflight/`@theme` would reach live projection | — Pending |
+| "Swap, don't restyle" — replace legacy controls with primitives | Unlayered scoped styles outrank Tailwind utilities; layering utilities on existing elements cannot work | — Pending |
+| Sequence design system before AI work | Keeps new AI UI built once on the new component layer instead of rebuilt after the revamp | — Pending |
 | Start with the Settings surface | Widest control variety, lowest blast radius on the live output path | — Pending |
-| Defer the exact migration path (Svelte 3→5 vs 3→4 legacy shadcn) to research | Need evidence on migration cost, risk, and long-term viability before committing | — Pending |
 | Keep the output/projector rendering path out of scope | Live-presentation-critical; a UI revamp must not regress it | — Pending |
 | Model profile = inherit; parallel execution; standard granularity | OpenCode runtime with `resolve_model_ids: omit` in `~/.gsd/defaults.json` | — Pending |
 
@@ -95,4 +118,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-17 after initialization*
+*Last updated: 2026-10-17 after initialization and scope expansion (AI workstream added as Milestone 2)*
