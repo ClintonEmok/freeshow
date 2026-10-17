@@ -1,0 +1,124 @@
+{
+    "electron": {
+        "command": "npx eslint -c config/linting/eslint.electron.json --ext .js,.ts src/electron --format json",
+        "fileCount": 149,
+        "errorCount": 212,
+        "warningCount": 25,
+        "problemCount": 237,
+        "fixableErrorCount": 3,
+        "fixableWarningCount": 0,
+        "zeroProblems": false,
+        "typescriptEslintFindings": 237,
+        "svelteCompilerDiagnostics": {
+            "count": 0,
+            "byCode": {}
+        },
+        "ruleBreakdown": {
+            "no-console": 62,
+            "@typescript-eslint/require-await": 34,
+            "no-shadow": 32,
+            "@typescript-eslint/no-unused-vars": 25,
+            "@typescript-eslint/restrict-plus-operands": 20,
+            "no-empty": 19,
+            "(no-rule)": 9,
+            "no-underscore-dangle": 7,
+            "@typescript-eslint/no-empty-function": 6,
+            "@typescript-eslint/unbound-method": 4,
+            "max-classes-per-file": 4,
+            "@typescript-eslint/await-thenable": 3,
+            "@typescript-eslint/no-unnecessary-type-assertion": 3,
+            "radix": 3,
+            "@typescript-eslint/consistent-type-imports": 2,
+            "guard-for-in": 2,
+            "@typescript-eslint/prefer-for-of": 1,
+            "id-blacklist": 1
+        }
+    },
+    "frontend": {
+        "command": "npx eslint -c config/linting/eslint.frontend.json --ext .js,.ts src/frontend --format json",
+        "fileCount": 255,
+        "errorCount": 630,
+        "warningCount": 0,
+        "problemCount": 630,
+        "fixableErrorCount": 320,
+        "fixableWarningCount": 0,
+        "zeroProblems": false,
+        "typescriptEslintFindings": 630,
+        "svelteCompilerDiagnostics": {
+            "count": 0,
+            "byCode": {}
+        },
+        "ruleBreakdown": {
+            "prefer-const": 164,
+            "no-shadow": 111,
+            "@typescript-eslint/no-inferrable-types": 94,
+            "@typescript-eslint/prefer-for-of": 49,
+            "no-empty": 42,
+            "no-console": 33,
+            "@typescript-eslint/no-empty-function": 33,
+            "@typescript-eslint/no-unnecessary-type-assertion": 26,
+            "radix": 13,
+            "@typescript-eslint/require-await": 12,
+            "spaced-comment": 11,
+            "@typescript-eslint/array-type": 8,
+            "@typescript-eslint/consistent-type-imports": 7,
+            "object-shorthand": 6,
+            "one-var": 6,
+            "@typescript-eslint/no-unused-vars": 4,
+            "max-classes-per-file": 2,
+            "@typescript-eslint/no-unused-expressions": 2,
+            "eqeqeq": 2,
+            "@typescript-eslint/dot-notation": 2,
+            "no-undef-init": 1,
+            "@typescript-eslint/no-implied-eval": 1,
+            "@typescript-eslint/no-this-alias": 1
+        }
+    },
+    "svelte": {
+        "command": "npx eslint -c config/linting/eslint.svelte.js --ext .svelte src/frontend --format json",
+        "fileCount": 464,
+        "errorCount": 167,
+        "warningCount": 39,
+        "problemCount": 206,
+        "fixableErrorCount": 140,
+        "fixableWarningCount": 0,
+        "zeroProblems": false,
+        "typescriptEslintFindings": 167,
+        "svelteCompilerDiagnostics": {
+            "count": 39,
+            "byCode": {
+                "a11y-click-events-have-key-events": 16,
+                "a11y-autofocus": 9,
+                "a11y-label-has-associated-control": 6,
+                "a11y-no-noninteractive-tabindex": 4,
+                "a11y-missing-attribute": 2,
+                "a11y-role-has-required-aria-props": 2
+            }
+        },
+        "ruleBreakdown": {
+            "@typescript-eslint/no-inferrable-types": 96,
+            "@typescript-eslint/no-unnecessary-type-assertion": 44,
+            "a11y-click-events-have-key-events": 16,
+            "@typescript-eslint/no-empty-function": 15,
+            "a11y-autofocus": 9,
+            "@typescript-eslint/require-await": 7,
+            "a11y-label-has-associated-control": 6,
+            "@typescript-eslint/no-unused-vars": 5,
+            "a11y-no-noninteractive-tabindex": 4,
+            "a11y-missing-attribute": 2,
+            "a11y-role-has-required-aria-props": 2
+        }
+    },
+    "styles": {
+        "command": "npx stylelint \"src/frontend/**/*.{css,scss,svelte}\" --config config/linting/.stylelintrc.json --formatter json",
+        "fileCount": 464,
+        "errorCount": 216,
+        "warningCount": 0,
+        "problemCount": 216,
+        "erroredFileCount": 90,
+        "zeroProblems": false,
+        "ruleBreakdown": {
+            "csstools/use-logical": 216
+        }
+    }
+}

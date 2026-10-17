@@ -1,0 +1,50 @@
+command:            npx prettier --config config/formatting/.prettierrc.yaml --check src scripts
+exit-code:          1  (prettier --check exits 1 when any file is unformatted; this is the pre-upgrade state, not a regression)
+candidate-files:    1039  (git ls-files src scripts, prettier default extensions)
+svelte-candidates:  547
+unformatted-files:  40
+unformatted-svelte: 20  (proves prettier-plugin-svelte parses .svelte files — the false pass this number exists to defeat)
+
+--- raw prettier output ---
+Checking formatting...
+[warn] src/electron/audio/IcecastSender.ts
+[warn] src/electron/blackmagic/macadam-interface.d.ts
+[warn] src/electron/cloud/syncManager.test.ts
+[warn] src/electron/contentProviders/onStage/OnStageProvider.ts
+[warn] src/electron/contentProviders/planningCenter/live.ts
+[warn] src/electron/ndi/NdiSender.ts
+[warn] src/electron/utils/LyricSearch.ts
+[warn] src/frontend/ai/llm/llmManager.ts
+[warn] src/frontend/components/drawer/audio/effects/AudioEqualizer.svelte
+[warn] src/frontend/components/drawer/live/BMDStreams.svelte
+[warn] src/frontend/components/drawer/live/Cam.svelte
+[warn] src/frontend/components/drawer/live/NDIStreams.svelte
+[warn] src/frontend/components/drawer/live/OMTStreams.svelte
+[warn] src/frontend/components/drawer/live/recorder.ts
+[warn] src/frontend/components/drawer/live/Screens.svelte
+[warn] src/frontend/components/drawer/live/Windows.svelte
+[warn] src/frontend/components/drawer/player/Vimeo.svelte
+[warn] src/frontend/components/edit/editbox/Editbox.svelte
+[warn] src/frontend/components/edit/scripts/autoPosition.ts
+[warn] src/frontend/components/helpers/output.ts
+[warn] src/frontend/components/helpers/websiteControls.ts
+[warn] src/frontend/components/inputs/MaterialZoom.svelte
+[warn] src/frontend/components/main/popups/SelectTemplate.svelte
+[warn] src/frontend/components/output/Camera.svelte
+[warn] src/frontend/components/output/effects/simplex-noise.js
+[warn] src/frontend/components/slide/views/Chart.svelte
+[warn] src/frontend/components/slide/views/visualizerKaleidoscope.ts
+[warn] src/frontend/components/slide/views/websiteDomPool.ts
+[warn] src/frontend/components/stage/StageLayouts.svelte
+[warn] src/frontend/components/system/Snaplines.svelte
+[warn] src/frontend/converters/opensong.ts
+[warn] src/frontend/converters/songbeamer.ts
+[warn] src/frontend/converters/txtAutoSections.ts
+[warn] src/frontend/utils/createData.ts
+[warn] src/server/remote/components/pages/ScriptureContent.svelte
+[warn] src/server/remote/components/tablet/layout/drawer/CategoryListRenderer.svelte
+[warn] src/server/remote/components/tablet/layout/drawer/pages/TabletDrawerShows.svelte
+[warn] src/server/stage/components/Slide.svelte
+[warn] src/server/stage/components/Stagebox.svelte
+[warn] src/server/stage/util/helpers.ts
+[warn] Code style issues found in 40 files. Run Prettier with --write to fix.

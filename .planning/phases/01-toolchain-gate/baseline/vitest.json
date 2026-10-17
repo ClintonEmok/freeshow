@@ -1,0 +1,31 @@
+{
+    "command": "npx vitest run --config config/testing/vitest.config.ts --reporter=json",
+    "numTotalTestFiles": 12,
+    "numFailedTestFiles": 1,
+    "numTotalTestSuites": 60,
+    "numPassedTestSuites": 56,
+    "numFailedTestSuites": 4,
+    "numPendingTestSuites": 0,
+    "numTotalTests": 181,
+    "numPassedTests": 179,
+    "numFailedTests": 2,
+    "numSkippedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "success": false,
+    "failedTestFiles": [
+        "src/electron/cloud/syncManager.test.ts"
+    ],
+    "failedTests": [
+        {
+            "file": "src/electron/cloud/syncManager.test.ts",
+            "title": "Scenario 1: if not found locally, and marked as 'deleted' in cloud: skip",
+            "message": "AssertionError: expected true to be false // Object.is equality"
+        },
+        {
+            "file": "src/electron/cloud/syncManager.test.ts",
+            "title": "should fall back to file mtime when neither device has ever tracked a real edit time (backward compatibility)",
+            "message": "AssertionError: expected 1 to be 2 // Object.is equality"
+        }
+    ]
+}

@@ -1,0 +1,1 @@
+No external API integration: toolchain/dependency upgrade only — no service, SDK, or network contract is touched.
