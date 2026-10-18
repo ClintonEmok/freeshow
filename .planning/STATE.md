@@ -3,17 +3,17 @@ gsd_state_version: "1.0"
 current_phase: 1
 current_phase_name: Toolchain Gate
 status: executing
-stopped_at: Completed 01-02 (build-contract hardening + Svelte lint flat-config migration)
-last_updated: "2026-10-18T00:10:00.000Z"
+stopped_at: Completed 01-03 (Svelte 5 legacy-mode toolchain swap — the atomic version bump)
+last_updated: "2026-10-18T01:22:00.000Z"
 last_activity: 2026-10-18
-last_activity_desc: "01-02 complete: cssFileName + names-aware assetFileNames on both library-mode configs, scripts/assertBuildOutput.js wired into postbuild (observed failing 5 ways), terser declared, Svelte lint job migrated to eslint-plugin-svelte@3 flat config with svelte/valid-compile proven firing; all 464 .svelte byte-identical and the 1920x1080 pixel gate still 2/2 green"
-state_head: d3a0c668
+last_activity_desc: "01-03 complete: Svelte 5.57.2 legacy mode + Vite 8.0.16 (Rolldown) + TypeScript 5.9.3 + svelte-check 4.7.7 + Vitest 4.1.12 from one --force-free install; six new App() sites replaced with mount(), componentApi set nowhere, 546 of 547 components byte-identical plus one authorized 3-line rename; build exits 0 with the assertion passing, bundle.js minified, pixel gate 2/2 at maxDiffPixels 0, npm start ready in 412ms with no compiler errors; the a11y_ suppression PROVEN live (129 a11y warnings in svelte-check vs 0 in the build log)"
+state_head: 1cf9c0a2
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 5
-  completed_plans: 2
-  percent: 40
+  completed_plans: 3
+  percent: 60
 ---
 
 # Project State
@@ -28,29 +28,29 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 1 (Toolchain Gate) — EXECUTING
-Plan: 2 of 5 in current phase (01-02 complete)
+Plan: 3 of 5 in current phase (01-03 complete)
 Status: In progress
-Last activity: 2026-10-18 — Completed 01-02: hardened both library-mode build configs, added the `postbuild` build-output assertion, declared `terser`, and migrated the Svelte lint job to `eslint-plugin-svelte@3` flat config with the compiler check proven firing
+Last activity: 2026-10-18 — Completed 01-03: the atomic version bump. Svelte 5.57.2 in legacy mode, Vite 8.0.16 on Rolldown, TypeScript 5.9.3, svelte-check 4.7.7 and Vitest 4.1.12 — with zero component rewrites, a pixel-identical output window and an exit-0 production build
 
-Progress: [████░░░░░░] 40%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 2
-- Average duration: 30 min
-- Total execution time: 59 min
+- Total plans completed: 3
+- Average duration: 36 min
+- Total execution time: 106 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-toolchain-gate | 2 | 59 min | 30 min |
+| 01-toolchain-gate | 3 | 106 min | 36 min |
 
 **Recent Trend:**
 
-- Last 5 plans: 01-01 (31 min), 01-02 (28 min)
+- Last 5 plans: 01-01 (31 min), 01-02 (28 min), 01-03 (47 min)
 - Trend: -
 
 *Updated after each plan completion*
@@ -82,6 +82,16 @@ Recent decisions affecting current work:
 - [01-02] typescript-eslint v8 dropped `no-inferrable-types` and `no-empty-function` from its presets (111 recorded findings) and renamed `no-var-requires` → `no-require-imports`, `ban-types` → `no-restricted-types`, `recommended-requiring-type-checking` → `recommended-type-checked`. All are handled explicitly in the configs; adopting the lower numbers would have been silent check loss.
 - [01-02] **The `lint` chain is red by construction** and always was: `npm-run-all -s` stops at `lint:electron`, which had 209 unfixable errors in the recorded baseline. Do not use `npm run lint`'s exit code as a gate, and do not run it while sources must stay frozen — it applies `--fix` to `src/electron/**` and `src/frontend/**` (7 `.ts` files in the observed run, restored immediately).
 - [01-02] Post-migration counts (measured `--format json`, no `--fix`): svelte 464 files **172 err / 0 warn** (baseline 167/39); electron 149 files **269 err / 0 warn** (baseline 212/25); frontend 255 files **677 err / 0 warn** (baseline 630/0); styles 464 files **216 err** (baseline 216 — unchanged). Electron and frontend totals **rise** because v8's presets check more (new rules, `no-unused-vars` moved from `warn` to `error`); all 39 a11y warnings the old Svelte job reported are still reported by `test:svelte` (39 of its 47 `WARNINGS`).
+- [01-03] **Authorized criterion-1 exception — one `.svelte` file, 3 lines.** `src/frontend/components/settings/tabs/Connection.svelte` renamed a local `{@const connections = …}` binding to `connectionCount` (commit `1cf9c0a2`). The binding shadowed the imported `connections` store, making `$connections` a *scoped* subscription — a hard, unconditional Svelte 5 compile error (`store_invalid_scoped_subscription`) that Svelte 4 compiled silently. This is a **latent-bug fix, not a syntax rewrite**: behaviour unchanged, the store import and `$connections` untouched, no other `.svelte` file in the phase diff. 546 of 547 components are byte-identical.
+- [01-03] `svelte.config.mjs` is now `preprocess: [vitePreprocess()]`, and its defaults are `{ script: false, style: true }` — correct because the repo has zero `<style lang=...>` blocks and zero code-emitting TS features. **Rule:** if an `enum`/`using`/decorator/parameter-property is ever added inside `<script lang="ts">`, give `vitePreprocess({ script: true })` or move it to a `.ts` module.
+- [01-03] **Dev does NOT discover `svelte.config.mjs`, empirically confirmed.** Dev prints `no Svelte config found at …/public - using default configuration`, because `vite.config.mjs:20` sets `root: production ? "." : "public"`. The inline `preprocess` at `vite.config.mjs:9` is therefore **load-bearing** — RESEARCH Open Question 4 resolved as "discovery does not happen". Removing that inline preprocess would silently drop TS preprocessing in dev while production kept working.
+- [01-03] `src/frontend/tsconfig.json` pins `strict: false` explicitly (over `@tsconfig/svelte@5`'s `strict: true`) plus `module`/`moduleResolution`/`verbatimModuleSyntax`, and **keeps** `vite/client` (upstream dropped it; it types `import.meta.env`). Verified clean: **TS7006/TS7031 = 0** post-swap. `src/server/tsconfig.json` needed only the `module`/`moduleResolution` pins — it already set `strict: true` explicitly. Honest caveat: the pinned `svelte-check` covers `src/frontend` only, so the 83 server `.svelte` files are **not** type-checked — a pre-existing gap, not a regression.
+- [01-03] Deliberately held: `prettier-plugin-svelte@^3.4.0` and `prettier@^3.6.2` (a formatter bump is the one dependency whose purpose is to rewrite frozen source), `rollup-plugin-svelte@^7.2.2` (peers `svelte >=3.5.0`; referenced only by the dead rollup config), `electron`, `electron-builder`, `@rollup/plugin-terser`, `npm-run-all2`. Vite 8's registry names changed more than the plan anticipated: **Rolldown replaces esbuild + Rollup** (22 `@rolldown/binding-*` in; 24 `@esbuild/*` out) and **Lightning CSS** replaces the old CSS minimiser. Lockfile audited: no unintended package identity changed.
+- [01-03] **The `a11y_` suppression is PROVEN live, not merely quiet.** `svelte-check` (which does not apply the Vite `onwarn` filter) reports **129 real a11y warnings**; the build log carries **0** `a11y_` codes. The kebab→snake prefix rename works. This is the strongest available evidence for threat T-03-07.
+- [01-03] **NEW FINDING — the build log is no longer clean: 165 `element_invalid_self_closing_tag` WARNINGS** (158 distinct `src/frontend` files + 7 `src/server` sites). Svelte 5 warns about self-closing non-void HTML elements; Svelte 3 was silent. They are warnings (exit 0) and are NOT `a11y_` codes, so `onwarn` never sees them. This is 01-04's decision — three options: (a) add the code to the `onwarn` suppression alongside `a11y_` (**recommended**, matches the a11y precedent, keeps criterion 1 intact), (b) fix the 165 sites (a real source diff that would itself need its own criterion-1 authorization), (c) accept and record.
+- [01-03] `npm run lint`'s exit code was already redundant and plan verification item 5 is **unexecutable as written** (it claims the chain "still exits 0 with all four jobs"; `npm-run-all -s` has always stopped at `lint:electron`). `lint:electron`/`lint:frontend` carry `--fix` and must not be run while sources are frozen. `lint:svelte` has **no** `--fix` and **was** run, because `config/linting/eslint.svelte.flat.mjs:4` imports `svelte.config.mjs` — the file 01-03 rewrote. Result **185 err / 0 warn** (01-02: 172/0; baseline: 167/39); the +13 is TypeScript-5.9-aware type rules finding more on unchanged source, not check loss.
+- [01-03] **Plan defect (recorded, plan file NOT amended):** the Task 2 verify script requires `AudioMultichannel`, `AudioProcessor` and `PitchShiftNode` in `src/frontend/audio/audioAnalyser.ts` to be type-only, but they are **`export class` runtime values** (`AudioMultichannel.DEFAULT_CHANNELS`, `AudioProcessor.createNode`, `source instanceof PitchShiftNode`). Making them type-only would erase the bindings and, under `verbatimModuleSyntax`, be a bundler error. The committed code is correct; the plan's assertion is what is wrong (it fails on exactly those 3 names and passes on the other 5 files). Treat the plan's Task 2 `<automated>` block as superseded for those names.
+- [01-03] **Plan defect:** the plan enumerated 8 ambiguous type imports; **11** were needed. The 3 extra — `src/frontend/ai/scripture/BibleCacheManager.ts`, `src/frontend/components/timeline/TimelineActions.ts`, `src/frontend/components/timeline/TimelinePlayback.ts` — were committed in `065c8c90` with justification (Rule 3, blocking).
 
 ### Pending Todos
 
@@ -90,21 +100,21 @@ None yet.
 ### Blockers/Concerns
 
 - [Roadmap] `REQUIREMENTS.md` v1 scope is **32** requirements (not 33) — the eight `A11Y-01`…`A11Y-08` ids contain digits and were missed by the original tally. Traceability records 32/32; resolved.
-- [Phase 1] Highest-uncertainty phase: seven open toolchain questions (`eslint-plugin-svelte@3` against the eslintrc config, Vite 7 × the IIFE `build.lib` output, Terser `mangle.toplevel` × Svelte 5 output, the `verbatimModuleSyntax` tsconfig requirement, legacy↔runes interop). No automated safety net exists — the release smoke checklist must stand up before the first commit.
+- [Phase 1 / 01-04] **Top open item: the 165 new `element_invalid_self_closing_tag` warnings.** Svelte 5 emits them (Svelte 3 did not) across 158 `src/frontend` files + 7 `src/server` sites, and `onwarn` never sees them because they are not `a11y_` codes. Exit code stays 0, so no gate trips — but T-03-07's concern ("normalising ignored output — which is how a real warning gets missed") now applies to a 165-line wall. Needs an explicit choice in 01-04: suppress via `onwarn` (recommended), fix the 165 sites (needs its own criterion-1 authorization), or accept and record.
+- [Phase 1 / 01-04] svelte-check moved **2244 FILES / 338 ERRORS / 47 WARNINGS / 598 HINTS → 2173 FILES / 144 ERRORS / 291 WARNINGS** (svelte-check 4 no longer reports HINTS). Read the composition, not the net: the 144 errors are 89 in `src/frontend/utils/popup.ts` alone (the Svelte 5 `__sveltets_2_IsomorphicComponent` → `ComponentType` change) plus ~18 `verbatimModuleSyntax` errors inside `node_modules/json-bible`; the 291 warnings are 157 self-closing + 129 a11y + 5 other. The **−71 FILES** delta is attributable to the `@tsconfig/svelte@5` base change (`moduleResolution: "Bundler"`, changed `node_modules`/`@types` resolution) and must be confirmed not to be source-file check loss. `TS7006`/`TS7031` = **0**, so Pitfall 1 is clear.
+- [Phase 1 / 01-04] `lint:svelte` is **185 err / 0 warn** vs 172 at 01-02 vs 167 at baseline (+13). Confirm this is TS-5.9 type-awareness on unchanged source, not check loss.
+- [Phase 1] Pre-existing, NOT regressions: 2 Vitest failures in `src/electron/cloud/syncManager.test.ts`, and 40 Prettier-unformatted files (20 of them `.svelte`). Both are recorded in `baseline/` and are the numbers 01-04 must not exceed — 01-03 held both at exact parity (40 files, identical set).
 - [Phase 2] `@theme inline` may still emit a `:root` block; confirm in the built CSS what lands on `:root` and that it changes nothing in an output window. This is the single most important item to verify before Phase 4.
 - [Phase 2] Tailwind's native engine (`@tailwindcss/oxide`) vs. `npm ci`, CI matrices and emulated cross-builds — keep it in devDependencies, pin the lockfile, assert a known class exists in the built CSS.
 - [Phase 4] Icon-system fork unresolved: Lucide inside `components/ui/**` only (recommended, with a mapping table) vs. mapping primitives onto `Icon.svelte`. Decide in Phase 4.
 - [Phase 4] Security items carried from research: sanitizer at the DS boundary for any HTML-rendering primitive, theme colour-value validation before `setProperty`, never mount the DS into `contextIsolation: false` windows.
 - [Phase 1 / 01-05] **The Linux electron window is created at the configured bounds**, so `playwright.yml`'s `xvfb-run --server-args="-screen 0 1280x960x24"` will clamp a 1920x1080 output window and the capture will not be 1920x1080 (`enableLargerThanScreen` is macOS-only). Plan 01-05 must widen it to `-screen 0 1920x1080x24`, add the `update_snapshots` `workflow_dispatch` input, and commit `-linux.png`/`-win32.png` baselines. Until a platform's baseline is committed its pixel comparison skips by design.
-- [Phase 1] Pre-existing, NOT regressions: 2 Vitest failures in `src/electron/cloud/syncManager.test.ts`, and 40 Prettier-unformatted files (20 of them `.svelte`). Both are recorded in `baseline/` and are the numbers 01-04 must not exceed.
-- [Phase 1] `npx playwright test` requires `npm run build` first (the harness boots the production `public/index.html`), and `node scripts/cleanBuilds.js` must restore the dev tags afterwards or `npm start` will load a deleted bundle.
-- [Phase 1 / 01-03] The Svelte lint job is now flat-config (`ESLINT_USE_FLAT_CONFIG=true` on ESLint 8.57.1, a deliberate bridge — eslintrc is removed in ESLint 10 and ESLint 9 is EOL). Two follow-ups: (a) `config/linting/eslint.svelte.flat.mjs` imports `svelte.config.mjs`, so 01-03 must keep that file importable from ESM; (b) the full flat migration of the two eslintrc jobs is deferred work — it forces `eslint-plugin-jsdoc@39` and `eslint-plugin-prefer-arrow@1.2.3` bumps.
-- [Phase 1 / 01-04] Post-upgrade comparisons must use the baseline's convention (`--format json`, **no** `--fix`) and must be read against 01-02's per-rule classification, not only the pre-plan baseline: electron/frontend totals intentionally rise under typescript-eslint v8's larger presets, and `restrict-plus-operands` fell to 0 in electron because v8 made that rule's default options permissive.
+- [Phase 1 / 01-05] New bundle numbers to track: `bundle.js` **3,930,087 B** minified, `bundle.css` **257,310 B**. Vite 8's default minifier changed; the current gate only proves "minified at all" (source banner absent). A real size budget is P2's job.
 - [Phase 1] One post-change Vitest full run flaked `src/electron/data/zip.test.ts` ("a file disappears while zipping", a filesystem race) under machine load; it passes 5/5 in isolation and the repeat full run matched the baseline (179 passed / 2 failed). Not a regression — do not re-baseline for it.
 
 ## Session Continuity
 
-Last session: 2026-10-18 00:10 UTC
-Stopped at: Completed 01-02 — build contracts hardened (`cssFileName` + `names`-aware hook), `scripts/assertBuildOutput.js` in the `postbuild` chain, `terser` declared, Svelte lint job on `eslint-plugin-svelte@3` flat config with `svelte/valid-compile` proven firing; pixel gate still 2/2 green; all 464 `.svelte` byte-identical
-Resume file: .planning/phases/01-toolchain-gate/01-03-PLAN.md (wave 3 — the version bumps: Svelte 5.57.2 legacy mode, Vite 8 + plugin 7, TypeScript 5.9.3, svelte-check 4, Vitest 4)
-Next action: execute 01-03 (bump the framework/bundler/checking stack; switch the `a11y-` prefix to `a11y_` in both Vite configs; the 8 `verbatimModuleSyntax` type-import fixes; then re-run `npm run build`, the pixel gate and the four lint jobs and compare against `baseline/` + 01-02's classification)
+Last session: 2026-10-18 01:22 UTC
+Stopped at: Completed 01-03 — the toolchain swap. Svelte 5.57.2 legacy mode + Vite 8.0.16 (Rolldown) + TypeScript 5.9.3 + svelte-check 4.7.7 + Vitest 4.1.12; six `mount()` sites, `componentApi` nowhere, 546/547 components byte-identical plus one authorized 3-line rename; build exit 0, `bundle.js` minified, pixel gate 2/2 at `maxDiffPixels: 0`, `npm start` ready in 412 ms
+Resume file: .planning/phases/01-toolchain-gate/01-03-SUMMARY.md
+Next action: execute 01-04 (post-upgrade parity judgment — decide the 165 `element_invalid_self_closing_tag` warnings, attribute the svelte-check 144/291 vs 338/47 and −71 FILES movement, confirm `lint:svelte` 185 vs 172 is TS-5.9 type-awareness, and assert the two pre-existing Vitest failures are still the only ones), then 01-05 (packaged cross-OS smoke + the Linux xvfb screen-size widening)
