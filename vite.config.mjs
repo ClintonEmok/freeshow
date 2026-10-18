@@ -2,8 +2,15 @@ import { defineConfig } from "vite"
 import { svelte, vitePreprocess } from "@sveltejs/vite-plugin-svelte"
 
 const production = process.env.NODE_ENV === "production"
+const importMetaUrlName = "__freeshow_import_meta_url__"
+
+function importMetaUrlIntro(bundlePath) {
+    return `var ${importMetaUrlName} = typeof document !== "undefined" ? (document.currentScript && document.currentScript.src || new URL(${JSON.stringify(bundlePath)}, document.baseURI).href) : undefined;`
+}
 
 export default defineConfig({
+    // Vite 8/Rolldown no longer polyfills import.meta.url in IIFE output; keep dev's native URL untouched.
+    ...(production && { define: { "import.meta.url": importMetaUrlName } }),
     plugins: [
         svelte({
             preprocess: vitePreprocess(),
@@ -41,7 +48,9 @@ export default defineConfig({
                               return "bundle.css"
                           }
                           return name
-                      }
+                      },
+                      // Module scripts have no document.currentScript; resolve the emitted bundle from index.html.
+                      intro: importMetaUrlIntro("./build/bundle.js")
                   }
               }
           }

@@ -77,7 +77,9 @@ async function launchApp(): Promise<AppContext> {
     const tmpSettingFolder = tmp.dirSync({ unsafeCleanup: true })
     const electronApp = await electron.launch({
         // --no-sandbox is required for Electron to launch reliably on Linux CI.
-        args: [".", "--no-sandbox"],
+        // Electron inherits the host's Retina backing scale otherwise (2 device pixels per CSS pixel).
+        // Playwright's `scale: "css"` cannot infer Electron's native window scale from its browser context.
+        args: [".", "--no-sandbox", "--force-device-scale-factor=1"],
         env: { ...process.env, NODE_ENV: "production", FS_MOCK_STORE_PATH: tmpSettingFolder.name }
     })
 
@@ -397,7 +399,7 @@ test("projector output frame is pixel-identical to the committed pre-upgrade bas
             animations: "disabled",
             caret: "hide",
             maxDiffPixels: 0,
-            // scale: "css" keeps a Retina display from producing a 3840x2160 machine-specific baseline.
+            // Keep the emitted PNG at CSS-pixel dimensions even if Playwright's capture context changes.
             scale: "css",
             timeout: 30_000
         })

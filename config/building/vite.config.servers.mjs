@@ -11,6 +11,12 @@ export const servers = {
     output_stream: { typescript: true }
 }
 
+const importMetaUrlName = "__freeshow_import_meta_url__"
+
+function importMetaUrlIntro() {
+    return `var ${importMetaUrlName} = typeof document !== "undefined" ? (document.currentScript && document.currentScript.src || new URL("client.js", document.baseURI).href) : undefined;`
+}
+
 // Copy static files for the server
 function copyServerFiles(id) {
     const root = process.cwd()
@@ -68,6 +74,8 @@ export function getServerViteConfig(serverId, production = process.env.NODE_ENV 
     const root = process.cwd()
 
     return {
+        // Vite 8/Rolldown no longer polyfills import.meta.url in IIFE output; keep dev's native URL untouched.
+        ...(production && { define: { "import.meta.url": importMetaUrlName } }),
         plugins: [
             svelte({
                 preprocess: vitePreprocess(),
@@ -105,7 +113,9 @@ export function getServerViteConfig(serverId, production = process.env.NODE_ENV 
                             return "styles.css"
                         }
                         return name
-                    }
+                    },
+                    // Server index.html loads client.js as a classic script, so currentScript is the bundle URL.
+                    intro: importMetaUrlIntro()
                 }
             },
             minify: production ? "terser" : false,
