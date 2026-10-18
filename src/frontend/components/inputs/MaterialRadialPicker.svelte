@@ -151,7 +151,7 @@
 
 <!-- Number input styled like your original -->
 <div class="textfield numberfield {disabled ? 'disabled' : ''}" tabindex="-1" on:focusout={handleFocusOut}>
-    <div class="background" />
+    <div class="background" ></div>
 
     <div class="input-wrapper">
         <input bind:value={numberValue} type="number" {id} {placeholder} {disabled} {autofocus} {step} min="0" max="360" class="input edit" class:noValue={!numberValue} on:keydown={handleKeyDown} on:input={handleInput} on:focus={togglePopup} on:wheel={handleWheel} />
@@ -179,7 +179,7 @@
 
     <label for={id} class:value-filled={numberValue !== 0}>{translateText(label)}</label>
 
-    <span class="underline" />
+    <span class="underline" ></span>
 
     <!-- Radial Popup -->
     {#if showPopup}
