@@ -536,13 +536,13 @@
                         <T id="media.folder_type" />
                     </MaterialButton>
 
-                    <div class="group-spacer" />
+                    <div class="group-spacer" ></div>
 
                     <MaterialButton variant="outlined" icon="templates" title="actions.project_template" on:click={createProjectTemplate} white>
                         <T id="actions.project_template" />
                     </MaterialButton>
 
-                    <div class="group-spacer" />
+                    <div class="group-spacer" ></div>
 
                     <MaterialButton variant="outlined" icon="import" title="actions.import: formats.project" on:click={importProject} white>
                         <T id="actions.import" />
@@ -553,7 +553,7 @@
                     </MaterialButton>
 
                     {#if $providerConnections.planningcenter}
-                        <div class="group-spacer" />
+                        <div class="group-spacer" ></div>
                         <MaterialButton variant="outlined" icon="list" title="Planning Center" on:click={openPcoPicker} white>Planning Center</MaterialButton>
                     {/if}
                 </div>
