@@ -80,7 +80,7 @@ export class ContentProviderRegistry {
         }
 
         try {
-            const result = await provider.connect(scope as any)
+            const result = await provider.connect(scope)
             return !!result
         } catch (error) {
             console.error(`Failed to connect to ${providerId}:`, error)
@@ -101,7 +101,7 @@ export class ContentProviderRegistry {
         }
 
         try {
-            provider.disconnect(scope as any)
+            provider.disconnect(scope)
         } catch (error) {
             console.error(`Failed to disconnect from ${providerId}:`, error)
         }
@@ -154,7 +154,7 @@ export class ContentProviderRegistry {
         }
 
         try {
-            await provider.startupLoad(scope as any, data)
+            await provider.startupLoad(scope, data)
         } catch (error) {
             console.error(`Failed to perform startup load for ${providerId}:`, error)
         }

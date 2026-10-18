@@ -307,7 +307,7 @@ function silentSwitch(teamId: string, scope: OnStageScopes): Promise<boolean> {
             if (!access) return resolve(false)
             onStageApiRequest("/integrations/v1/switch-team", "POST", { Authorization: `Bearer ${access.access_token}` }, { teamId }, (err, data: OnStageAuthData) => {
                 if (err || !data?.access_token) return resolve(false)
-                saveTokens(scope, { ...data, scope } as NonNullable<OnStageAuthData>)
+                saveTokens(scope, { ...data, scope })
                 resolve(true)
             })
         })

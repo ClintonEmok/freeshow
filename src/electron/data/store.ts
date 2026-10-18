@@ -219,7 +219,7 @@ export function getStore<T extends keyof typeof storeFilesData | "config">(id: T
     }
 
     try {
-        return _store[storeId]!.store
+        return _store[storeId].store
     } catch (err) {
         console.error(`Could not get store data for ${id}:`, err)
         return storeFilesData[storeId].defaults

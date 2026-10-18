@@ -341,7 +341,7 @@ export class CanvaContentLibrary {
                         type: "image" as const,
                         name: item.image.name || "Canva Image",
                         mediaId: item.image.id
-                    } as ContentFile
+                    }
                 }
 
                 // Designs (including presentations)
@@ -410,7 +410,7 @@ export class CanvaContentLibrary {
                     type: "image" as const,
                     name: `Slide ${item.index ?? pageIndex}`,
                     mediaId: item.index?.toString() || pageIndex.toString()
-                } as ContentFile
+                }
             })
             .filter((file): file is ContentFile => !!file)
 

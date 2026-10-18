@@ -131,7 +131,7 @@ export async function decompressZipStream(file: string, asBuffer = false, option
             resolve(data)
         }
 
-        yauzl.open(file, { lazyEntries: true, decodeStrings: false } as any, (err, zipfile) => {
+        yauzl.open(file, { lazyEntries: true, decodeStrings: false }, (err, zipfile) => {
             if (err) {
                 rejectOnce(err)
                 return
@@ -271,7 +271,7 @@ function bufferInMemory(readStream: NodeJS.ReadableStream, name: string, extensi
 
 export function getZipModifiedDates(filePath: string): Promise<{ [key: string]: Date }> {
     return new Promise((resolve) => {
-        yauzl.open(filePath, { lazyEntries: true, decodeStrings: false } as any, (err, zipfile) => {
+        yauzl.open(filePath, { lazyEntries: true, decodeStrings: false }, (err, zipfile) => {
             if (err || !zipfile) return resolve({})
 
             const modified: { [key: string]: Date } = {}

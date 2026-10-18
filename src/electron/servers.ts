@@ -121,13 +121,13 @@ export function startServers({ ports, max, disabled, data }: MainSendPayloads[Ma
         // recreate a fresh, listenable instance (the previous http.Server may have been closed)
         createServerInstance(id)
 
-        servers[id]!.max = max
-        if (ports[id.toLowerCase()]) servers[id]!.port = ports[id.toLowerCase()]
+        servers[id].max = max
+        if (ports[id.toLowerCase()]) servers[id].port = ports[id.toLowerCase()]
 
-        servers[id]!.data = data[id.toLowerCase()] || {}
+        servers[id].data = data[id.toLowerCase()] || {}
 
-        servers[id]!.server.listen(servers[id]!.port, onStarted)
-        servers[id]!.server.once("error", (err: Error) => {
+        servers[id].server.listen(servers[id].port, onStarted)
+        servers[id].server.once("error", (err: Error) => {
             if ((err as any).code === "EADDRINUSE") {
                 servers[id]!.server.close()
                 console.error(`${id} server port ${servers[id]!.port} already in use`)
@@ -160,9 +160,9 @@ export function closeServers() {
     serverList.forEach((id: ServerName) => {
         if (!servers[id]?.server) return
         // close socket.io (disconnects clients and closes the underlying http server)
-        servers[id]!.io.close()
+        servers[id].io.close()
         // clear connection state so reconnect counts / max limit don't drift across restarts
-        servers[id]!.connections = {}
+        servers[id].connections = {}
     })
 }
 
