@@ -846,3 +846,17 @@ The current-only awaits in `src/electron/cloud/drive.ts:209:9`, `src/electron/da
 | Development HTML restoration / cleanliness | `/src/frontend/main.ts` dev module literal present; `git status --porcelain public/index.html` empty | Independently checked after cleanup; captured in `phase1-01-04-final/task3-final-verification.txt` |
 
 Task 3 source authorization and output-pixel/cleanup gates pass. Plan 01-04 as a whole remains **BLOCKED**: the fresh production build has zero target warnings, but pinned svelte-check still reports three target warnings (`EffectsInfo.svelte:4:1`, `OverlayInfo.svelte:14:5`, `output/preview/PreviewCanvas.svelte:85:5`); Electron/frontend `await-thenable` remain 6/3 and 1/0 versus their individual baselines; and Prettier has 120 unformatted files versus the 40-file baseline (80 new remediation paths). These findings are preserved without suppression, source changes beyond the recorded authorization, or formatter writes. The build assertion, Stylelint, Vitest baseline, and pixel comparisons pass their recorded criteria; the specific unresolved deltas prevent gate acceptance.
+
+## Plan 01-10 — Post-remediation residual source work
+
+### Task 1 — Fresh checker-only tag reconciliation
+
+Before editing, the fresh pinned command `npx svelte-check --tsconfig config/typescript/tsconfig.svelte.json --output machine` exited 1 for the existing checker errors and reported exactly three `element_invalid_self_closing_tag` records. The full output, independent exit status, and parsed target records are retained as `phase1-01-10/svelte-check-pre-tags.raw`, `.exit`, and `-targets.txt` under `/private/var/folders/ht/_t09b17d0p11tcppmbhzsry40000gn/T/opencode/`. The three records and only checker-only target sites were:
+
+| Pre-edit checker diagnostic | Tag | Exact source hunk |
+|---|---|---|
+| `src/frontend/components/drawer/info/EffectsInfo.svelte:4:1` | `<div>` | Line 4: `<div class="scroll" />` → `<div class="scroll" ></div>` |
+| `src/frontend/components/drawer/info/OverlayInfo.svelte:14:5` | `<div>` | Line 14: `<div class="scroll" />` → `<div class="scroll" ></div>` |
+| `src/frontend/components/output/preview/PreviewCanvas.svelte:85:5` | `<canvas>` | Line 85: `<canvas … bind:this={canvas} />` → `<canvas … bind:this={canvas} ></canvas>` |
+
+The fresh inventory had no target record at the stale `OverlayInfo.svelte:54` site. No attributes, values, or surrounding markup changed. The post-edit pinned checker again exited 1 for existing non-target errors and reported **zero** `element_invalid_self_closing_tag` records; complete output and independent status are `phase1-01-10/svelte-check-post-tags.raw` and `.exit`. `git diff --check 88902f7b6b68de6885aa031a9b12873643d6f956 -- [the three paths]` exited 0. This is additive evidence only; the historical 01-04 table and blocked result above are unchanged.
