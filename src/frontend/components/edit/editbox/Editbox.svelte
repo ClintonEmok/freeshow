@@ -272,7 +272,7 @@
     <EditboxCropping bind:this={cropElem} {item} {index} {ref} {itemElem} {plain} {isLocked} selected={$activeEdit.items.includes(index)} bind:cropActive bind:cropPreview />
 
     {#if shapeGuideStyle && !plain}
-        <div class="shapeOutsideGuide" style={shapeGuideStyle} />
+        <div class="shapeOutsideGuide" style={shapeGuideStyle} ></div>
     {/if}
 
     {#if mediaShouldBeBackground}

@@ -51,7 +51,7 @@
         {/if}
 
         {#if controllerUrl}
-            <div style="flex: 1;" />
+            <div style="flex: 1;" ></div>
             <div style="padding: 4px 2px;text-align: center;margin-top: 10px;max-width: 100%;display: flex;justify-content: center;align-items: center;font-size: 0.7em;opacity: 0.8;">
                 <Link url={controllerUrl}>
                     <span style="text-overflow: ellipsis;overflow: hidden;white-space: nowrap;">{controllerUrl.replace("https://", "").replace(/id=[^&]+/g, "id=...")}</span>

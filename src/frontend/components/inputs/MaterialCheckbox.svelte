@@ -34,8 +34,8 @@
 </script>
 
 <div style={$$props.style || null} class="checkboxfield {center ? 'centered' : ''} {disabled ? 'disabled' : ''}" class:small data-title={translateText(title || label)} role="checkbox" aria-checked={checkedValue} tabindex={disabled ? undefined : 0} on:click={toggle} on:keydown={onKeyDown}>
-    <div class="background" />
-    <div class="hover" />
+    <div class="background" ></div>
+    <div class="hover" ></div>
 
     <input type="checkbox" bind:checked={checkedValue} {id} {disabled} class="hidden-input" tabindex="-1" aria-hidden="true" />
 
@@ -61,7 +61,7 @@
         {/if}
     </label>
 
-    <span class="underline" />
+    <span class="underline" ></span>
 </div>
 
 <style>

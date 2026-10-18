@@ -122,7 +122,7 @@
                     {#if group.label}
                         <div class="group-label"><T id={group.label} /></div>
                     {:else if i > 0}
-                        <div class="group-spacer" />
+                        <div class="group-spacer" ></div>
                     {/if}
 
                     {#each group.items as item, j}
