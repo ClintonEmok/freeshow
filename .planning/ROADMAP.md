@@ -215,7 +215,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Toolchain Gate | 5/9 | In progress | - |
+| 1. Toolchain Gate | 6/9 | In progress | - |
 | 2. Design-Token Foundation | 0/4 | Not started | - |
 | 3. Settings IA & Flows | 0/3 | Not started | - |
 | 4. Primitive Layer | 0/4 | Not started | - |
