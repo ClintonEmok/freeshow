@@ -11,8 +11,8 @@ export default defineConfig({
                 dev: !production
             },
             onwarn: (warning, handler) => {
-                // disable A11y warnings
-                if (warning.code.startsWith("a11y-")) return
+                // disable A11y warnings (Svelte 5 renamed the warning codes from kebab-case to snake_case)
+                if (warning.code.startsWith("a11y_")) return
                 handler(warning)
             }
         })

@@ -2,7 +2,7 @@
 // Svelte app entry point
 
 import * as Sentry from "@sentry/electron/renderer"
-import "svelte"
+import { mount } from "svelte"
 import App from "./App.svelte"
 import { ERROR_FILTER } from "./utils/common"
 
@@ -20,6 +20,6 @@ if (import.meta.env.PROD) {
     })
 }
 
-const app = new App({ target: document.body })
+const app = mount(App, { target: document.body })
 
 export default app
