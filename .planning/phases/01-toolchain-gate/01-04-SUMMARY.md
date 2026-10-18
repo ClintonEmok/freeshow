@@ -79,6 +79,8 @@ Each planned task was committed atomically:
 2. **Task 2: Measure checks against recorded baselines** — `6b28d122` (`docs(01-04): measure post-upgrade check parity`)
 3. **Task 3: Classify deltas and hold the line** — `5773d1bc` (`fix(01-04): preserve typed lint coverage and baseline rule behavior`)
 
+**Post-blocker compatibility correction:** `949a2f46` (`fix(01-04): restore caught-error lint parity`).
+
 **Plan metadata:** recorded in the final documentation commit.
 
 ## Files Created/Modified
