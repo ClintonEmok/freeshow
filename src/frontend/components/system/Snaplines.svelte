@@ -126,7 +126,7 @@
     <div
         class="line {line[0]}"
         style="{isX ? `left: ${line[1]}px; width: ${thickness}px; height: 100%;` : `top: ${line[1]}px; height: ${thickness}px; width: 100%;`}transform: translate{isX ? 'X' : 'Y'}(-50%);"
-    />
+    ></div>
 {/each}
 
 <style>

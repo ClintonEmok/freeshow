@@ -17,7 +17,7 @@
 <div class="main" class:active style="width: {100 / columns}%" class:list role="none" on:click>
     <div class="slide" class:disabled={layout?.disabled} style={layout?.settings?.color ? `background-color: ${layout.settings.color};` : ""}>
         <div style="width: 100%;">
-            <div class="preview" style="aspect-ratio: {resolution.width} / {resolution.height}; background-color: {layout?.items?.length ? 'black' : 'transparent'};" />
+            <div class="preview" style="aspect-ratio: {resolution.width} / {resolution.height}; background-color: {layout?.items?.length ? 'black' : 'transparent'};" ></div>
             <div class="label" style="position: relative;" data-title={layout?.name}>
                 {#if layout?.password}
                     <span style="position: absolute;left: 5px;" data-title={translateText("remote.password")}>

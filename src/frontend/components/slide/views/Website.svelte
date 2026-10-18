@@ -101,7 +101,7 @@
                     checkNavigation()
                 }
             }}
-        />
+        ></div>
     </div>
 {/if}
 
