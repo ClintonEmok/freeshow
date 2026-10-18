@@ -702,3 +702,147 @@ This is a baseline-gate failure. These exact remediation-path formatting deltas 
 The exact 01-03-tip-to-current audit identifies 30 changed `.ts` files. Repository-wide search of `src/**/*.test.ts` / `*.integration.test.ts` found focused tests for three changed modules: `src/electron/data/zip.ts` → `src/electron/data/zip.test.ts` (run: `npx vitest run --config config/testing/vitest.config.ts src/electron/data/zip.test.ts`, exit 0, 5/5 passed); `src/electron/data/store.ts` → `src/electron/cloud/syncManager.test.ts` (run: `npx vitest run --config config/testing/vitest.config.ts src/electron/cloud/syncManager.test.ts`, exit 1, 28 passed / same 2 baseline failures); and `src/frontend/components/helpers/array.ts` → nearest `src/frontend/utils/search.test.ts` (run: `npx vitest run --config config/testing/vitest.config.ts src/frontend/utils/search.test.ts`, exit 0, 39/39 passed; this test mocks the helper module rather than directly exercising its assertion site). Independent raw stdout/stderr and statuses are `focused-zip.*`, `focused-syncManager.*`, and `focused-search.*` in the evidence directory.
 
 Explicit absence evidence: no focused test/importing test was found for the remaining 27 changed TypeScript files: `src/electron/contentProviders/ContentProviderRegistry.ts`, `src/electron/contentProviders/canva/CanvaContentLibrary.ts`, `src/electron/contentProviders/onStage/connect.ts`, `src/electron/servers.ts`, `src/frontend/components/actions/apiHelper.ts`, `src/frontend/components/context/contextMenuSearch.ts`, `src/frontend/components/context/loadItems.ts`, `src/frontend/components/context/menuClick.ts`, `src/frontend/components/drawer/bible/scripture.ts`, `src/frontend/components/edit/scripts/chords.ts`, `src/frontend/components/edit/scripts/itemHelpers.ts`, `src/frontend/components/export/projectLink.ts`, `src/frontend/components/helpers/clipboard.ts`, `src/frontend/components/helpers/dropActions.ts`, `src/frontend/components/helpers/history.ts`, `src/frontend/components/helpers/output.ts`, `src/frontend/components/helpers/shows.ts`, `src/frontend/components/main/popups/localization/translation.ts`, `src/frontend/components/quicksearch/quicksearch.ts`, `src/frontend/components/show/formatTextEditor.ts`, `src/frontend/components/slide/views/websiteDomPool.ts`, `src/frontend/components/stage/stage.ts`, `src/frontend/components/timeline/TimelineActions.ts`, `src/frontend/converters/powerpoint/PowerPointHelper.ts`, `src/frontend/converters/songbeamer.ts`, `src/frontend/show/slides.ts`, and `src/frontend/utils/drive.ts`. Full Vitest remains the available suite-level evidence for these files; no test was created or changed.
+
+### Task 3 — source-hunk authorization and Darwin output-render gate
+
+#### Exact source-hunk audit
+
+Comparison revision: `88902f7b6b68de6885aa031a9b12873643d6f956` (the exact 01-03/01-04 plan-start tip). The audited input was `git diff --unified=0 88902f7b6b68de6885aa031a9b12873643d6f956..HEAD`; its complete captured diff is `phase1-01-04-final/source-diff-unified0.raw` outside the repository. This replaces the historical 46-path assertion above; no path-count-only acceptance was used.
+
+The read-only audit parsed the old/new source lines and compared each production diagnostic coordinate against the source at the comparison revision. Results: **161** production-inventoried compiler sites across **84** Svelte paths and **161** exact tag-close source changes across those same 84 paths; Git groups these into 142 unified-diff hunk ranges. Every old diagnostic coordinate/tag matched the original source, and each changed line is exactly the single-token transformation `/>` → `></tag>`; there were zero extra/missing paths, tags, sites, or other Svelte text changes. The table maps every pre-fix production diagnostic to its physical changed hunk line. The five multi-line opening-tag cases whose changed `/>` line differs from the diagnostic line are separately mapped in the 01-07/01-09 summaries and shown explicitly below.
+
+| Application-source file | Pre-fix production diagnostic(s) | Exact changed hunk line(s) and tag |
+|---|---|---|
+| `src/frontend/ai/components/floating/AiTranscription.svelte` | 94:20 `<div>` | 94 `<div>` |
+| `src/frontend/components/draw/Draw.svelte` | 27:8 `<div>`, 29:8 `<div>` | 27 `<div>`, 29 `<div>` |
+| `src/frontend/components/draw/DrawSettings.svelte` | 129:8 `<div>` | 129 `<div>` |
+| `src/frontend/components/draw/Fill.svelte` | 28:0 `<div>` | 28 `<div>` |
+| `src/frontend/components/draw/Paint.svelte` | 146:0 `<canvas>` | 146 `<canvas>` |
+| `src/frontend/components/draw/Particles.svelte` | 31:4 `<div>` | 31 `<div>` |
+| `src/frontend/components/drawer/Card.svelte` | 37:12 `<div>`, 39:12 `<div>` | 37 `<div>`, 39 `<div>` |
+| `src/frontend/components/drawer/audio/Audio.svelte` | 416:8 `<div>`, 449:8 `<div>` | 416 `<div>`, 449 `<div>` |
+| `src/frontend/components/drawer/audio/AudioMeter.svelte` | 174:20 `<div>`, 175:20 `<span>`, 176:20 `<div>`, 180:20 `<span>` | 174 `<div>`, 175 `<span>`, 176 `<div>`, 180 `<span>` |
+| `src/frontend/components/drawer/audio/effects/AudioCompressor.svelte` | 162:12 `<div>`, 168:4 `<div>` | 162 `<div>`, 168 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioDelay.svelte` | 99:4 `<div>` | 99 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioFilter.svelte` | 152:4 `<div>` | 152 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioLimiter.svelte` | 134:12 `<div>`, 140:4 `<div>` | 134 `<div>`, 140 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioNoiseGate.svelte` | 108:4 `<div>` | 108 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioReverb.svelte` | 101:4 `<div>` | 101 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioStereoShaper.svelte` | 105:4 `<div>` | 105 `<div>` |
+| `src/frontend/components/drawer/bible/Scripture.svelte` | 1284:8 `<div>`, 1291:12 `<div>` | 1284 `<div>`, 1291 `<div>` |
+| `src/frontend/components/drawer/calendar/Calendar.svelte` | 239:36 `<span>` | 239 `<span>` |
+| `src/frontend/components/drawer/calendar/CalendarsManagement.svelte` | 42:24 `<span>` | 42 `<span>` |
+| `src/frontend/components/drawer/live/BMDStream.svelte` | 73:4 `<canvas>`, 77:12 `<canvas>` | 73 `<canvas>`, 77 `<canvas>` |
+| `src/frontend/components/drawer/live/Capture.svelte` | 89:12 `<canvas>` | 89 `<canvas>` |
+| `src/frontend/components/drawer/live/Mic.svelte` | 105:20 `<div>`, 106:20 `<span>` | 105 `<div>`, 106 `<span>` |
+| `src/frontend/components/drawer/live/NDIStream.svelte` | 53:4 `<canvas>`, 58:12 `<canvas>` | 53 `<canvas>`, 58 `<canvas>` |
+| `src/frontend/components/drawer/live/OMTStream.svelte` | 53:4 `<canvas>`, 57:12 `<canvas>` | 53 `<canvas>`, 57 `<canvas>` |
+| `src/frontend/components/drawer/media/Media.svelte` | 584:20 `<div>` | 584 `<div>` |
+| `src/frontend/components/drawer/pages/Interactions.svelte` | 422:24 `<div>` | 422 `<div>` |
+| `src/frontend/components/drawer/pages/InteractionsInfo.svelte` | 54:12 `<div>` | 54 `<div>` |
+| `src/frontend/components/drawer/player/Vimeo.svelte` | 178:8 `<iframe>` | 178 `<iframe>` |
+| `src/frontend/components/edit/ItemAddMenu.svelte` | 125:24 `<div>` | 125 `<div>` |
+| `src/frontend/components/edit/editbox/Editbox.svelte` | 275:8 `<div>` | 275 `<div>` |
+| `src/frontend/components/edit/editbox/EditboxCropping.svelte` | 214:4, 215:4, 216:4, 217:4, 219:4, 220:4, 221:4, 222:4, 224:4, 225:4, 226:4, 227:4 `<div>` | 214 `<div>`, 215 `<div>`, 216 `<div>`, 217 `<div>`, 219 `<div>`, 220 `<div>`, 221 `<div>`, 222 `<div>`, 224 `<div>`, 225 `<div>`, 226 `<div>`, 227 `<div>` |
+| `src/frontend/components/edit/editbox/EditboxLines.svelte` | 757:12 `<div>` | 779 `<div>` (multi-line opening tag) |
+| `src/frontend/components/edit/editors/AudioEditor.svelte` | 47:4 `<div>`, 48:4 `<div>` | 47 `<div>`, 48 `<div>` |
+| `src/frontend/components/edit/editors/MediaEditor.svelte` | 71:12 `<div>`, 75:12 `<div>` | 71 `<div>`, 75 `<div>` |
+| `src/frontend/components/inputs/MaterialButton.svelte` | 121:8 `<span>` | 121 `<span>` |
+| `src/frontend/components/inputs/MaterialCheckbox.svelte` | 37:4 `<div>`, 38:4 `<div>`, 64:4 `<span>` | 37 `<div>`, 38 `<div>`, 64 `<span>` |
+| `src/frontend/components/inputs/MaterialColorInput.svelte` | 206:8 `<div>`, 213:8 `<span>` | 206 `<div>`, 213 `<span>` |
+| `src/frontend/components/inputs/MaterialDropdown.svelte` | 282:4 `<div>`, 314:4 `<span>` | 282 `<div>`, 314 `<span>` |
+| `src/frontend/components/inputs/MaterialFilePicker.svelte` | 59:4 `<div>`, 101:4 `<span>` | 59 `<div>`, 101 `<span>` |
+| `src/frontend/components/inputs/MaterialFolderPicker.svelte` | 53:4 `<div>`, 75:4 `<span>` | 53 `<div>`, 75 `<span>` |
+| `src/frontend/components/inputs/MaterialNumberInput.svelte` | 155:4 `<div>`, 176:4 `<span>` | 155 `<div>`, 176 `<span>` |
+| `src/frontend/components/inputs/MaterialPopupButton.svelte` | 66:4 `<div>`, 111:4 `<span>` | 66 `<div>`, 111 `<span>` |
+| `src/frontend/components/inputs/MaterialRadialPicker.svelte` | 154:4 `<div>`, 182:4 `<span>` | 154 `<div>`, 182 `<span>` |
+| `src/frontend/components/inputs/MaterialTextInput.svelte` | 80:4 `<div>`, 90:4 `<span>` | 80 `<div>`, 90 `<span>` |
+| `src/frontend/components/inputs/MaterialTextarea.svelte` | 36:4 `<div>`, 37:4 `<textarea>`, 39:4 `<span>` | 36 `<div>`, 37 `<textarea>`, 39 `<span>` |
+| `src/frontend/components/inputs/MaterialTimePicker.svelte` | 62:4 `<div>`, 72:4 `<span>` | 62 `<div>`, 72 `<span>` |
+| `src/frontend/components/inputs/MaterialToggleSwitch.svelte` | 38:4 `<div>`, 39:4 `<div>`, 57:8 `<div>`, 60:4 `<span>` | 38 `<div>`, 39 `<div>`, 57 `<div>`, 60 `<span>` |
+| `src/frontend/components/main/Loader.svelte` | 5:0 `<div>` | 5 `<div>` |
+| `src/frontend/components/main/ProgressPanel.svelte` | 87:28 `<div>`, 109:28 `<div>` | 87 `<div>`, 109 `<div>` |
+| `src/frontend/components/main/Top.svelte` | 100:12 `<div>`, 155:12 `<div>` | 100 `<div>`, 155 `<div>` |
+| `src/frontend/components/main/popups/ChooseMediaInput.svelte` | 71:12 `<div>` | 71 `<div>` |
+| `src/frontend/components/main/popups/ManageFonts.svelte` | 164:22 `<div>` | 164 `<div>` |
+| `src/frontend/components/media/Video.svelte` | 233:8 `<video>`, 241:8 `<video>` | 233 `<video>`, 241 `<video>` |
+| `src/frontend/components/output/layers/BackgroundMedia.svelte` | 55:74 `<div>` | 55 `<div>` |
+| `src/frontend/components/output/layers/PdfOutput.svelte` | 80:8 `<canvas>` | 80 `<canvas>` |
+| `src/frontend/components/output/tools/MediaControls.svelte` | 119:16 `<div>`, 123:16 `<div>`, 142:16 `<div>` | 119 `<div>`, 123 `<div>`, 142 `<div>` |
+| `src/frontend/components/show/AudioPreview.svelte` | 166:4 `<canvas>` | 166 `<canvas>` |
+| `src/frontend/components/show/ProjectContentList.svelte` | 477:12 `<div>`, 494:12 `<div>` | 477 `<div>`, 494 `<div>` |
+| `src/frontend/components/show/Projects.svelte` | 539:20 `<div>`, 545:20 `<div>`, 556:24 `<div>` | 539 `<div>`, 545 `<div>`, 556 `<div>` |
+| `src/frontend/components/show/VideoShow.svelte` | 371:20 `<video>`, 382:20 `<video>`, 421:16 `<div>`, 459:16 `<div>` | 371 `<video>`, 382 `<video>`, 421 `<div>`, 459 `<div>` |
+| `src/frontend/components/show/pdf/PdfPreview.svelte` | 210:16 `<canvas>` | 210 `<canvas>` |
+| `src/frontend/components/show/tools/HighlightedNotes.svelte` | 65:4 `<textarea>` | 65 `<textarea>` |
+| `src/frontend/components/show/tools/Notes.svelte` | 32:4 `<textarea>` | 32 `<textarea>` |
+| `src/frontend/components/show/tools/SlideGroups.svelte` | 132:12 `<div>` | 132 `<div>` |
+| `src/frontend/components/slide/Layouts.svelte` | 144:16 `<div>`, 158:12 `<div>` | 144 `<div>`, 158 `<div>` |
+| `src/frontend/components/slide/Reference.svelte` | 90:8, 99:8, 115:8, 126:8, 136:8 `<div>` | 90 `<div>`, 99 `<div>`, 115 `<div>`, 126 `<div>`, 136 `<div>` |
+| `src/frontend/components/slide/SkeletonSlide.svelte` | 22:12 `<div>`, 33:8 `<div>`, 38:12 `<div>` | 22 `<div>`, 33 `<div>`, 38 `<div>` |
+| `src/frontend/components/slide/Slide.svelte` | 280:8 `<div>`, 289:8 `<div>`, 415:28 `<div>`, 419:20 `<div>`, 425:28 `<div>`, 429:32 `<div>` | 280 `<div>`, 289 `<div>`, 415 `<div>`, 419 `<div>`, 425 `<div>`, 429 `<div>` |
+| `src/frontend/components/slide/views/Captions.svelte` | 85:12 `<webview>` | 85 `<webview>` |
+| `src/frontend/components/slide/views/MediaItem.svelte` | 191:16 `<video>`, 200:16 `<video>` | 191 `<video>`, 200 `<video>` |
+| `src/frontend/components/slide/views/Timer.svelte` | 151:4 `<div>`, 153:4 `<div>` | 151 `<div>`, 153 `<div>` |
+| `src/frontend/components/slide/views/Visualizer.svelte` | 243:0 `<canvas>` | 243 `<canvas>` |
+| `src/frontend/components/slide/views/Website.svelte` | 87:8 `<div>` | 104 `<div>` (multi-line opening tag) |
+| `src/frontend/components/stage/SkeletonStageSlide.svelte` | 20:12 `<div>` | 20 `<div>` |
+| `src/frontend/components/system/Movebox.svelte` | 97:8 `<div>`, 101:12 `<div>` | 97 `<div>`, 101 `<div>` |
+| `src/frontend/components/system/SelectElem.svelte` | 338:16, 342:16, 345:16, 346:16, 349:16 `<span>`, 353:12 `<span>` | 338 `<span>`, 342 `<span>`, 345 `<span>`, 346 `<span>`, 349 `<span>`, 353 `<span>` |
+| `src/frontend/components/system/Snaplines.svelte` | 126:4 `<div>` | 129 `<div>` (multi-line opening tag) |
+| `src/frontend/components/timeline/TimelineEasing.svelte` | 219:24, 222:24, 230:24, 253:24 `<div>` | 219 `<div>`, 222 `<div>`, 250 `<div>` (for 230), 273 `<div>` (for 253) |
+| `src/server/common/components/Checkbox.svelte` | 5:4 `<div>` | 5 `<div>` |
+| `src/server/common/components/Loader.svelte` | 5:0 `<div>` | 5 `<div>` |
+| `src/server/output_stream/App.svelte` | 172:4 `<canvas>` | 172 `<canvas>` |
+| `src/server/remote/components/MaterialButton.svelte` | 112:8 `<span>` | 112 `<span>` |
+| `src/server/stage/components/PreviewCanvas.svelte` | 66:4 `<canvas>` | 66 `<canvas>` |
+| `src/server/stage/components/Timer.svelte` | 74:4 `<div>`, 76:4 `<div>` | 74 `<div>`, 76 `<div>` |
+
+For the 30 changed application `.ts` files, the complete changed-line list and target diagnostic attribution is below. Finding-level behavioral reviews are in the corresponding T1/T2/T3/T4 classification tables in `01-07-SUMMARY.md`, `01-08-SUMMARY.md`, and `01-09-SUMMARY.md`. Each code hunk maps to an individually reviewed current-only `no-unnecessary-type-assertion`; annotation/import lines are direct type-preservation or cleanup dependencies. No `src/**/*.js` path changed.
+
+| Application-source file | Changed hunk line(s) | Reviewed target diagnostic(s) / attribution |
+|---|---|---|
+| `src/electron/contentProviders/ContentProviderRegistry.ts` | 83, 104, 157 | `no-unnecessary-type-assertion` at 83:51, 104:33, 157:40 |
+| `src/electron/contentProviders/canva/CanvaContentLibrary.ts` | 344, 413 | `no-unnecessary-type-assertion` at 337:28 and 406:24; each assertion spans to the hunk line |
+| `src/electron/contentProviders/onStage/connect.ts` | 310 | `no-unnecessary-type-assertion` at 310:35 |
+| `src/electron/data/store.ts` | 222 | `no-unnecessary-type-assertion` at 222:16 |
+| `src/electron/data/zip.ts` | 134, 274 | `no-unnecessary-type-assertion` at 134:26, 274:30 |
+| `src/electron/servers.ts` | 124–125, 127, 129–130, 163, 165 | `no-unnecessary-type-assertion` at 124:9, 125:38, 127:9, 129:9/36, 130:9, 163:9, 165:9 |
+| `src/frontend/components/actions/apiHelper.ts` | 589, 591 | `no-unnecessary-type-assertion` at 591:12; line 589 adds the preserving `Promise<API_id_value>` return annotation |
+| `src/frontend/components/context/contextMenuSearch.ts` | 25 | `no-unnecessary-type-assertion` at 25:23 |
+| `src/frontend/components/context/loadItems.ts` | 245 | `no-unnecessary-type-assertion` at 245:40 |
+| `src/frontend/components/context/menuClick.ts` | 2469 | `no-unnecessary-type-assertion` at 2469:62 |
+| `src/frontend/components/drawer/bible/scripture.ts` | 192, 1416 | `no-unnecessary-type-assertion` at 192:71, 1416:102; current-only `await-thenable` at 160:50 is retained with no hunk |
+| `src/frontend/components/edit/scripts/chords.ts` | 19, 24 | `no-unnecessary-type-assertion` at 18:5 (assertion at line 19), 24:5 |
+| `src/frontend/components/edit/scripts/itemHelpers.ts` | 198 | `no-unnecessary-type-assertion` at 198:21 |
+| `src/frontend/components/export/projectLink.ts` | 7, 107, 136, 143 | `no-unnecessary-type-assertion` at 107:12 and 132:20; line 107 supplies the explicit map element type, line 143 removes the outer assertion, line 136 removes the nested cast, and line 7 removes its now-unused type import |
+| `src/frontend/components/helpers/array.ts` | 90 | `no-unnecessary-type-assertion` at 90:45; only the current-only inner assertion was removed, while the matched outer assertion remains |
+| `src/frontend/components/helpers/clipboard.ts` | 1032, 1034, 1453 | `no-unnecessary-type-assertion` at 1032:17, 1034:22, 1453:90 |
+| `src/frontend/components/helpers/dropActions.ts` | 681 | `no-unnecessary-type-assertion` at 681:70 |
+| `src/frontend/components/helpers/history.ts` | 41, 322, 360 | `no-unnecessary-type-assertion` at 41:47, 322:13, 360:13 |
+| `src/frontend/components/helpers/output.ts` | 2091 | `no-unnecessary-type-assertion` at 2091:18; only the current-only `lines!` was removed, the matched `text!` remains |
+| `src/frontend/components/helpers/shows.ts` | 133 | `no-unnecessary-type-assertion` at 133:49 and 133:63 |
+| `src/frontend/components/main/popups/localization/translation.ts` | 49, 80 | `no-unnecessary-type-assertion` at 80:28; line 49 adds the equivalent `Promise<Item | null>` callback return type |
+| `src/frontend/components/quicksearch/quicksearch.ts` | 330 | `no-unnecessary-type-assertion` at 330:25 |
+| `src/frontend/components/show/formatTextEditor.ts` | 84 | `no-unnecessary-type-assertion` at 84:31 |
+| `src/frontend/components/slide/views/websiteDomPool.ts` | 196, 199, 202, 226, 231 | `no-unnecessary-type-assertion` at 196:20/34/57, 199:20, 202:20/41, 226:13, 231:35/100/118 |
+| `src/frontend/components/stage/stage.ts` | 47 | `no-unnecessary-type-assertion` at 47:39 |
+| `src/frontend/components/timeline/TimelineActions.ts` | 133, 156–157 | `no-unnecessary-type-assertion` at 133:17, 156:17, 157:17 |
+| `src/frontend/converters/powerpoint/PowerPointHelper.ts` | 290, 295, 1405, 1421 | `no-unnecessary-type-assertion` at 295:28 and 1416:12; lines 290 and 1405 add equivalent callback/function return annotations, and lines 295 and 1421 remove the casts |
+| `src/frontend/converters/songbeamer.ts` | 128 | `no-unnecessary-type-assertion` at 128:12 |
+| `src/frontend/show/slides.ts` | 51, 91, 318, 343, 347, 432, 437 | `no-unnecessary-type-assertion` at the corresponding seven lines (51:13, 91:13, 318:9, 343:40, 347:21, 432:13, 437:40) |
+| `src/frontend/utils/drive.ts` | 4, 52 | `no-unnecessary-type-assertion` at 52:32; line 4 removes the now-unused type-only import |
+
+The current-only awaits in `src/electron/cloud/drive.ts:209:9`, `src/electron/data/import.ts:24:9` and `:36:9`, and `src/frontend/components/drawer/bible/scripture.ts:160:50` have no source hunk; they remain unchanged because scheduling, Promise reaction/rejection timing, or async-from-sync iterator-close behavior is not established as equivalent. All matched and baseline-only target findings are likewise unchanged. `src/frontend/tsconfig.json` has a separate earlier 01-04 configuration hunk at new line 5 (`allowJs`/`noEmit`), not an application-source remediation. `config/testing/output-render.test.ts` has two earlier plan-owned test-harness hunks (old lines 80 and 400) for Darwin scale normalization; it is not application source. No other `src` source hunk failed attribution.
+
+#### Fresh Darwin output-render comparison and cleanup
+
+| Command / assertion | Result | Evidence |
+|---|---|---|
+| `npx playwright test --config config/testing/playwright.config.ts output-render --retries=0` | Exit 0; **2 passed, 0 skipped**, 1 worker; both 1920×1080 output comparisons actually ran | Full stdout/stderr and independent status: `phase1-01-04-final/output-render.stdout`, `.stderr`, `.exit`; no snapshot-update option used |
+| `maxDiffPixels: 0` | Present and unchanged | `config/testing/output-render.test.ts:401`; test reports Darwin baseline verified at 1920×1080 |
+| Snapshot SHA-256 before / after | `1f040b92c1ede6a4237e817bfc389fb2a694f0c3c43b70f675a7579f3ea49162` / identical | `output-render.snapshot.before.sha256`, `output-render.snapshot.after.sha256`; `git diff --exit-code 88902f7b6b68de6885aa031a9b12873643d6f956 -- config/testing/output-render.test.ts-snapshots/output-1920x1080-darwin.png` exit 0 |
+| `node scripts/cleanBuilds.js` | Exit 0 | `phase1-01-04-final/clean-builds.stdout`, `.stderr`, `.exit` |
+| Development HTML restoration / cleanliness | `/src/frontend/main.ts` dev module literal present; `git status --porcelain public/index.html` empty | Independently checked after cleanup; captured in `phase1-01-04-final/task3-final-verification.txt` |
+
+Task 3 source authorization and output-pixel/cleanup gates pass. Plan 01-04 as a whole remains **BLOCKED**: the fresh production build has zero target warnings, but pinned svelte-check still reports three target warnings (`EffectsInfo.svelte:4:1`, `OverlayInfo.svelte:14:5`, `output/preview/PreviewCanvas.svelte:85:5`); Electron/frontend `await-thenable` remain 6/3 and 1/0 versus their individual baselines; and Prettier has 120 unformatted files versus the 40-file baseline (80 new remediation paths). These findings are preserved without suppression, source changes beyond the recorded authorization, or formatter writes. The build assertion, Stylelint, Vitest baseline, and pixel comparisons pass their recorded criteria; the specific unresolved deltas prevent gate acceptance.
