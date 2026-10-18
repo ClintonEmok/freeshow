@@ -41,19 +41,19 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 **Wave 1**
 
-- [ ] 01-01: Freeze the toolchain, pin the `svelte-check` baseline command, record all five pre-upgrade baselines, and stand up the output-window pixel-diff gate with a committed 1920x1080 baseline — all *before* any dependency change
+- [x] 01-01: Freeze the toolchain, pin the `svelte-check` baseline command, record all five pre-upgrade baselines, and stand up the output-window pixel-diff gate with a committed 1920x1080 baseline — all *before* any dependency change
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02: Pre-bump hardening — `cssFileName` + API-agnostic `assetFileNames` on both library-mode configs, `scripts/assertBuildOutput.js` wired into `postbuild`, `terser` declared, and the Svelte lint job migrated to `eslint-plugin-svelte@3` flat config with `svelte/valid-compile` kept alive
+- [x] 01-02: Pre-bump hardening — `cssFileName` + API-agnostic `assetFileNames` on both library-mode configs, `scripts/assertBuildOutput.js` wired into `postbuild`, `terser` declared, and the Svelte lint job migrated to `eslint-plugin-svelte@3` flat config with `svelte/valid-compile` kept alive
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-03: The atomic toolchain swap — `svelte@5`, `@sveltejs/vite-plugin-svelte@7`, `vite@8`, `typescript@5.9`, `@tsconfig/svelte@5`, `svelte-check@4` and `vitest@4` in one install; `mount()` at the six entry sites; `vitePreprocess()`; the `a11y_` code rename; the tsconfig pins; the eight type-only import fixes
+- [x] 01-03: The atomic toolchain swap — `svelte@5`, `@sveltejs/vite-plugin-svelte@7`, `vite@8`, `typescript@5.9`, `@tsconfig/svelte@5`, `svelte-check@4` and `vitest@4` in one install; `mount()` at the six entry sites; `vitePreprocess()`; the `a11y_` code rename; the tsconfig pins; the eight type-only import fixes
 
 **Wave 4** *(blocked on Wave 3 completion; capture the pre-remediation checker inventory before source edits)*
 
-- [ ] 01-06: Capture the fresh pinned pre-remediation `svelte-check` inventory before edits, then normalize warning batches S1/S2 (24 frontend files)
+- [x] 01-06: Capture the fresh pinned pre-remediation `svelte-check` inventory before edits, then normalize warning batches S1/S2 (24 frontend files)
 
 **Wave 5** *(blocked on 01-06; source batches have disjoint file ownership and run in parallel)*
 
@@ -215,7 +215,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Toolchain Gate | 0/5 | Not started | - |
+| 1. Toolchain Gate | 4/9 | In progress | - |
 | 2. Design-Token Foundation | 0/4 | Not started | - |
 | 3. Settings IA & Flows | 0/3 | Not started | - |
 | 4. Primitive Layer | 0/4 | Not started | - |
