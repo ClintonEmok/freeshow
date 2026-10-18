@@ -188,7 +188,7 @@
     <div class="mediaContainer" style={mediaContainerStyle}>
         {#if ($currentWindow || preview) && getMediaType(getExtension(mediaPath)) === "video"}
             {#if item.fit === "blur"}
-                <video bind:this={videoBlurElem} src={encodeFilePath(mediaPath)} style="{mediaStyleBlurString}{mediaStyleCombinedString}" muted autoplay loop={shouldLoop} />
+                <video bind:this={videoBlurElem} src={encodeFilePath(mediaPath)} style="{mediaStyleBlurString}{mediaStyleCombinedString}" muted autoplay loop={shouldLoop} ></video>
             {/if}
             {@const itemVol = item.volume ?? $media[mediaPath]?.volume ?? 1}
             {@const mainVol = ($audioChannelsData.main?.volume ?? 1) * itemVol}
@@ -197,7 +197,7 @@
             </video>
 
             {#if softLoopValue > 0 && shouldLoop}
-                <video bind:this={softLoopVideo} src={encodeFilePath(mediaPath)} style="{mediaStyleString}{mediaStyleCombinedString} position: absolute;top: 0;left: 0;transition: 0.2s opacity;opacity: {effectiveSoftLoopOpacity};pointer-events: none;" muted loop={shouldLoop} />
+                <video bind:this={softLoopVideo} src={encodeFilePath(mediaPath)} style="{mediaStyleString}{mediaStyleCombinedString} position: absolute;top: 0;left: 0;transition: 0.2s opacity;opacity: {effectiveSoftLoopOpacity};pointer-events: none;" muted loop={shouldLoop} ></video>
             {/if}
         {:else}
             <!-- WIP image flashes when loading new image (when changing slides with the same image) -->
