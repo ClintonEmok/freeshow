@@ -193,13 +193,13 @@ export function attachPersistentWebview(
 
     const controller: WebviewController = {
         getCurrentUrl() {
-            return slot!.history[slot!.historyIndex] || slot!.webview?.getURL?.() || currentSrc
+            return slot.history[slot.historyIndex] || slot.webview?.getURL?.() || currentSrc
         },
         canGoBack() {
-            return slot!.historyIndex > 0
+            return slot.historyIndex > 0
         },
         canGoForward() {
-            return slot!.historyIndex < slot!.history.length - 1
+            return slot.historyIndex < slot.history.length - 1
         },
         goBack() {
             navigateHistory(-1)
@@ -223,12 +223,12 @@ export function attachPersistentWebview(
     return {
         update(newOptions: typeof options) {
             if (inner) return inner.update(newOptions)
-            slot!.options = newOptions
+            slot.options = newOptions
             if (newOptions.src !== currentSrc) {
                 detach()
                 inner = attachPersistentWebview(targetNode, newOptions)
             } else {
-                applyWebviewStyle(slot!.webview, newOptions.zoom, newOptions.isOutput, currentSrc, slot!.isDomReady, slot!.isMuted)
+                applyWebviewStyle(slot.webview, newOptions.zoom, newOptions.isOutput, currentSrc, slot.isDomReady, slot.isMuted)
             }
         },
         destroy() {

@@ -44,7 +44,7 @@ export function addStageItem(itemType: string, options: any = {}, textValue = ""
         const existingItems: StageItem[] = Object.values(a[stageId].items)
         if (existingItems.length) style = getLikelyPosition(existingItems, style)
 
-        let item: StageItem = { type: itemType as any, style, align: "", ...options }
+        let item: StageItem = { type: itemType, style, align: "", ...options }
 
         if (itemType === "text") {
             item.lines = [{ align: "", text: [{ style: "", value: textValue || "" }] }]

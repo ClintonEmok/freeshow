@@ -287,12 +287,12 @@ export class PowerPointPackage {
 
                 const rels = getValue(value, "Relationships")
 
-                const normRels = rels.map((r: any) => {
+                const normRels = rels.map((r: any): Relationship => {
                     const id = getAttribute(r, "Id")
                     const type = getAttribute(r, "Type")
                     const target = getAttribute(r, "Target").replace(/^\/+/, "")
                     // const targetMode = getAttribute(r, "TargetMode")
-                    return { id, type, target } as Relationship
+                    return { id, type, target }
                 })
 
                 this.rels.set(owner, normRels)
@@ -1402,7 +1402,7 @@ export class PowerPointPackage {
 
 /////////
 type Position = { left: number; top: number; width: number; height: number }
-function getPosition(psp: any, scale: { x: number; y: number; factor: number } | null = null) {
+function getPosition(psp: any, scale: { x: number; y: number; factor: number } | null = null): Position {
     // common path: p:spPr -> a:xfrm -> a:off/@x,y and a:ext/@cx,cy
     let spPr = getValue(psp, "p:spPr")
     if (!spPr.length) spPr = getValue(psp, "p:grpSpPr")
@@ -1418,7 +1418,7 @@ function getPosition(psp: any, scale: { x: number; y: number; factor: number } |
         top: round(emuToPixels(oy) * (scale?.y ?? 1)),
         width: round(emuToPixels(cx) * (scale?.x ?? 1)),
         height: round(emuToPixels(cy) * (scale?.y ?? 1))
-    } as Position
+    }
 }
 
 function resolveOpcPath(fromPath: string, target: string) {

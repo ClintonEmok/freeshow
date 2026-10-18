@@ -125,7 +125,7 @@ function convertSongbeamerFileToShow(name: string, text: string, categoryId: str
         }
     }
 
-    return show as Show
+    return show
 }
 
 function getTags(tags: string[]) {

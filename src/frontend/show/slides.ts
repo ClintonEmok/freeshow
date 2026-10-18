@@ -48,7 +48,7 @@ export function changeSlideGroups(obj: { sel: { data: { index: number }[] }; men
 
         if (slides.length > 1) {
             const newChildren = slides.slice(1).map(({ id }) => id)
-            newData.slides[slideId].children!.push(...newChildren)
+            newData.slides[slideId].children.push(...newChildren)
 
             let childLayoutData: { [key: string]: any } = {}
             newChildren.forEach((childId, childIndex) => {
@@ -88,7 +88,7 @@ export function changeSlideGroups(obj: { sel: { data: { index: number }[] }; men
             const newChildData = i === 0 ? clone(layoutRef) : clone(layoutRef.children?.[slideId] || {})
             delete newChildData.id
             delete newChildData.children
-            newData.layout[newParentLayoutIndex].children![slideId] = newChildData
+            newData.layout[newParentLayoutIndex].children[slideId] = newChildData
         }
     })
     // remove old parents
@@ -315,7 +315,7 @@ export function changeLayout(layout: LayoutRef[], slides: { [key: string]: Slide
         const lastIndex: number = newLayout.length - 1
         // if (!newLayout[index]) newLayout[index] = {}
         if (!newLayout[lastIndex].children) newLayout[lastIndex].children = {}
-        newLayout[lastIndex].children![slideRef.id] = layout[i].data
+        newLayout[lastIndex].children[slideRef.id] = layout[i].data
 
         if (skip.includes(slideRef.parent?.layoutIndex ?? -1)) return
         if (changedButNotThis || alreadyChanged) {
@@ -340,11 +340,11 @@ export function changeLayout(layout: LayoutRef[], slides: { [key: string]: Slide
             if (slideId === id || !slides[slideId]) return
             children.forEach((childId) => {
                 if (slides[slideId].children?.length) {
-                    const childIndex = slides[slideId].children!.indexOf(childId)
+                    const childIndex = slides[slideId].children.indexOf(childId)
                     if (childIndex < 0) return
 
                     // remove if it includes child from another slide
-                    slides[slideId].children!.splice(childIndex, 1)
+                    slides[slideId].children.splice(childIndex, 1)
                 }
             })
         })
@@ -429,12 +429,12 @@ function changeParent(slides: { [key: string]: Slide }, parentId: string, slideR
         if (slideRef.id !== parentId && slideRef.parent?.id !== parentId) {
             // add new children
             if (!slides[parentId].children) slides[parentId].children = []
-            slides[parentId].children!.push(slideRef.id)
+            slides[parentId].children.push(slideRef.id)
         }
     }
 
     // remove children array if nothing left
-    if (slides[parentId]?.children && !slides[parentId].children!.length) delete slides[parentId].children
+    if (slides[parentId]?.children && !slides[parentId].children.length) delete slides[parentId].children
 
     // the label defines if a slide is a child or not
     if (slideRef.type === "child" && slideRef.newType === "parent") {

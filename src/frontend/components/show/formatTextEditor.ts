@@ -81,7 +81,7 @@ export function formatText(text: string, showId = "", itemIndex = 0) {
         slidesNew.forEach((_slide, i) => {
             if (i > 0) {
                 slidesNew[i].id = uid()
-                children.push(slidesNew[i].id!)
+                children.push(slidesNew[i].id)
             }
         })
         slidesNew[0].id = uid()

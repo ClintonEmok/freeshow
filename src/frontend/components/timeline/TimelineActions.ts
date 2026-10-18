@@ -130,7 +130,7 @@ export class TimelineActions {
                 if (!a[showId]?.layouts?.[layoutId]) return a
 
                 if (!a[showId].layouts[layoutId].timeline) a[showId].layouts[layoutId].timeline = { actions: [] }
-                a[showId].layouts[layoutId].timeline!.actions = clone(this.actions)
+                a[showId].layouts[layoutId].timeline.actions = clone(this.actions)
 
                 return a
             })
@@ -153,8 +153,8 @@ export class TimelineActions {
                 if (!a[showId]?.slides?.[slideId]) return a
 
                 if (!a[showId].slides[slideId].timeline) a[showId].slides[slideId].timeline = { actions: [] }
-                a[showId].slides[slideId].timeline!.actions = clone(this.actions)
-                a[showId].slides[slideId].timeline!.loop = this.shouldLoop
+                a[showId].slides[slideId].timeline.actions = clone(this.actions)
+                a[showId].slides[slideId].timeline.loop = this.shouldLoop
 
                 return a
             })
