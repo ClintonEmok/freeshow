@@ -67,7 +67,7 @@ Plans:
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 01-04: Final post-remediation parity gate — fresh production build and pinned svelte-check inventory, all four non-mutating lint jobs, exact Vitest/Prettier/Stylelint comparisons, changed-TypeScript focused tests, source-hunk authorization audit, and the actual zero-pixel output gate
+- [ ] 01-04: Final post-remediation parity gate — fresh production build and pinned svelte-check inventory, all four non-mutating lint jobs, exact Vitest/Prettier/Stylelint comparisons, changed-TypeScript focused tests, source-hunk authorization audit, and the actual zero-pixel output gate. **Blocked after the post-01-10 rerun only by frontend `await-thenable` 1 vs baseline 0 at `scripture.ts:160:50`; 01-05 remains pending.**
 
 **Wave 8** *(blocked on Wave 7 completion)*
 

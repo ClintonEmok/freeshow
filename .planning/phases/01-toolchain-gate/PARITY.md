@@ -1025,9 +1025,9 @@ The three Electron awaits are the baseline matches in `src/electron/data/backup.
 
 #### Vitest
 
-Command: `npx vitest run --config config/testing/vitest.config.ts --reporter=json`; exit **1**. The complete JSON is `vitest.stdout` (stderr is `vitest.stderr`), status is `vitest.exit`, and parsed summary is `vitest-summary.txt`. Result is exactly **60 suites / 12 test files / 181 tests / 179 passed / 2 failed / 0 pending / 0 todo / 0 skipped**. Vitest 4 omits `numSkippedTests`; skipped was derived by counting assertion statuses across every result: exactly 179 `passed` plus 2 `failed`, with no skipped/pending/todo/disabled status and `numPendingTests=0`. Both failures are the same baseline failures in `src/electron/cloud/syncManager.test.ts`: the deleted-in-cloud scenario (`expected true to be false`) and the file-mtime fallback scenario (`expected 1 to be 2`). This is exact baseline parity; its expected nonzero exit did not stop later checks.
+Command: `npx vitest run --config config/testing/vitest.config.ts --reporter=json`; exit **1**. The complete JSON is `vitest.stdout` (stderr is `vitest.stderr`), status is `vitest.exit`, and parsed summary is `vitest-summary.txt`. Result is exactly **60 suites / 12 test files / 181 tests / 179 passed / 2 failed / 0 pending / 0 todo / 0 skipped**. Vitest 4 omits `numSkippedTests`; skipped was derived by counting assertion statuses across every result: exactly 179 `passed` plus 2 `failed`, with no skipped/pending/todo/disabled status and `numPendingTests=0`. These exact **2 known failures** match baseline in `src/electron/cloud/syncManager.test.ts`: the deleted-in-cloud scenario (`expected true to be false`) and the file-mtime fallback scenario (`expected 1 to be 2`). This is exact baseline parity; its expected nonzero exit did not stop later checks.
 
-#### Prettier and TypeScript-focused tests
+#### Prettier comparison and Focused TypeScript tests
 
 `npx prettier --config config/formatting/.prettierrc.yaml --check src scripts` exited **1** with exactly **40** unformatted paths; comparison against `baseline/format.txt` reports `missing=0, extra=0` and identical path sets. No formatter write occurred. Full raw output and status are `prettier.stdout`, `prettier.stderr`, and `prettier.exit`; exact path-set comparison is `prettier-path-comparison.txt`.
 

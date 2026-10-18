@@ -204,3 +204,31 @@ The execution narrative and blocker counts above preserve the original 01-04 run
 ### Continuation deviations and next-phase readiness
 
 None. The gate tasks changed only `PARITY.md`; required metadata updates changed this summary and `STATE.md`. Build outputs were cleaned, no application source/build or lint config/test/baseline/snapshot was modified during this continuation, and unrelated untracked files were left untouched. The live checkout was discovered to be local `main`, ahead of `origin/main`, contrary to the earlier workspace note; no branch switch or push was attempted, and the release-on-push risk is recorded in `STATE.md`. Phase 1 and the milestone remain in progress. Revisit the three checker-only warnings, four async lint deltas, and 80 Prettier deltas within authorized scope, then rerun the affected final gates before proceeding to 01-05.
+
+## Final post-01-10 gate continuation
+
+This continuation preserves the original blocked 01-04 narrative above and the earlier post-01-09 continuation as historical records. The frontmatter status remains **blocked** because the fresh frontend `await-thenable` count is still over its individual baseline. The new gate evidence is additive in `PARITY.md`; complete command output and independent statuses are retained under `/private/var/folders/ht/_t09b17d0p11tcppmbhzsry40000gn/T/opencode/phase1-01-04-final/post-01-10/`.
+
+### Continuation performance and task commits
+
+- **Started:** 2026-10-18T14:32:14Z
+- **Completed:** 2026-10-18T14:48:07Z
+- **Duration:** 15m 53s
+- **Tasks:** 3/3 executed; acceptance remains blocked
+- **Task 1:** Fresh production rebuild, assertion, and pinned checker — `3314cc8f` (`docs(01-04): record post-01-10 build and checker gate`)
+- **Task 2:** Four non-mutating lint jobs, Vitest/Prettier/Stylelint, and focused TypeScript evidence — `8086a3ab` (`docs(01-04): record post-01-10 parity checks`)
+- **Task 3:** Exact source-hunk audit, fresh output-render comparison, and cleanup — `7735978a` (`docs(01-04): record source audit and output gate`)
+- **Plan metadata:** separate documentation commit after this continuation, `STATE.md`, and `ROADMAP.md` are updated.
+
+### Final post-01-10 results
+
+- Fresh `npm run build` and separate `node scripts/assertBuildOutput.js` both exited 0. The fresh production build had **zero** `element_invalid_self_closing_tag` warnings. Pinned `svelte-check` exited 1 for existing errors and reported **2174 FILES / 144 ERRORS / 134 WARNINGS**, with **zero** target self-closing-tag diagnostics. Its files/errors/target requirements passed; the unchanged Svelte `ignoreWarnings: true` compiler policy was accurately retained in the record.
+- All four non-mutating lint jobs retained file coverage and stayed at or below aggregate baselines: Electron 234/237, frontend 621/630, Svelte 185/206, and Stylelint 216/216. The individual target differential is within baseline for Electron (`no-unnecessary-type-assertion` 1/3; `await-thenable` 3/3) and frontend assertions (23/26), but frontend `await-thenable` remains **1/0** at `src/frontend/components/drawer/bible/scripture.ts:160:50`. The pre-existing semantic probe found a custom thenable getter-order difference; that site was not changed, suppressed, or re-baselined. This remains the sole final-gate blocker.
+- Full Vitest remained exactly 60 suites / 181 tests / 179 passed / the same two known `syncManager.test.ts` failures / zero skipped. Prettier is back at the exact baseline set (40 unformatted paths; `missing=0, extra=0`); Stylelint remains 216. The three focused TypeScript test runs produced zip 5/5, syncManager 28 passed plus the same 2 baseline failures, and search 39/39; 29 changed TypeScript files have no focused test and rely on the recorded full run.
+- The exact `88902f7b6b68de6885aa031a9b12873643d6f956` source audit covers 119 application-source files (87 Svelte, 32 TypeScript, no JavaScript) and 213 unified hunk ranges. All 164 Svelte tag hunks map one-to-one to the 161 fresh production targets plus three checker-only pre-fix sites, with no missing/extra/other Svelte hunk. All TypeScript hunks map to individually reviewed target findings or their type-preserving annotation/import dependencies; the Drive/import async changes are backed by Plan 01-10 probes, and the scripture await has no hunk. The prior `src/frontend/tsconfig.json` lint-coverage change is separately identified as configuration.
+- `output-render` ran after the fresh build with `--retries=0`: **2 passed / 0 skipped** at `maxDiffPixels: 0`. The Darwin snapshot hash remained `1f040b92c1ede6a4237e817bfc389fb2a694f0c3c43b70f675a7579f3ea49162`. `cleanBuilds.js` passed, restored the development HTML literal, and left `public/index.html` clean.
+- This continuation changed planning evidence only. No application source, build/lint configuration, tests, baseline, or snapshot was modified; the pre-existing untracked isolation sentinel and planning files were left untouched.
+
+### Final decision and next-phase readiness
+
+The build, fresh target-warning inventories, aggregate lint counts, Vitest/Prettier/Stylelint comparisons, source-hunk audit, and projector output/cleanup gates pass. The frontend `await-thenable` current-only finding is above baseline and cannot be safely changed because the thenable getter order is observably different. **Plan 01-04 remains BLOCKED, Phase 1 remains in progress, and Plan 01-05 remains pending. Do not start 01-05 until an authorized resolution is demonstrated and the complete final gate passes.**

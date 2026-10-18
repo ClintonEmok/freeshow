@@ -3,10 +3,10 @@ gsd_state_version: "1.0"
 current_phase: 01
 current_phase_name: Toolchain Gate
 status: executing
-stopped_at: Completed 01-10 residual remediation; 01-04 final parity gate remains pending
-last_updated: "2026-10-18T14:30:28Z"
+stopped_at: Completed 01-04 post-01-10 final-gate rerun; gate remains blocked by the frontend await-thenable baseline delta
+last_updated: "2026-10-18T14:48:07Z"
 last_activity: 2026-10-18
-last_activity_desc: Completed 01-10 residual parity remediation
+last_activity_desc: Completed the 01-04 final gate rerun; documented the remaining blocker
 state_head: cc6144cd
 progress:
   total_phases: 7
@@ -28,9 +28,9 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 01 (Toolchain Gate) — EXECUTING
-Plan: 10 of 10 (Wave 6; next is the 01-04 final parity gate)
-Status: In progress — 01-10 complete; final parity gate remains pending
-Last activity: 2026-10-18 — Completed 01-10-PLAN.md
+Plan: 04 of 10 (Wave 7; post-01-10 final gate rerun is blocked; 01-05 remains pending)
+Status: In progress — 01-04 remains blocked by frontend `await-thenable` 1 vs baseline 0
+Last activity: 2026-10-18 — Completed all 01-04 final-gate checks; recorded residual blocker
 
 Progress: [███░░░░░░░] 25%
 
@@ -64,6 +64,7 @@ Recent decisions affecting current work:
 
 - [01-10] The three fresh checker-only sites are normalized and pinned svelte-check reports zero `element_invalid_self_closing_tag` records. The Drive and both import `await-thenable` findings were fixed only after retained differential probes; `scripture.ts:160:50` remains unchanged because custom thenable getter ordering differs.
 - [01-10] Formatting covered only the exact 80-path delta plus the three checker-only Svelte files; the full Prettier path set is restored to the exact 40-path baseline. No formatter hunk escaped the compiler/lint-authorized sites.
+- [01-04 final gate — post-01-10] Fresh production build/assertion, production and pinned-checker self-closing-tag inventories, aggregate lint/Test/format/style baselines, source-hunk audit, and the 2/2 zero-pixel Darwin output gate pass. Frontend `await-thenable` remains 1 vs baseline 0 at `src/frontend/components/drawer/bible/scripture.ts:160:50`; its observed thenable getter-order difference makes it unsafe to change. Plan 01-04 stays blocked and Plan 01-05 stays pending.
 
 - [01-04 final gate — pre-01-10 historical] Fresh production build and explicit output assertion passed with zero `element_invalid_self_closing_tag` build warnings; the exact 161-site source-hunk audit was authorized, and the Darwin output-render comparison passed 2/2 at `maxDiffPixels: 0` with the snapshot unchanged. At that time, the gate was blocked by three checker-only targets, four current-only awaits, and 80 new Prettier paths. Plan 01-10 has resolved the three checker targets, three await findings, and formatter delta; the full 01-04 gate must be rerun. Do not start 01-05.
 
@@ -110,7 +111,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Rerun the full post-remediation 01-04 final parity gate. The only current residual async lint blocker is `src/frontend/components/drawer/bible/scripture.ts:160:50`; do not start 01-05 until 01-04 passes.
+- Keep Plan 01-04 blocked until an authorized resolution/disposition exists for the over-baseline `src/frontend/components/drawer/bible/scripture.ts:160:50` `await-thenable` finding; then rerun the complete final gate. Do not start Plan 01-05 before that gate passes.
 
 ### Blockers/Concerns
 
@@ -118,6 +119,7 @@ Recent decisions affecting current work:
 - [Phase 1 / 01-04 pre-01-10 inventory] The pre-remediation production inventory contained 161 `element_invalid_self_closing_tag` warnings (154 frontend + 7 server); S1/S2, S3/S4, S5/S6 and S7 normalized all 161 production-inventoried sites. The pre-01-10 checker inventory additionally had three checker-only sites at `EffectsInfo.svelte:4:1`, `OverlayInfo.svelte:14:5`, and output `PreviewCanvas.svelte:85:5`; plan 01-10 normalized them and its post-format checker reports zero target records. The final production build/inventory remains pending in 01-04. No suppression is authorized.
 - [Phase 1 / pre-01-10 historical] Four current-only `await-thenable` findings were initially present. Plan 01-10 resolved the Drive site and both import-loop sites after differential probes; only `scripture.ts:160:50` remains, with a documented custom thenable getter-order mismatch. The full 01-04 lint baseline comparison must be rerun.
 - [Phase 1 / 01-04 final gate] Baseline checker counts remain **2244 FILES / 338 ERRORS / 47 WARNINGS / 598 HINTS**; pre-01-10 fresh counts were **2174 / 144 / 291** (svelte-check 4.7.7 omits HINTS). Plan 01-10's post-format checker reports zero target self-closing-tag records, but the final full checker/baseline comparison has not been rerun. The −70 FILES delta is attributed to the `@tsconfig/svelte@5`/module-resolution change with unchanged project includes.
+- [Phase 1 / 01-04 final gate — fresh post-01-10 result] The final checker is **2174 FILES / 144 ERRORS / 134 WARNINGS** with zero self-closing-tag target records; build target warnings are also zero. Aggregate lint totals, Vitest (179/2/0 skipped), Prettier (exact 40-file baseline), Stylelint (216), and output-render (2/2, `maxDiffPixels: 0`) meet their gates. The sole current blocker is frontend `await-thenable` 1 vs 0 at `scripture.ts:160:50`; no suppression or source change is authorized without behavior-equivalence evidence.
 - [Phase 1 / 01-04] `lint:svelte` is **185 err / 0 warn** vs 172 at 01-02 vs 167 at baseline (+13). Confirm this is TS-5.9 type-awareness on unchanged source, not check loss.
 - [Phase 1] Pre-existing, NOT regressions: 2 Vitest failures in `src/electron/cloud/syncManager.test.ts`, and 40 Prettier-unformatted files (20 of them `.svelte`). Both are recorded in `baseline/` and are the numbers 01-04 must not exceed — 01-03 held both at exact parity (40 files, identical set).
 - [Phase 2] `@theme inline` may still emit a `:root` block; confirm in the built CSS what lands on `:root` and that it changes nothing in an output window. This is the single most important item to verify before Phase 4.
@@ -130,14 +132,18 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-### Current residual remediation and final-gate state
+### Current residual remediation and pre-gate handoff
 
 - Plan 01-10 completed: fresh pinned checker has zero `element_invalid_self_closing_tag` target records; the exact 80 formatting paths plus three checker-only paths were formatted, and Prettier returned to the exact 40-file baseline.
 - Differential probes support the `drive.ts` and two `import.ts` fixes. The only current async blocker is `scripture.ts:160:50`, where candidate thenable getter ordering differs.
-- The historical 01-04 build/output checks and Darwin pixel comparison passed their recorded criteria, but they predate the 01-10 edits. The post-01-10 full 01-04 gate has not run and remains mandatory.
-- Keep plan 01-04 pending/blocked until that complete gate passes. Do not start 01-05.
+- At the time of this pre-gate handoff, the historical 01-04 build/output checks and Darwin pixel comparison predated the 01-10 edits; the full final gate was still pending.
 
-Last session: 2026-10-18 14:30 UTC
-Stopped at: Completed 01-10 residual remediation; the post-remediation 01-04 final gate is next.
+### Post-01-10 final gate result
+
+- Plan 01-04 Tasks 1–3 were all executed. Build and output assertion passed; fresh build/checker self-closing-tag inventories are zero; all four non-mutating lint jobs, full Vitest, Prettier, Stylelint, focused TypeScript evidence, exact source audit, projector comparison, and cleanup were captured under `/private/var/folders/ht/_t09b17d0p11tcppmbhzsry40000gn/T/opencode/phase1-01-04-final/post-01-10/`.
+- The gate is still blocked by the single current-only frontend `await-thenable` finding at `scripture.ts:160:50`, retained because the candidate changes custom thenable getter order. Keep Phase 1 in progress and Plan 01-05 pending; do not start it.
+
+Last session: 2026-10-18 14:48 UTC
+Stopped at: Completed 01-04 final-gate rerun; the plan remains blocked by one frontend await-thenable finding.
 Resume file: None
-Next action: execute the complete 01-04 post-remediation parity gate and keep 01-05 pending until it passes.
+Next action: wait for an authorized behavior-preserving resolution/disposition of `scripture.ts:160:50`; rerun the full 01-04 gate afterward and keep 01-05 pending until it passes.
