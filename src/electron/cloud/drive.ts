@@ -205,12 +205,11 @@ export async function syncDataDrive(data: DriveData) {
     let bibles: { [key: string]: BibleCategories } | null = null
 
     // CONFIGS
-    await Promise.all(
-        Object.entries(storeFilesData).map(([id, data]) => {
-            if (!data.portable) return
-            syncStores(id as keyof typeof _store)
-        })
-    )
+    const configSyncResults = Object.entries(storeFilesData).map(([id, data]) => {
+        if (!data.portable) return
+        syncStores(id as keyof typeof _store)
+    })
+    await Promise.all(configSyncResults.map(() => Promise.resolve()))
 
     // SCRIPTURE
     if (bibles === null) bibles = getStore("SYNCED_SETTINGS")?.scriptures

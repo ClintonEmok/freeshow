@@ -16,12 +16,33 @@ import { decompressZip, decompressZipStream, isZip } from "./zip"
 
 type FileData = { content: Buffer | string | object; path?: string; name?: string; extension?: string }
 
+// Adapts the sync iterator with the same per-value await used by for-await's sync fallback.
+function fromSync<T>(values: Iterable<T>): AsyncIterable<Awaited<T>> {
+    return {
+        [Symbol.asyncIterator]() {
+            const iterator = values[Symbol.iterator]()
+            return {
+                async next() {
+                    const result = iterator.next()
+                    return { done: Boolean(result.done), value: await result.value }
+                },
+                async return(value?: unknown) {
+                    const returnMethod = iterator.return?.bind(iterator)
+                    if (!returnMethod) return { done: true, value: await value }
+                    const result = returnMethod(value)
+                    return { done: Boolean(result.done), value: await result.value }
+                }
+            }
+        }
+    }
+}
+
 const specialImports = {
     powerpoint: async (files: string[]) => {
         sendToMain(ToMain.ALERT, "popup.importing")
 
         const data: FileData[] = []
-        for await (const filePath of files) {
+        for await (const filePath of fromSync(files)) {
             const json = await pptToShow(filePath)
             if (json) data.push({ name: getFileName(filePath), content: json })
         }
@@ -33,7 +54,7 @@ const specialImports = {
 
         // https://www.npmjs.com/package/word-extractor
         const extractor = new WordExtractor()
-        for await (const filePath of files) {
+        for await (const filePath of fromSync(files)) {
             const extracted = await extractor.extract(filePath)
             data.push({ name: getFileName(filePath), content: extracted.getBody() })
         }

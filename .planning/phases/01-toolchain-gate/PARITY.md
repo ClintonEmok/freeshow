@@ -860,3 +860,25 @@ Before editing, the fresh pinned command `npx svelte-check --tsconfig config/typ
 | `src/frontend/components/output/preview/PreviewCanvas.svelte:85:5` | `<canvas>` | Line 85: `<canvas … bind:this={canvas} />` → `<canvas … bind:this={canvas} ></canvas>` |
 
 The fresh inventory had no target record at the stale `OverlayInfo.svelte:54` site. No attributes, values, or surrounding markup changed. The post-edit pinned checker again exited 1 for existing non-target errors and reported **zero** `element_invalid_self_closing_tag` records; complete output and independent status are `phase1-01-10/svelte-check-post-tags.raw` and `.exit`. `git diff --check 88902f7b6b68de6885aa031a9b12873643d6f956 -- [the three paths]` exited 0. This is additive evidence only; the historical 01-04 table and blocked result above are unchanged.
+
+### Task 2 — Current-only `await-thenable` dispositions
+
+The independent differential sources, complete outputs, individual statuses, and candidate index are under `/private/var/folders/ht/_t09b17d0p11tcppmbhzsry40000gn/T/opencode/phase1-01-10/`; see `async-probe-index.md`. Probes ran on Node `v22.23.2`, not through repository tests.
+
+| Pre-edit finding | Disposition and exact hunk | Evidence / final status |
+|---|---|---|
+| `src/electron/cloud/drive.ts:209:9` | **Resolved.** Lines 208–212 first materialize the same `Object.entries(...).map(...)` callbacks and fire-and-forget `syncStores()` calls; a second pure map wraps each existing void slot with `Promise.resolve()` before the original awaited aggregate boundary. `syncStores()` return promises are not returned or joined. | `probe-drive.cjs/.raw/.exit`: fulfillment, thenable assimilation, detached rejection identity, side-effect/microtask trace, and completion order match; map exception identity matches. This avoids changing rejection behavior by accidentally awaiting the detached sync operations. |
+| `src/electron/data/import.ts:24:9` | **Resolved.** Lines 19–38 add a local explicit sync-to-async iterator adapter; the unchanged `for await` body now consumes `fromSync(files)` at line 44. | `probe-import-powerpoint.cjs/.raw/.exit`: 8/8 scenarios match, including sync/native Promise/thenable values, rejection identity, body abrupt completion, array close, and a custom sync iterator `return()` plus return-value thenable trace. |
+| `src/electron/data/import.ts:36:9` | **Resolved.** The same helper is used at line 56; the Word loop body is unchanged. | `probe-import-word.cjs/.raw/.exit`: 8/8 equivalent scenarios, including matching iterator-close and close-value assimilation traces. The exact helper also passes an isolated strict TypeScript check (`typecheck-fromSync.ts/.raw/.exit`, exit 0). |
+| `src/frontend/components/drawer/bible/scripture.ts:160:50` | **Unchanged — blocker retained.** No source hunk. | `probe-scripture.cjs/.raw/.exit`: two of six candidate scenarios differ. Both thenable fulfillment and rejection read the custom thenable's `then` getter before the existing Promise.all processing boundary; the original reads it during Promise.all. Although normal sync values, native Promise fulfillment/rejection, and delayed completion match, the observed thenable-order difference prevents claiming equivalence. |
+
+An initial `async function* fromSync(values) { yield* values }` adapter matched the import semantic probes but introduced a new `@typescript-eslint/require-await` finding; the retained intermediate JSON/status are `lint-electron-post.json/.exit`. A `yield await` adapter failed the custom iterator return-value close trace (`probe-import-*-await-variant.cjs/.raw/.exit`). The final explicit async-iterator adapter avoids that new lint finding and passed all retained scenarios; no rule was disabled, suppressed, or autofixed.
+
+The exact targeted lint commands were rerun without `--fix`, with full JSON, stderr, and independent status files:
+
+```text
+npx eslint -c config/linting/eslint.electron.json --ext .js,.ts src/electron/cloud/drive.ts src/electron/data/import.ts --format json
+npx eslint -c config/linting/eslint.frontend.json --ext .js,.ts src/frontend/components/drawer/bible/scripture.ts --format json
+```
+
+Before edits, Electron had 2 files / 5 errors / 0 warnings, including three current-only await findings; after the final adapter it had 2 / 2 / 0, with zero `await-thenable` findings. Frontend remained 1 file / 30 errors / 0 warnings, with the single scripture await unchanged. Both commands exited 1 for existing non-target findings; complete pre/post outputs and statuses are in `lint-electron-{pre,post-final}.*` and `lint-frontend-{pre,post-final}.*`. No change was made to `src/electron/data/backup.ts`; its three baseline-matched awaits remain untouched. `git diff --check` on the assigned async files exited 0.
