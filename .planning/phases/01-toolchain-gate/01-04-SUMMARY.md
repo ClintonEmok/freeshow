@@ -51,7 +51,7 @@ completed: 2026-10-18
 
 # Phase 1 Plan 4: Post-upgrade parity audit Summary
 
-**Parity evidence preserves the production/output gates and check inventory; restoring typescript-eslint v5's caught-error default brings `no-unused-vars` back to baseline, while other lint deltas and 161 Svelte 5 build warnings keep the plan blocked.**
+**The post-remediation production build and zero-pixel output gate pass; final parity remains blocked by three checker-only Svelte warnings, four async lint deltas, and 80 newly unformatted paths.**
 
 ## Performance
 
@@ -163,9 +163,44 @@ None.
 
 ## Next Phase Readiness
 
-The build/output contract and pixel baseline remain verified, so the independent packaged cross-platform smoke work in 01-05 can be investigated. However, Phase 1 parity is not closed: do not report the milestone/toolchain gate as fully passing until the user authorizes a disposition for the lint deltas and Svelte warning wall without weakening existing checks.
+This paragraph records the initial pre-remediation outcome only. The final post-remediation readiness result is in the continuation section below; plan 01-05 must not start while 01-04 remains blocked.
 
 ---
 *Phase: 01-toolchain-gate*
 *Plan: 04*
 *Completed: 2026-10-18*
+
+## Final post-remediation gate continuation
+
+The execution narrative and blocker counts above preserve the original 01-04 run before the user's narrow source-remediation authorization and plans 01-06 through 01-09. This continuation records the final post-remediation gate; its fresh measurements supersede earlier interim/current-state counts without deleting that history.
+
+### Continuation performance and task commits
+
+- **Started:** 2026-10-18T10:09:16Z
+- **Completed:** 2026-10-18T10:22:13Z
+- **Duration:** 13 min (rounded)
+- **Tasks:** 3/3 executed; acceptance remains blocked
+- **Task 1:** Fresh production rebuild, output assertion, and pinned checker evidence — `6560470a` (`docs(01-04): record fresh build and checker gate evidence`)
+- **Task 2:** Non-mutating lint, full Vitest, formatter/style comparisons, and focused tests — `667a26f3` (`docs(01-04): record lint and test parity results`)
+- **Task 3:** Source-hunk authorization audit, Darwin output-render comparison, and cleanup — `6db378a8` (`docs(01-04): record source audit and pixel gate`)
+- **Final plan metadata:** committed separately after this summary and `STATE.md` update.
+
+### Final results
+
+- Fresh `npm run build` and separate `node scripts/assertBuildOutput.js` both exited 0. The fresh production log contains zero `element_invalid_self_closing_tag` warnings; the output contract and non-empty artifacts passed.
+- Fresh pinned `svelte-check` exited 1 with `2174 FILES / 144 ERRORS / 137 WARNINGS`, below the 338-error baseline, but still reports three `element_invalid_self_closing_tag` sites: `EffectsInfo.svelte:4:1`, `OverlayInfo.svelte:14:5`, and `output/preview/PreviewCanvas.svelte:85:5`. The target-warning zero criterion therefore remains unmet; no new warning suppression was added.
+- Each of the four non-mutating lint jobs retained file coverage and did not exceed its aggregate problem baseline. The individual async target-rule gates still fail: Electron `await-thenable` is 6 versus baseline 3; frontend is 1 versus baseline 0. These are the four preserved Promise/async-iterator cases, not a green target-rule parity result.
+- Vitest exactly matches 60 suites / 181 tests / 179 passed / the same two `syncManager.test.ts` baseline failures / zero skipped. Stylelint remains 216 (baseline 216). Prettier reports 120 unformatted paths against baseline 40 (80 new paths); no format writes were made.
+- The exact source-hunk audit against `88902f7b6b68de6885aa031a9b12873643d6f956` maps all 161 changed Svelte tag hunks across 84 files to fresh pre-remediation production diagnostics and all 30 changed application TypeScript files to individually reviewed lint findings or their explicit type-only dependent annotations/import cleanups. The five multi-line Svelte diagnostic-to-hunk offsets are identified in `PARITY.md`. The pre-existing `src/frontend/tsconfig.json` change is documented separately as configuration, not source remediation. The source audit passed; no additional application source was changed during this final gate.
+- `output-render` ran with `--retries=0`: both 1920×1080 comparisons passed, zero skipped, at `maxDiffPixels: 0`. The Darwin snapshot SHA-256 stayed `1f040b92c1ede6a4237e817bfc389fb2a694f0c3c43b70f675a7579f3ea49162`. `cleanBuilds.js` exited 0, restored the development HTML literal, and left `public/index.html` clean.
+
+### Final decisions and blockers
+
+- Preserved all four current-only `await-thenable` findings; no change was proven to preserve Promise reactions, scheduling/rejection timing, or async-from-sync iterator-close behavior.
+- Left the three checker-only target warnings visible and unmodified because they are not part of the fresh production warning inventory used to authorize S1–S7; no warning policy or suppression was changed.
+- Did not format the 80 newly unformatted remediation paths during the final gate. Formatter writes are out of scope and would change the reviewed source hunks.
+- The source-authorization and projector gates pass, but the required checker target-warning, individual async-lint, and Prettier baseline gates do not. **Plan 01-04 remains BLOCKED; do not mark it complete or start 01-05.**
+
+### Continuation deviations and next-phase readiness
+
+None. The gate tasks changed only `PARITY.md`; required metadata updates changed this summary and `STATE.md`. Build outputs were cleaned, no application source/build or lint config/test/baseline/snapshot was modified during this continuation, and unrelated untracked files were left untouched. The live checkout was discovered to be local `main`, ahead of `origin/main`, contrary to the earlier workspace note; no branch switch or push was attempted, and the release-on-push risk is recorded in `STATE.md`. Phase 1 and the milestone remain in progress. Revisit the three checker-only warnings, four async lint deltas, and 80 Prettier deltas within authorized scope, then rerun the affected final gates before proceeding to 01-05.

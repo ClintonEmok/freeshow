@@ -3,11 +3,11 @@ gsd_state_version: "1.0"
 current_phase: 1
 current_phase_name: Toolchain Gate
 status: executing
-stopped_at: Completed 01-09 (S7 warning normalization and T3/T4 lint review)
-last_updated: "2026-10-18T09:53:16Z"
+stopped_at: Executed the 01-04 final parity gate; acceptance remains blocked
+last_updated: "2026-10-18T10:22:13Z"
 last_activity: 2026-10-18
-last_activity_desc: Completed Phase 1 plan 01-09
-state_head: 8883ba5adf4a66e2097b51a194ca90a524592478
+last_activity_desc: Ran the 01-04 post-remediation final gate and recorded unresolved parity blockers
+state_head: 6db378a8c66b912e05a813dfc719a8bffb825f4b
 progress:
   total_phases: 7
   completed_phases: 0
@@ -28,9 +28,9 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 1 of 7 (Toolchain Gate) — EXECUTING
-Plan: 01-09 of 9 (7 successful plans complete; 01-04 remains pending as the final parity gate)
-Status: In progress — all Wave 5 source batches S1-S7 and T1-T4 are complete; final parity remains pending with four async blockers
-Last activity: 2026-10-18 — Completed 01-09-PLAN.md
+Plan: 01-04 of 9 (7 successful plans complete; final gate run captured, 01-04 remains blocked/pending)
+Status: In progress — 01-04 final post-remediation checks are recorded; acceptance remains blocked by checker-only warnings, four async lint deltas, and Prettier baseline drift
+Last activity: 2026-10-18 — Ran the 01-04 final parity gate; do not start 01-05
 
 Progress: [██░░░░░░░░] 23%
 
@@ -62,6 +62,8 @@ Progress: [██░░░░░░░░] 23%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [01-04 final gate] Fresh production build and explicit output assertion pass with zero `element_invalid_self_closing_tag` build warnings; the exact 161-site source-hunk audit is authorized, and the Darwin output-render comparison passes 2/2 at `maxDiffPixels: 0` with the snapshot unchanged. The gate remains blocked by three fresh checker-only target warnings, four current-only `await-thenable` findings over their individual baselines, and 80 new Prettier-unformatted paths. Do not start 01-05.
+
 - [Roadmap] Svelte 5 in legacy mode, not the Svelte 4 legacy shadcn line — the toolchain gate is its own phase (P1) with zero component-syntax rewrites, ending on a packaged cross-OS smoke test and an output-window pixel-diff gate
 - [Roadmap] Omit Tailwind Preflight and scope everything to `[data-ds="v2"]` (P2) — main, output/projector, export and capture windows share one `bundle.css`, so any global CSS is an on-air regression risk
 - [Roadmap] Freeze legacy token names and bridge via `@theme inline` to a new semantic namespace (P2) — `--primary`/`--secondary`/`--accent` collide with shadcn's names under inverted meanings across ~1,318 `var()` reads
@@ -71,7 +73,7 @@ Recent decisions affecting current work:
 - [Autonomous] UI-SPEC generation scoped to Phases 4 and 5 only. The `ui-plan-gate` returns `frontend: true` for every phase because it matches the word "component" in the ROADMAP goals — a false positive. P1 is a toolchain upgrade with zero visual change; P2's acceptance test is literally "nothing changed", so a design contract there would contradict the phase. P3 is structural (no styling), P6 is verification, P7 is docs. P4 (primitive layer) and P5 (Settings revamp) do get UI-SPECs.
 - [01-03] **Criterion 1 amended with ONE authorized exception.** `src/frontend/components/settings/tabs/Connection.svelte` — a 3-line local rename (`connections` → `connectionCount`) is required because `{@const connections = …}` shadows the imported `connections` store, making `$connections` a scoped subscription, which Svelte 5 rejects as a hard, unconditional error. Svelte 4 compiled it silently. This is a latent-bug fix, not a syntax rewrite: 546 of 547 components compile untouched, behaviour is unchanged, and that file + 3 lines is the entire `.svelte` diff for the phase. Recorded in `01-03-PLAN.md` §`<criterion_1_amendment>` and `01-03-SUMMARY.md`; plans 01-04's gates were amended to match.
 - [01-03] Toolchain migration landed and verified: svelte 5.57.2, vite 8.0.16, `@sveltejs/vite-plugin-svelte` 7.1.2, typescript 5.9.3, svelte-check 4.7.7, vitest 4.1.12. `npm run build` exits 0; `assertBuildOutput.js` passes; **pixel gate passes at `maxDiffPixels: 0`** (the output/projector path is provably unchanged); Vitest is at exact baseline parity (179 passed / 2 failed); Prettier's 40 unformatted files are the identical pre-existing set. svelte-check improved to **144 errors vs the 338 baseline**, with zero `TS7006`/`TS7031` (no `strict` leak).
-- [Workspace] Work is on branch `gsd/m1-design-system`, NOT `main`. `release.yml` fires on every push to `main` and runs a publishing `npm run release` on four runners — a toolchain migration must not be one push away from shipping itself.
+- [Workspace] The live checkout is local branch `main`, ahead of `origin/main`, despite the earlier state note claiming `gsd/m1-design-system`; this execution made no branch switch or push. `release.yml` publishes on any push to `main`; do not push until the intended branch and release intent are confirmed.
 - [Environment] `npm` 10.9.8 cannot resolve the migrated peer set (`ERESOLVE`); **npm 11.21.1 resolves it with no flags**. `npm ci` never resolves peers, so CI is unaffected, but a dev running npm 10 needs npm 11 to install. Recorded in `01-03-SUMMARY.md`.
 - [01-01] `test:svelte` is pinned to `svelte-check --tsconfig config/typescript/tsconfig.svelte.json`. There is no root `tsconfig.json`/`jsconfig.json`, and svelte-check's no-flag behaviour is an upwards traversal that found nothing — so the old bare command reported a near-clean result over a partially-resolved tree. The real baseline is **2244 FILES / 338 ERRORS / 47 WARNINGS / 598 HINTS**; a later near-zero count means the invocation broke, not that the code improved.
 - [01-01] The Svelte lint job is **not inert** today: 464 files, 167 errors, 39 warnings, and all 39 are Svelte compiler a11y diagnostics surfaced by the `eslint-plugin-svelte3` processor (kebab-case rule ids; zero ids under the literal `svelte3/` namespace). Plan 01-02's flat-config parity claim is measured against this: it must keep surfacing the same compiler diagnostics via an explicit `svelte/valid-compile`.
@@ -105,7 +107,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Run plan 01-04's final production/checker/lint/test/pixel parity gate; do not start plan 01-05 before it completes.
+- Resolve or obtain an explicit disposition for the three checker-only target warnings, four async lint deltas, and 80 Prettier baseline deltas; rerun affected final gates. Do not start plan 01-05 until plan 01-04 passes.
 
 ### Blockers/Concerns
 
@@ -125,7 +127,15 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-10-18 09:53 UTC
-Stopped at: Completed 01-09 — S7 normalized 22 production-inventoried warning sites; T3/T4 resolved 39 safe current-only assertions and retained 18 matched findings. Four T1/T2 async blockers and three checker-only warning sites remain for final parity.
+### Final 01-04 gate state (current; supersedes older interim counts above)
+
+- Fresh production build and separate output assertion passed; production target warning count is zero. Fresh checker result is `2174 FILES / 144 ERRORS / 137 WARNINGS`, with three target diagnostics remaining at `EffectsInfo.svelte:4:1`, `OverlayInfo.svelte:14:5`, and `output/preview/PreviewCanvas.svelte:85:5`.
+- The source hunk audit maps all 161 authorized production-inventoried tag changes; the Darwin output-render gate passed 2/2 with zero skipped at `maxDiffPixels: 0`, unchanged snapshot hash, successful `cleanBuilds.js`, and clean `public/index.html`.
+- All four lint jobs retain coverage and per-job total problems are at or below baseline; target `await-thenable` still exceeds baseline (Electron 6/3, frontend 1/0). The four current-only async findings remain unchanged.
+- Vitest remains at 60 suites / 181 tests / 179 passed / the same two baseline failures / zero skipped. Stylelint is 216/216. Prettier reports 120 unformatted files versus 40 baseline (80 new), with no formatter writes.
+- Plan 01-04 remains blocked and pending; do not start 01-05. The older interim checker/build counts above remain historical evidence, not the current result.
+
+Last session: 2026-10-18 10:21 UTC
+Stopped at: Executed all three 01-04 final-gate tasks; build and output pixels pass, while checker-only target warnings, async lint deltas, and Prettier drift keep acceptance blocked.
 Resume file: None
-Next action: execute final parity plan 01-04 only. Do not start 01-05 until the final gate completes.
+Next action: obtain an authorized safe disposition for the remaining parity blockers, rerun affected gates, and keep 01-05 pending until 01-04 passes.
