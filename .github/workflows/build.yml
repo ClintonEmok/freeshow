@@ -1,31 +1,76 @@
 name: Build
 on:
-  workflow_dispatch:
+    workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
+    build:
+        runs-on: ${{ matrix.os }}
 
-    strategy:
-      matrix:
-        os:
-          [
-            windows-latest,
-            macos-latest,
-            ubuntu-latest
-          ]
+        strategy:
+            matrix:
+                os: [windows-latest, macos-latest, ubuntu-latest]
 
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v5
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v5
 
-      - name: Install Node.js and NPM
-        uses: actions/setup-node@v5
-        with:
-          node-version: 22
+            - name: Install Node.js and NPM
+              uses: actions/setup-node@v5
+              with:
+                  node-version: 22
 
-      - name: Install dependencies
-        run: npm ci
+            - name: Install dependencies
+              run: npm ci
 
-      - name: Build app
-        run: npm run build
+            - name: Build app
+              run: npm run build
+
+            - name: Package app
+              run: npx electron-builder --config config/building/electron-builder.yaml --dir
+              timeout-minutes: 30
+
+            - name: Resolve packaged executable
+              shell: bash
+              run: |
+                  case "$RUNNER_OS" in
+                    Windows)
+                      executable=$(find dist -type f -name 'FreeShow.exe' -print -quit)
+                      ;;
+                    macOS)
+                      executable=$(find dist -type f -path '*/FreeShow.app/Contents/MacOS/FreeShow' -print -quit)
+                      ;;
+                    Linux)
+                      executable=$(find dist/linux-unpacked -maxdepth 1 -type f -executable ! -name 'chrome-sandbox' ! -name 'chrome_crashpad_handler' -print -quit 2>/dev/null || true)
+                      ;;
+                    *)
+                      echo "Unsupported runner OS: $RUNNER_OS" >&2
+                      exit 1
+                      ;;
+                  esac
+
+                  if [[ -z "$executable" ]]; then
+                    echo "Could not resolve the packaged FreeShow executable" >&2
+                    ls -R dist | head -50
+                    exit 1
+                  fi
+
+                  executable=$(node -e 'console.log(require("path").resolve(process.argv[1]))' "$executable")
+                  echo "Resolved packaged executable: $executable"
+                  printf 'FS_SMOKE_EXECUTABLE=%s\n' "$executable" >> "$GITHUB_ENV"
+
+            - name: Install Linux Electron runtime dependencies
+              if: runner.os == 'Linux'
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y libfontconfig1-dev
+                  npx playwright install --with-deps
+
+            - name: Run smoke tests against packaged app
+              shell: bash
+              timeout-minutes: 15
+              run: |
+                  if [[ "$RUNNER_OS" == "Linux" ]]; then
+                    xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" -- npx playwright test --config config/testing/playwright.config.ts smoke
+                  else
+                    npx playwright test --config config/testing/playwright.config.ts smoke
+                  fi

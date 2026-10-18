@@ -6,6 +6,12 @@ on:
     # pull_request:
     #     branches: [dev]
     workflow_dispatch:
+        inputs:
+            update_snapshots:
+                description: Capture per-OS pixel baselines with --update-snapshots=all and upload them for commit
+                required: false
+                type: boolean
+                default: false
 
 jobs:
     test:
@@ -26,7 +32,7 @@ jobs:
             - name: Build
               run: npm run build
             - name: Run Playwright tests
-              run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:playwright
+              run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" -- npm run test:playwright -- ${{ inputs.update_snapshots && '--update-snapshots=all' || '' }}
             #   if: matrix.os == 'ubuntu-latest'
             # - run: npm run test
             #   if: matrix.os != 'ubuntu-latest'
@@ -36,3 +42,10 @@ jobs:
                   name: test-output
                   path: test-output/
                   retention-days: 30
+            - uses: actions/upload-artifact@v4
+              if: ${{ inputs.update_snapshots }}
+              with:
+                  name: pixel-baselines
+                  path: |
+                      config/testing/output-render.test.ts-snapshots/
+                      config/testing/smoke.test.ts-snapshots/
