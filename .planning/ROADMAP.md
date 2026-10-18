@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. `svelte-check`, the Svelte ESLint plugin and Vitest all run and report no new errors or failures versus the pre-upgrade baseline — no existing check was dropped or silently converted to non-blocking (TOOL-03)
   5. Release smoke checklist green on packaged Windows, macOS and Linux artifacts: launch app, open Settings, open an output, play a song, import a file — with `better-sqlite3`, `@discordjs/opus` and `osr-capture` loading on each platform (TOOL-04)
 
-**Plans**: 9 plans
+**Plans**: 10 plans
 
 Plans:
 **Wave 1**
@@ -61,15 +61,19 @@ Plans:
 - [x] 01-08: Remediation batches S5/S6 and T2 — normalize the next 24 diagnosed Svelte files and review the next 12 target-lint files
 - [x] 01-09: Remediation batch S7 and T3/T4 — normalize the final 12 diagnosed Svelte files (including server sites) and review the final 23 target-lint files
 
-**Wave 6** *(blocked on all Wave 5 remediation plans)*
+**Wave 6** *(blocked on all Wave 5 remediation plans; residual checker/lint/format scope is bounded before the final gate)*
 
-- [ ] 01-04: Final post-remediation parity gate — fresh production build and pinned svelte-check inventory, all four non-mutating lint jobs, exact Vitest/Prettier/Stylelint comparisons, changed-TypeScript focused tests, source-hunk authorization audit, and the actual zero-pixel output gate
+- [ ] 01-10: Residual source remediation — normalize the three fresh checker-only tags, attempt only probe-proven async fixes for four current-only `await-thenable` findings, and format the exact 80-path Prettier delta plus the three newly changed checker-only files within authorized hunks
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
+- [ ] 01-04: Final post-remediation parity gate — fresh production build and pinned svelte-check inventory, all four non-mutating lint jobs, exact Vitest/Prettier/Stylelint comparisons, changed-TypeScript focused tests, source-hunk authorization audit, and the actual zero-pixel output gate
+
+**Wave 8** *(blocked on Wave 7 completion)*
+
 - [ ] 01-05: Cross-OS packaged validation — packaging exercised on all three platforms in `build.yml`, the Linux virtual screen widened to 1920x1080, a smoke spec that proves the operator flow and exercises `better-sqlite3`/`@discordjs/opus`/`osr-capture` for real, and the executed release smoke checklist
 
-**Sequencing amendment:** Plan 01-06 depends on completed 01-03 and first captures the fresh pinned `svelte-check` inventory before its S1/S2 source edits. Plans 01-07 through 01-09 depend on 01-06 and have disjoint file ownership, so they share Wave 5; they carry batches S3/S4 + T1, S5/S6 + T2, and S7 + T3/T4. Plan 01-04 is retained (not renumbered) as the final verification gate and depends on all four remediation plans. Existing packaging plan 01-05 then depends on 01-04. The earlier blocked 01-04 measurements and 46-path inventory remain historical; they are not the revised source-scope acceptance test.
+**Sequencing amendment:** Plan 01-06 depends on completed 01-03 and first captures the fresh pinned `svelte-check` inventory before its S1/S2 source edits. Plans 01-07 through 01-09 depend on 01-06 and have disjoint file ownership, so they share Wave 5; they carry batches S3/S4 + T1, S5/S6 + T2, and S7 + T3/T4. New plan 01-10 depends on 01-06 through 01-09 and is the Wave 6 residual-remediation continuation. Plan 01-04 is retained (not renumbered) as the final verification gate in Wave 7, now depending on 01-10; its historical blocked summary remains unchanged and the final gate may be re-executed as a continuation. Packaging plan 01-05 follows in Wave 8 and depends on 01-04. The earlier blocked 01-04 measurements and 46-path inventory remain historical, not completion evidence or the revised source-scope acceptance test.
 
 **Decomposition note (deviation from the original four-plan sketch, forced by the dependency graph):**
 The original 01-02/01-03 split ("Vite first, still on Svelte 3" then "Svelte 5") is not achievable. Verified against the npm registry while planning: `@sveltejs/vite-plugin-svelte@7.1.2` peers `vite ^8.0.0` **and** `svelte ^5.46.4`; plugin 6 peers `svelte ^5.0.0`; plugins 4 and 5 require Svelte 5; and plugin `2.5.3` is the last Svelte-3-capable release. Separately, `svelte-check@4.7.7` peers `typescript ^5 || ^6` while `svelte-check@2.10.3` peers `svelte ^3.24.0`, so no `svelte-check` release supports Svelte 5 with TypeScript 4.9 — and dropping it would lose a check TOOL-03 forbids losing. `vitest@4.1.12` peers `vite ^6 || ^7 || ^8`. The Svelte/Vite/TypeScript/`svelte-check`/Vitest quintuple is therefore one atomic install landing in 01-03. The inverse is also true and was exploited: the Svelte **lint** migration (`eslint-plugin-svelte@3.23.1` peers `svelte ^3.37 || ^4 || ^5`; `typescript-eslint@8.71.2` peers `typescript >=4.8.4 <6.1.0`) is version-independent, so it moves *earlier*, into 01-02, which also removes `eslint-plugin-svelte3`'s `svelte ^3.2.0` peer before the Svelte 5 install.
@@ -215,7 +219,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Toolchain Gate | 7/9 | In progress | - |
+| 1. Toolchain Gate | 7/10 | In progress | - |
 | 2. Design-Token Foundation | 0/4 | Not started | - |
 | 3. Settings IA & Flows | 0/3 | Not started | - |
 | 4. Primitive Layer | 0/4 | Not started | - |
