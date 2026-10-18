@@ -287,3 +287,178 @@ npm run build: exit 0; bundle.css 257310 bytes; bundle.js 3930171 bytes; one CSS
 npx playwright test --config config/testing/playwright.config.ts output-render: 2 passed (29.0s), maxDiffPixels = 0
 node scripts/cleanBuilds.js: exit 0; dev HTML literal restored; git status --porcelain public/index.html: empty
 ```
+
+## Addendum — authorized remediation evidence and revised baseline inventory
+
+This addendum supplements, and does not overwrite, the original blocked 01-04 measurements above. The original 46-path list is historical evidence only, not revised source-scope acceptance. The new application-source audit compares Plan 01-04 additions and remediation batches with the exact plan-start/01-03 tip `88902f7b6b68de6885aa031a9b12873643d6f956`. The pre-upgrade revision `136d77575ec1f853c66eba3a1f44be7401e9234c` remains the check-count baseline, not the source-hunk diff base.
+
+### Reproduced target ESLint diagnostics
+
+The isolated baseline reproduction ran `npm ci --ignore-scripts --omit=optional` successfully at revision `136d77575ec1f853c66eba3a1f44be7401e9234c`. Baseline versions: ESLint `8.57.1`, `@typescript-eslint/eslint-plugin` / parser `5.62.0`, TypeScript `4.9.5`, Svelte `3.59.2`, Vite `4.5.14`. Current pre-remediation versions: ESLint `8.57.1`, `@typescript-eslint/eslint-plugin` / parser `8.71.2`, TypeScript `5.9.3`, Svelte `5.57.2`, Vite `8.0.16`.
+
+Baseline and current detailed JSON use these exact commands, without `--fix`:
+
+```text
+npx eslint -c config/linting/eslint.electron.json --ext .js,.ts src/electron --format json
+npx eslint -c config/linting/eslint.frontend.json --ext .js,.ts src/frontend --format json
+```
+
+The baseline reproduction matches exactly: Electron 149 files / 212 errors / 25 warnings / 237 problems; frontend 255 / 630 / 0 / 630. Current pre-remediation: Electron 149 / 254 errors / 0 warnings / 254 problems; frontend 255 / 671 errors / 0 warnings / 671 problems.
+
+Normalized identity is repository-relative source path + rule id + exact diagnostic source range with whitespace collapsed. Absolute checkout prefixes, line/column shifts, version-specific `message`, and `messageId` are ignored. Identical source ranges use multiset counts so repeated findings are retained. This checked normalization differs from the earlier preliminary comparison: frontend is 23 matched / 3 baseline-only / 51 current-only, not 15 / 11 / 59; Electron is 4 / 2 / 20. The rule-level deltas remain `50−3=47` frontend assertions, `17−2=15` Electron assertions, plus 1 frontend and 3 Electron `await-thenable` findings.
+
+| Scope | Rule | Baseline | Current pre-remediation | Matched | Baseline-only | Current-only |
+|---|---|---:|---:|---:|---:|---:|
+| Electron | `no-unnecessary-type-assertion` | 3 | 18 | 1 | 2 | 17 |
+| Electron | `await-thenable` | 3 | 6 | 3 | 0 | 3 |
+| Frontend | `no-unnecessary-type-assertion` | 26 | 73 | 23 | 3 | 50 |
+| Frontend | `await-thenable` | 0 | 1 | 0 | 0 | 1 |
+| **Total** | | **32** | **98** | **27** | **5** | **71** |
+
+The following table is the durable per-file inventory from the detailed baseline/current JSON. Locations are line:column; em dashes mean there was no finding for that scope/rule. The last column is matched / baseline-only / current-only after normalized range comparison.
+
+| File | Rule | Baseline locations | Current pre-remediation locations | Matched / baseline-only / current-only |
+|---|---|---|---|---|
+| `src/electron/cloud/drive.ts` | `await-thenable` | — | 209:9 | 0 / 0 / 1 |
+| `src/electron/contentProviders/canva/CanvaContentLibrary.ts` | `no-unnecessary-type-assertion` | — | 337:28, 406:24 | 0 / 0 / 2 |
+| `src/electron/contentProviders/ContentProviderRegistry.ts` | `no-unnecessary-type-assertion` | — | 83:51, 104:33, 157:40 | 0 / 0 / 3 |
+| `src/electron/contentProviders/onStage/connect.ts` | `no-unnecessary-type-assertion` | — | 310:35 | 0 / 0 / 1 |
+| `src/electron/data/backup.ts` | `await-thenable` | 24:13, 30:9, 34:9 | 24:13, 30:9, 34:9 | 3 / 0 / 0 |
+| `src/electron/data/import.ts` | `await-thenable` | — | 24:9, 36:9 | 0 / 0 / 2 |
+| `src/electron/data/store.ts` | `no-unnecessary-type-assertion` | 215:21 | 215:21, 222:16 | 1 / 0 / 1 |
+| `src/electron/data/zip.ts` | `no-unnecessary-type-assertion` | — | 134:26, 274:30 | 0 / 0 / 2 |
+| `src/electron/ndi/NdiSender.ts` | `no-unnecessary-type-assertion` | 114:27 | — | 0 / 1 / 0 |
+| `src/electron/omt/OmtSender.ts` | `no-unnecessary-type-assertion` | 125:27 | — | 0 / 1 / 0 |
+| `src/electron/servers.ts` | `no-unnecessary-type-assertion` | — | 124:9, 125:38, 127:9, 129:9, 129:36, 130:9, 163:9, 165:9 | 0 / 0 / 8 |
+| `src/frontend/audio/effects/audioEffectsHelpers.ts` | `no-unnecessary-type-assertion` | 143:45 | 143:45 | 1 / 0 / 0 |
+| `src/frontend/components/actions/apiHelper.ts` | `no-unnecessary-type-assertion` | — | 591:12 | 0 / 0 / 1 |
+| `src/frontend/components/context/contextMenuSearch.ts` | `no-unnecessary-type-assertion` | — | 25:23 | 0 / 0 / 1 |
+| `src/frontend/components/context/loadItems.ts` | `no-unnecessary-type-assertion` | — | 245:40 | 0 / 0 / 1 |
+| `src/frontend/components/context/menuClick.ts` | `no-unnecessary-type-assertion` | — | 2469:62 | 0 / 0 / 1 |
+| `src/frontend/components/drawer/bible/scripture.ts` | `await-thenable` | — | 160:50 | 0 / 0 / 1 |
+| `src/frontend/components/drawer/bible/scripture.ts` | `no-unnecessary-type-assertion` | 1060:33 | 192:71, 1060:33, 1416:102 | 1 / 0 / 2 |
+| `src/frontend/components/drawer/calendar/calendars.ts` | `no-unnecessary-type-assertion` | 200:72 | 200:72 | 1 / 0 / 0 |
+| `src/frontend/components/drawer/calendar/event.ts` | `no-unnecessary-type-assertion` | 76:43 | 76:43 | 1 / 0 / 0 |
+| `src/frontend/components/drawer/pages/interactions.ts` | `no-unnecessary-type-assertion` | 704:31 | 704:31 | 1 / 0 / 0 |
+| `src/frontend/components/edit/scripts/chords.ts` | `no-unnecessary-type-assertion` | — | 18:5, 24:5 | 0 / 0 / 2 |
+| `src/frontend/components/edit/scripts/itemHelpers.ts` | `no-unnecessary-type-assertion` | — | 198:21 | 0 / 0 / 1 |
+| `src/frontend/components/export/projectLink.ts` | `no-unnecessary-type-assertion` | — | 107:12, 132:20 | 0 / 0 / 2 |
+| `src/frontend/components/helpers/array.ts` | `no-unnecessary-type-assertion` | 90:45 | 90:45, 90:45 | 1 / 0 / 1 |
+| `src/frontend/components/helpers/clipboard.ts` | `no-unnecessary-type-assertion` | — | 1032:17, 1034:22, 1453:90 | 0 / 0 / 3 |
+| `src/frontend/components/helpers/dropActions.ts` | `no-unnecessary-type-assertion` | — | 681:70 | 0 / 0 / 1 |
+| `src/frontend/components/helpers/history.ts` | `no-unnecessary-type-assertion` | — | 41:47, 322:13, 360:13 | 0 / 0 / 3 |
+| `src/frontend/components/helpers/historyHelpers.ts` | `no-unnecessary-type-assertion` | 475:74, 477:23, 478:23 | 475:74, 477:23, 478:23 | 3 / 0 / 0 |
+| `src/frontend/components/helpers/output.ts` | `no-unnecessary-type-assertion` | 1519:34, 1676:55, 2091:18 | 1519:34, 1676:55, 2091:18, 2091:18 | 3 / 0 / 1 |
+| `src/frontend/components/helpers/showActions.ts` | `no-unnecessary-type-assertion` | 999:32 | 999:32 | 1 / 0 / 0 |
+| `src/frontend/components/helpers/shows.ts` | `no-unnecessary-type-assertion` | — | 133:49, 133:63 | 0 / 0 / 2 |
+| `src/frontend/components/main/popups/localization/translation.ts` | `no-unnecessary-type-assertion` | — | 80:28 | 0 / 0 / 1 |
+| `src/frontend/components/output/preview/SpotifyManager.ts` | `no-unnecessary-type-assertion` | 66:28 | 66:28 | 1 / 0 / 0 |
+| `src/frontend/components/quicksearch/quicksearch.ts` | `no-unnecessary-type-assertion` | — | 330:25 | 0 / 0 / 1 |
+| `src/frontend/components/quicksearch/searchHighlight.ts` | `no-unnecessary-type-assertion` | 13:60 | 13:60 | 1 / 0 / 0 |
+| `src/frontend/components/show/formatTextEditor.ts` | `no-unnecessary-type-assertion` | — | 84:31 | 0 / 0 / 1 |
+| `src/frontend/components/slide/views/websiteDomPool.ts` | `no-unnecessary-type-assertion` | — | 196:20, 196:34, 196:57, 199:20, 202:20, 202:41, 226:13, 231:35, 231:100, 231:118 | 0 / 0 / 10 |
+| `src/frontend/components/stage/stage.ts` | `no-unnecessary-type-assertion` | — | 47:39 | 0 / 0 / 1 |
+| `src/frontend/components/system/textbox.ts` | `no-unnecessary-type-assertion` | 18:23, 39:31, 88:27, 216:23, 311:23 | 18:23, 39:31, 88:27, 216:23, 311:23 | 5 / 0 / 0 |
+| `src/frontend/components/timeline/TimelineActions.ts` | `no-unnecessary-type-assertion` | — | 133:17, 156:17, 157:17 | 0 / 0 / 3 |
+| `src/frontend/converters/powerpoint/PowerPointHelper.ts` | `no-unnecessary-type-assertion` | — | 295:28, 1416:12 | 0 / 0 / 2 |
+| `src/frontend/converters/songbeamer.ts` | `no-unnecessary-type-assertion` | — | 128:12 | 0 / 0 / 1 |
+| `src/frontend/IPC/responsesMain.ts` | `no-unnecessary-type-assertion` | 619:57, 620:60, 621:64 | — | 0 / 3 / 0 |
+| `src/frontend/show/slides.ts` | `no-unnecessary-type-assertion` | — | 51:13, 91:13, 318:9, 343:40, 347:21, 432:13, 437:40 | 0 / 0 / 7 |
+| `src/frontend/utils/cloudSync.ts` | `no-unnecessary-type-assertion` | 353:62 | 353:62 | 1 / 0 / 0 |
+| `src/frontend/utils/drive.ts` | `no-unnecessary-type-assertion` | — | 52:32 | 0 / 0 / 1 |
+| `src/frontend/utils/obsTalk.ts` | `no-unnecessary-type-assertion` | 51:13, 74:13 | 51:13, 74:13 | 2 / 0 / 0 |
+
+### Fresh pre-remediation production warning inventory
+
+The production build succeeded before remediation and emitted 161 `element_invalid_self_closing_tag` warnings across 84 source files: 154 frontend diagnostics in 78 files and 7 server diagnostics in 6 files. These are fresh pre-edit locations used to assign S1-S7; line/column values are before the authorized edits. The raw log is not permanent evidence, so the complete relative-path/location/tag inventory is recorded here. At this planning revision, the pinned `svelte-check` rerun against this exact pre-remediation state has not yet been captured; plan 01-06 Task 1 is explicitly ordered to capture it before any remediation source edit. Its earlier 157 target-warning count remains history, not a substitute for the fresh inventory.
+
+| File | Pre-edit diagnostic locations and element tags |
+|---|---|
+| `src/frontend/ai/components/floating/AiTranscription.svelte` | 94:20 `<div>` |
+| `src/frontend/components/draw/Draw.svelte` | 27:8 `<div>`; 29:8 `<div>` |
+| `src/frontend/components/draw/DrawSettings.svelte` | 129:8 `<div>` |
+| `src/frontend/components/draw/Fill.svelte` | 28:0 `<div>` |
+| `src/frontend/components/draw/Paint.svelte` | 146:0 `<canvas>` |
+| `src/frontend/components/draw/Particles.svelte` | 31:4 `<div>` |
+| `src/frontend/components/drawer/Card.svelte` | 37:12 `<div>`; 39:12 `<div>` |
+| `src/frontend/components/drawer/audio/Audio.svelte` | 416:8 `<div>`; 449:8 `<div>` |
+| `src/frontend/components/drawer/audio/AudioMeter.svelte` | 174:20 `<div>`; 175:20 `<span>`; 176:20 `<div>`; 180:20 `<span>` |
+| `src/frontend/components/drawer/audio/effects/AudioCompressor.svelte` | 162:12 `<div>`; 168:4 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioDelay.svelte` | 99:4 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioFilter.svelte` | 152:4 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioLimiter.svelte` | 134:12 `<div>`; 140:4 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioNoiseGate.svelte` | 108:4 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioReverb.svelte` | 101:4 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioStereoShaper.svelte` | 105:4 `<div>` |
+| `src/frontend/components/drawer/bible/Scripture.svelte` | 1284:8 `<div>`; 1291:12 `<div>` |
+| `src/frontend/components/drawer/calendar/Calendar.svelte` | 239:36 `<span>` |
+| `src/frontend/components/drawer/calendar/CalendarsManagement.svelte` | 42:24 `<span>` |
+| `src/frontend/components/drawer/live/BMDStream.svelte` | 73:4 `<canvas>`; 77:12 `<canvas>` |
+| `src/frontend/components/drawer/live/Capture.svelte` | 89:12 `<canvas>` |
+| `src/frontend/components/drawer/live/Mic.svelte` | 105:20 `<div>`; 106:20 `<span>` |
+| `src/frontend/components/drawer/live/NDIStream.svelte` | 53:4 `<canvas>`; 58:12 `<canvas>` |
+| `src/frontend/components/drawer/live/OMTStream.svelte` | 53:4 `<canvas>`; 57:12 `<canvas>` |
+| `src/frontend/components/drawer/media/Media.svelte` | 584:20 `<div>` |
+| `src/frontend/components/drawer/pages/Interactions.svelte` | 422:24 `<div>` |
+| `src/frontend/components/drawer/pages/InteractionsInfo.svelte` | 54:12 `<div>` |
+| `src/frontend/components/drawer/player/Vimeo.svelte` | 178:8 `<iframe>` |
+| `src/frontend/components/edit/ItemAddMenu.svelte` | 125:24 `<div>` |
+| `src/frontend/components/edit/editbox/Editbox.svelte` | 275:8 `<div>` |
+| `src/frontend/components/edit/editbox/EditboxCropping.svelte` | 214:4, 215:4, 216:4, 217:4, 219:4, 220:4, 221:4, 222:4, 224:4, 225:4, 226:4, 227:4 `<div>` |
+| `src/frontend/components/edit/editbox/EditboxLines.svelte` | 757:12 `<div>` |
+| `src/frontend/components/edit/editors/AudioEditor.svelte` | 47:4 `<div>`; 48:4 `<div>` |
+| `src/frontend/components/edit/editors/MediaEditor.svelte` | 71:12 `<div>`; 75:12 `<div>` |
+| `src/frontend/components/inputs/MaterialButton.svelte` | 121:8 `<span>` |
+| `src/frontend/components/inputs/MaterialCheckbox.svelte` | 37:4 `<div>`; 38:4 `<div>`; 64:4 `<span>` |
+| `src/frontend/components/inputs/MaterialColorInput.svelte` | 206:8 `<div>`; 213:8 `<span>` |
+| `src/frontend/components/inputs/MaterialDropdown.svelte` | 282:4 `<div>`; 314:4 `<span>` |
+| `src/frontend/components/inputs/MaterialFilePicker.svelte` | 59:4 `<div>`; 101:4 `<span>` |
+| `src/frontend/components/inputs/MaterialFolderPicker.svelte` | 53:4 `<div>`; 75:4 `<span>` |
+| `src/frontend/components/inputs/MaterialNumberInput.svelte` | 155:4 `<div>`; 176:4 `<span>` |
+| `src/frontend/components/inputs/MaterialPopupButton.svelte` | 66:4 `<div>`; 111:4 `<span>` |
+| `src/frontend/components/inputs/MaterialRadialPicker.svelte` | 154:4 `<div>`; 182:4 `<span>` |
+| `src/frontend/components/inputs/MaterialTextInput.svelte` | 80:4 `<div>`; 90:4 `<span>` |
+| `src/frontend/components/inputs/MaterialTextarea.svelte` | 36:4 `<div>`; 37:4 `<textarea>`; 39:4 `<span>` |
+| `src/frontend/components/inputs/MaterialTimePicker.svelte` | 62:4 `<div>`; 72:4 `<span>` |
+| `src/frontend/components/inputs/MaterialToggleSwitch.svelte` | 38:4 `<div>`; 39:4 `<div>`; 57:8 `<div>`; 60:4 `<span>` |
+| `src/frontend/components/main/Loader.svelte` | 5:0 `<div>` |
+| `src/frontend/components/main/ProgressPanel.svelte` | 87:28 `<div>`; 109:28 `<div>` |
+| `src/frontend/components/main/Top.svelte` | 100:12 `<div>`; 155:12 `<div>` |
+| `src/frontend/components/main/popups/ChooseMediaInput.svelte` | 71:12 `<div>` |
+| `src/frontend/components/main/popups/ManageFonts.svelte` | 164:22 `<div>` |
+| `src/frontend/components/media/Video.svelte` | 233:8 `<video>`; 241:8 `<video>` |
+| `src/frontend/components/output/layers/BackgroundMedia.svelte` | 55:74 `<div>` |
+| `src/frontend/components/output/layers/PdfOutput.svelte` | 80:8 `<canvas>` |
+| `src/frontend/components/output/tools/MediaControls.svelte` | 119:16 `<div>`; 123:16 `<div>`; 142:16 `<div>` |
+| `src/frontend/components/show/AudioPreview.svelte` | 166:4 `<canvas>` |
+| `src/frontend/components/show/ProjectContentList.svelte` | 477:12 `<div>`; 494:12 `<div>` |
+| `src/frontend/components/show/Projects.svelte` | 539:20 `<div>`; 545:20 `<div>`; 556:24 `<div>` |
+| `src/frontend/components/show/VideoShow.svelte` | 371:20 `<video>`; 382:20 `<video>`; 421:16 `<div>`; 459:16 `<div>` |
+| `src/frontend/components/show/pdf/PdfPreview.svelte` | 210:16 `<canvas>` |
+| `src/frontend/components/show/tools/HighlightedNotes.svelte` | 65:4 `<textarea>` |
+| `src/frontend/components/show/tools/Notes.svelte` | 32:4 `<textarea>` |
+| `src/frontend/components/show/tools/SlideGroups.svelte` | 132:12 `<div>` |
+| `src/frontend/components/slide/Layouts.svelte` | 158:12 `<div>`; 144:16 `<div>` |
+| `src/frontend/components/slide/Reference.svelte` | 90:8, 99:8, 115:8, 126:8, 136:8 `<div>` |
+| `src/frontend/components/slide/SkeletonSlide.svelte` | 22:12 `<div>`; 33:8 `<div>`; 38:12 `<div>` |
+| `src/frontend/components/slide/Slide.svelte` | 280:8 `<div>`; 289:8 `<div>`; 415:28 `<div>`; 419:20 `<div>`; 425:28 `<div>`; 429:32 `<div>` |
+| `src/frontend/components/slide/views/Captions.svelte` | 85:12 `<webview>` |
+| `src/frontend/components/slide/views/MediaItem.svelte` | 191:16 `<video>`; 200:16 `<video>` |
+| `src/frontend/components/slide/views/Timer.svelte` | 151:4 `<div>`; 153:4 `<div>` |
+| `src/frontend/components/slide/views/Visualizer.svelte` | 243:0 `<canvas>` |
+| `src/frontend/components/slide/views/Website.svelte` | 87:8 `<div>` |
+| `src/frontend/components/stage/SkeletonStageSlide.svelte` | 20:12 `<div>` |
+| `src/frontend/components/system/Movebox.svelte` | 97:8 `<div>`; 101:12 `<div>` |
+| `src/frontend/components/system/SelectElem.svelte` | 338:16, 342:16, 345:16, 346:16, 349:16 `<span>`; 353:12 `<span>` |
+| `src/frontend/components/system/Snaplines.svelte` | 126:4 `<div>` |
+| `src/frontend/components/timeline/TimelineEasing.svelte` | 219:24, 222:24, 230:24, 253:24 `<div>` |
+| `src/server/common/components/Checkbox.svelte` | 5:4 `<div>` |
+| `src/server/common/components/Loader.svelte` | 5:0 `<div>` |
+| `src/server/output_stream/App.svelte` | 172:4 `<canvas>` |
+| `src/server/remote/components/MaterialButton.svelte` | 112:8 `<span>` |
+| `src/server/stage/components/PreviewCanvas.svelte` | 66:4 `<canvas>` |
+| `src/server/stage/components/Timer.svelte` | 74:4 `<div>`; 76:4 `<div>` |
+
+### Final gate reminder
+
+The earlier 01-04 production build/pixel test were pre-edit and do not satisfy final acceptance. Plan 01-06 first captures the fresh pinned checker inventory before its S1/S2 edits; plans 01-07 through 01-09 then run in parallel with disjoint ownership, covering the remaining S3-S7 paths and T1-T4 files. Together plans 01-06 through 01-09 divide the 84 warning paths into seven 12-file batches and the 47 target-lint files into batches of 12, 12, 12 and 11. Final plan 01-04 must run the post-edit build and explicit `assertBuildOutput.js`; fresh production and pinned checker warning inventories; all four non-mutating lint jobs; full Vitest JSON/status comparison (60 suites / 181 total / 179 passed / the same two baseline failures / zero skipped, while continuing other checks); Prettier and Stylelint comparisons; focused tests for changed TypeScript; source-hunk authorization against the exact 01-03 tip; and `output-render` with `--retries=0` (actually executed, 2 passed, 0 skipped, `maxDiffPixels: 0`, unchanged snapshot), followed by `cleanBuilds.js` and public HTML cleanliness. Any unsafe/unresolved over-baseline delta or failed gate remains blocking.
