@@ -4,8 +4,12 @@
         "types": ["node", "svelte", "vite/client"],
         "sourceMap": true,
         "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
         "stripInternal": true,
-        // "strict": true,
+        // pinned false: the project opts into the individual strict flags below and must not inherit the umbrella from a future @tsconfig/svelte base bump
+        "strict": false,
+        "verbatimModuleSyntax": true,
         // "noImplicitAny": true,
         "strictNullChecks": true,
         "strictFunctionTypes": true,

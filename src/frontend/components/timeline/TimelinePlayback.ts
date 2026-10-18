@@ -1,4 +1,4 @@
-import { get, Unsubscriber } from "svelte/store"
+import { get, type Unsubscriber } from "svelte/store"
 import { Main } from "../../../types/IPC/Main"
 import type { TimelineAction } from "../../../types/Show"
 import { sendMain } from "../../IPC/main"

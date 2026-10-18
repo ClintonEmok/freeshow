@@ -4,6 +4,8 @@
         "types": ["node", "svelte"],
         "sourceMap": true,
         "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
         "stripInternal": true,
         "strict": true,
         "noImplicitAny": true,
