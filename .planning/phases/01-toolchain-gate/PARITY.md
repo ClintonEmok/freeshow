@@ -566,3 +566,27 @@ Every fresh checker `element_invalid_self_closing_tag` diagnostic (repo-relative
 | `src/frontend/components/system/SelectElem.svelte` | 338:17 `<span>`, 342:17 `<span>`, 345:17 `<span>`, 346:17 `<span>`, 349:17 `<span>`, 353:13 `<span>` |
 | `src/frontend/components/system/Snaplines.svelte` | 126:5 `<div>` |
 | `src/frontend/components/timeline/TimelineEasing.svelte` | 219:25 `<div>`, 222:25 `<div>`, 230:25 `<div>`, 253:25 `<div>` |
+
+## Post-remediation final verification
+
+This addendum records the final-gate rerun after 01-06/07/08/09. It preserves the original blocked measurements and inventories above. All raw command output and independent status files are retained outside the repository under `/private/var/folders/ht/_t09b17d0p11tcppmbhzsry40000gn/T/opencode/phase1-01-04-final/`; no source, build/lint configuration, test, baseline, or snapshot was changed for this gate.
+
+### Task 1 — fresh production build and pinned checker
+
+| Command | Exit | Evidence |
+|---|---:|---|
+| `npm run build` | 0 | Complete stdout/stderr: `phase1-01-04-final/build.raw`; independent status: `build.exit` (`0`). This is a fresh build after all remediation batches. |
+| `node scripts/assertBuildOutput.js` | 0 | Explicit separate invocation after build; complete output: `assert-build-output.raw`; independent status: `assert-build-output.exit` (`0`). Output: `Build output assertion passed: bundle.css (257310 bytes, 3 component selectors), bundle.js, production HTML literal, electron build`. |
+| `npx svelte-check --tsconfig config/typescript/tsconfig.svelte.json --output machine` | 1 | Complete machine output: `svelte-check.raw`; independent status: `svelte-check.exit` (`1`, known nonzero for checker errors). Summary: `COMPLETED 2174 FILES 144 ERRORS 137 WARNINGS 85 FILES_WITH_PROBLEMS`; project resolution is credible (`FILES >= 1000`) and errors are below the baseline 338. |
+
+Fresh production outputs: `public/build/bundle.js` 3,930,171 bytes; `public/build/bundle.css` 257,310 bytes; `build/electron/index.js` exists and is non-empty; the production HTML literal is present in `public/index.html` at this stage. The production log has **zero** `element_invalid_self_closing_tag` diagnostics (zero target-code records in the complete captured log). Its four Svelte plugin warnings are unrelated `css_unused_selector` diagnostics at `Popup.svelte:203:4`, `FloatingInputs.svelte:71:4`, `FloatingInputs.svelte:74:4`, and `Tabs.svelte:150:4`; no target self-closing warning or `a11y_` warning was emitted. The production log's warning-code outcome is therefore target `0`, CSS-unused-selector `4`.
+
+Fresh pinned-checker warning composition (137 total, extracted from all machine `WARNING` records): `a11y_autofocus` 9; `a11y_click_events_have_key_events` 16; `a11y_role_has_required_aria_props` 2; `a11y_consider_explicit_label` 4; `a11y_label_has_associated_control` 5; `a11y_no_noninteractive_element_interactions` 3; `a11y_no_static_element_interactions` 84; `a11y_no_noninteractive_tabindex` 4; `a11y_missing_attribute` 2 (129 a11y total); `css_unused_selector` 4; one compatibility warning for standard `appearance`; and `element_invalid_self_closing_tag` 3. The exact remaining checker target locations and tags are:
+
+| Repo-relative path | Fresh line:column | Tag |
+|---|---:|---|
+| `src/frontend/components/drawer/info/EffectsInfo.svelte` | 4:1 | `<div>` |
+| `src/frontend/components/drawer/info/OverlayInfo.svelte` | 14:5 | `<div>` |
+| `src/frontend/components/output/preview/PreviewCanvas.svelte` | 85:5 | `<canvas>` |
+
+The first two paths match the previously noted checker-only area. The fresh output additionally reports `output/preview/PreviewCanvas.svelte:85:5`; it is unchanged from the exact source comparison revision and is recorded as an additional checker-only target finding rather than silently omitted. No `OverlayInfo.svelte:54` target finding appears in this fresh run. These three current checker diagnostics violate the zero-target checker requirement and block Task 1 acceptance; no source or warning-policy change is authorized here. The existing `svelte/valid-compile` `ignoreWarnings: true` a11y policy remains unchanged, and no new suppression was added.
