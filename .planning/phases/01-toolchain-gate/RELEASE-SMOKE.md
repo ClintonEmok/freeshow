@@ -167,6 +167,70 @@ Two-phase, and the order matters:
 
 **Success Criterion 4 on the same run:** re-read `.planning/phases/01-toolchain-gate/baseline/README.md` and confirm `svelte-check`, the four lint jobs, Vitest and Prettier report **no new** errors/failures, and that no `lint:*` / `test:*` script was dropped from `package.json`. Both `continue-on-error: true` entries in `.github/workflows/ci.yml` must still be **exactly two** — flipping either one is a CI-behaviour change and is out of scope for Phase 1.
 
+## On-device execution record — 2026-10-19
+
+**Scope and honesty:** The macOS arm64 packaged flow and native-module calls below were exercised on this device. The packaging command itself did **not** complete successfully because no trusted, valid signing identity was available; the resulting app directory was still launchable and was smoke-tested, but this is not a successful release-packaging result. No GitHub Actions workflow was dispatched, so there are no CI run URLs, dates, or Windows/Linux results to report. Cross-platform evidence remains pending. Pixel evidence is per-OS only; this Darwin capture is not a Linux or Windows comparison baseline.
+
+### Build and packaged app
+
+| Check | Observed result |
+|---|---|
+| `npm run build` | **PASS** — Vite production bundle, server apps, Electron TypeScript build, and `scripts/assertBuildOutput.js` completed; assertion reported `bundle.css` 257310 bytes and verified the bundle, production HTML, selectors, and Electron build. |
+| `npm run pack` | **FAIL / release blocker** — electron-builder 26.17.0 rebuilt the native dependencies for Electron 37.10.3 arm64 and produced `dist/mac-arm64/FreeShow.app`; signing then failed. The log reported zero valid signing identities (available identities were expired or untrusted), `Failed to codesign your application with code: 1`, and `FreeShow.app: code has no resources but signature indicates they must be present`. No signing workaround was applied. |
+| Resolved executable used by smoke test | `/Users/clintonemok/Work/freeshow/dist/mac-arm64/FreeShow.app/Contents/MacOS/FreeShow` |
+| Packaged page URL | `file:///Users/clintonemok/Work/freeshow/dist/mac-arm64/FreeShow.app/Contents/Resources/app.asar/public/index.html` (not the development server) |
+
+### Checklist observations
+
+| Step | Result and observed evidence |
+|---|---|
+| 1. Launch | **PASS for this local smoke run** — the unpacked macOS arm64 executable launched and the main window loaded the packaged `app.asar/public/index.html`; the URL contained `index.html` and did not contain `localhost:3000`. The separate signing failure above remains a packaging/release blocker. |
+| 2. Settings | **PASS** — the test opened Settings and observed the General heading and language control. |
+| 3. Output | **PASS** — the output window rendered the `#output_window` hook and retained the configured 1920×1080 viewport. |
+| 4. Play a song | **PASS** — the test sent the seeded show live and observed the lyric `test line 1` in the output window. |
+| 5. Import a file | **PASS** — the mocked text-file import completed and `Smoke Imported Song` appeared in the app. |
+| 6. Native modules | **PASS** — details are listed below; all calls ran in Electron 37.10.3 (ABI 136), arm64. |
+| 7. Darwin pixel baseline | **PASS** — capture run wrote `config/testing/smoke.test.ts-snapshots/output-1920x1080-darwin.png`; it is 1920×1080 and non-uniform. A separate run without snapshot-update flags compared against it with `maxDiffPixels: 0` and passed. This baseline covers Darwin only. |
+
+Native-module result object from the packaged Electron main process:
+
+```json
+{
+  "runtime": { "electron": "37.10.3", "abi": "136", "arch": "arm64" },
+  "sqlite": { "loaded": true, "exercised": true, "detail": "SELECT 1 returned 1", "value": 1 },
+  "opus": { "loaded": true, "exercised": true, "detail": "encoded PCM frame to 3 bytes" },
+  "osrCapture": { "loaded": true, "exercised": true, "detail": "BGRA conversion returned 8 bytes; expected 8" },
+  "osrReadback": true
+}
+```
+
+Commands run against the resolved executable (the spec creates fresh temporary stores for each test):
+
+```bash
+FS_SMOKE_EXECUTABLE=/Users/clintonemok/Work/freeshow/dist/mac-arm64/FreeShow.app/Contents/MacOS/FreeShow \
+  npx playwright test --config config/testing/playwright.config.ts smoke --update-snapshots=all
+
+FS_SMOKE_EXECUTABLE=/Users/clintonemok/Work/freeshow/dist/mac-arm64/FreeShow.app/Contents/MacOS/FreeShow \
+  npx playwright test --config config/testing/playwright.config.ts smoke
+```
+
+Both runs passed all 3 smoke tests. The first captured the Darwin baseline; the second ran without `--update-snapshots` and compared against the committed-per-plan Darwin baseline. Local transcripts are in `/private/var/folders/ht/_t09b17d0p11tcppmbhzsry40000gn/T/opencode/phase1-01-05-smoke/smoke-capture-fixed.log` and `smoke-compare-fixed.log`. The first pre-fix attempt failed on the Show-navigation selector, main-process `require` availability, and Retina capture dimensions; the spec now targets the Show navigation slot, constructs a resolver from Electron's packaged app path, and sets device scale factor 1. The passing results above are from the corrected runs, not the failed attempt.
+
+### Cross-platform CI evidence — pending
+
+No workflow was dispatched. Consequently, run URLs and dates are **unavailable**, not inferred from repository status. Windows and Linux packaged smoke/native-module claims remain unverified; no cross-OS pixel comparison is claimed. Dispatch only against the current work branch `gsd/m1-design-system`, never `main`, then record each returned Actions URL, actual run date, matrix conclusion, and native-module output here:
+
+```bash
+gh workflow run build.yml --ref gsd/m1-design-system
+gh workflow run ci.yml --ref gsd/m1-design-system
+gh workflow run playwright.yml --ref gsd/m1-design-system
+gh workflow run playwright.yml --ref gsd/m1-design-system -f update_snapshots=true
+```
+
+The last command is a baseline-capture run only. Download its `pixel-baselines` artifact with `gh run download <RUN_ID> --name pixel-baselines`, commit the generated `-linux.png` baseline on the work branch, and dispatch the Playwright comparison and Build matrix again. The Build matrix must succeed on Windows, macOS, and Linux with packaged smoke results before TOOL-04 is approved. The Linux checkout capture and packaged Build smoke use the same bundle and 1920×1080 xvfb geometry; a packaged diff is a finding to retain, not a reason to re-capture or relax the threshold.
+
+**On-device versus CI-only statement:** macOS arm64 operator flow, native-module calls, and Darwin pixel comparison were verified on-device against the generated unpacked app directory. The `npm run pack` result is still a signing failure, not a passing package gate. Windows/Linux packaging and smoke results, CI-only run evidence, and any Linux baseline comparison are pending because no Actions dispatch was run. A Darwin baseline says nothing about Windows or Linux rendering.
+
 ## Failure handling
 
 - A failed step is a **release blocker**: do not re-capture the baseline or relax the pixel threshold to make it pass. The threshold starts at `maxDiffPixels: 0` and may only be relaxed to `maxDiffPixelRatio: 0.001` with the generated diff image kept for human review and the reason recorded.

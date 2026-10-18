@@ -49,7 +49,9 @@ async function launchApp(): Promise<AppContext> {
     try {
         electronApp = await electron.launch({
             ...(executablePath ? { executablePath } : {}),
-            args: executablePath ? ["--no-sandbox"] : [".", "--no-sandbox"],
+            // Electron otherwise inherits the Retina backing scale (2 device pixels per CSS pixel).
+            // Keep the emitted screenshot at the requested CSS-pixel dimensions on macOS.
+            args: executablePath ? ["--no-sandbox", "--force-device-scale-factor=1"] : [".", "--no-sandbox", "--force-device-scale-factor=1"],
             env: { ...process.env, NODE_ENV: "production", FS_MOCK_STORE_PATH: tmpSettingFolder.name }
         })
     } catch (err) {
@@ -128,7 +130,9 @@ async function openSettingsAndVerify(app: AppContext) {
 
 async function createSeededShow(app: AppContext) {
     const window = app.mainWindow
-    await window.locator('.top button[data-title*="show" i]').first().click({ timeout: timeoutMs })
+    // Settings is opened earlier in this flow. The first button in the middle top-nav group
+    // is the Show page button; target its structural slot rather than localized tooltip text.
+    await window.locator(".top > span:nth-of-type(2) button").first().click({ timeout: timeoutMs })
     await window.getByText("New project").first().click({ timeout: timeoutMs })
     await window.getByText("New show").first().click({ timeout: timeoutMs })
     await expect(window.locator("#name")).toBeVisible({ timeout: timeoutMs })
@@ -320,7 +324,13 @@ test("packaged native modules are callable under Electron's ABI", async () => {
     const app = await launchApp()
     try {
         const runtime = await app.electronApp.evaluate(() => ({ electron: process.versions.electron, abi: process.versions.modules, arch: process.arch }))
-        const checks = await app.electronApp.evaluate(() => {
+        const checks = await app.electronApp.evaluate(({ app }) => {
+            // Playwright evaluates this callback in Electron's main-process global scope, where
+            // CommonJS's module-local `require` is not a global. Build one from the packaged app
+            // manifest so native addons resolve from the artifact under test and Electron ABI.
+            const moduleApi = process.getBuiltinModule("module") as typeof import("node:module")
+            const pathApi = process.getBuiltinModule("path") as typeof import("node:path")
+            const requireFromApp = moduleApi.createRequire(pathApi.join(app.getAppPath(), "package.json"))
             const result: any = {
                 sqlite: { loaded: false, exercised: false, detail: "" },
                 opus: { loaded: false, exercised: false, detail: "" },
@@ -330,7 +340,7 @@ test("packaged native modules are callable under Electron's ABI", async () => {
 
             let db: any
             try {
-                const Database = require("better-sqlite3")
+                const Database = requireFromApp("better-sqlite3")
                 result.sqlite.loaded = true
                 db = new Database(":memory:")
                 result.sqlite.value = db.prepare("SELECT 1 AS n").get().n
@@ -343,7 +353,7 @@ test("packaged native modules are callable under Electron's ABI", async () => {
             }
 
             try {
-                const { OpusEncoder } = require("@discordjs/opus")
+                const { OpusEncoder } = requireFromApp("@discordjs/opus")
                 result.opus.loaded = true
                 const encoder = new OpusEncoder(48000, 2)
                 const encoded = encoder.encode(Buffer.alloc(960 * 2 * 2))
@@ -354,7 +364,7 @@ test("packaged native modules are callable under Electron's ABI", async () => {
             }
 
             try {
-                const osr = require("osr-capture")
+                const osr = requireFromApp("osr-capture")
                 result.osrCapture.loaded = true
                 const converted = osr.convertBgraToUyvy(Buffer.alloc(2 * 2 * 4), 2, 2)
                 result.osrCapture.exercised = Buffer.isBuffer(converted) && converted.length === 2 * 2 * 2
