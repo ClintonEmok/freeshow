@@ -4,16 +4,16 @@ current_phase: 1
 current_phase_name: Toolchain Gate
 status: executing
 stopped_at: Completed 01-03 (Svelte 5 legacy-mode toolchain swap — the atomic version bump)
-last_updated: "2026-10-18T01:22:00.000Z"
+last_updated: "2026-10-18T05:43:05.224Z"
 last_activity: 2026-10-18
-last_activity_desc: "01-03 complete: Svelte 5.57.2 legacy mode + Vite 8.0.16 (Rolldown) + TypeScript 5.9.3 + svelte-check 4.7.7 + Vitest 4.1.12 from one --force-free install; six new App() sites replaced with mount(), componentApi set nowhere, 546 of 547 components byte-identical plus one authorized 3-line rename; build exits 0 with the assertion passing, bundle.js minified, pixel gate 2/2 at maxDiffPixels 0, npm start ready in 412ms with no compiler errors; the a11y_ suppression PROVEN live (129 a11y warnings in svelte-check vs 0 in the build log)"
-state_head: 1cf9c0a2
+last_activity_desc: Phase 1 execution started
+state_head: 88902f7b6b68de6885aa031a9b12873643d6f956
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 5
   completed_plans: 3
-  percent: 60
+  percent: 0
 ---
 
 # Project State
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-17)
 
 **Core value:** The show must not fail — during a live service the operator must be able to get lyrics, scripture, and media onto the output displays reliably and instantly, with no visible interruption.
-**Current focus:** Phase 1 — Toolchain Gate (Svelte 5 legacy mode + Vite 7 + TypeScript 5.9)
+**Current focus:** Phase 1 — Toolchain Gate
 
 ## Current Position
 
 Phase: 1 (Toolchain Gate) — EXECUTING
-Plan: 3 of 5 in current phase (01-03 complete)
-Status: In progress
-Last activity: 2026-10-18 — Completed 01-03: the atomic version bump. Svelte 5.57.2 in legacy mode, Vite 8.0.16 on Rolldown, TypeScript 5.9.3, svelte-check 4.7.7 and Vitest 4.1.12 — with zero component rewrites, a pixel-identical output window and an exit-0 production build
+Plan: 1 of 5
+Status: Executing Phase 1
+Last activity: 2026-10-18 — Phase 1 execution started
 
-Progress: [██████░░░░] 60%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
