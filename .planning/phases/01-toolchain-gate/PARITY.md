@@ -462,3 +462,107 @@ The production build succeeded before remediation and emitted 161 `element_inval
 ### Final gate reminder
 
 The earlier 01-04 production build/pixel test were pre-edit and do not satisfy final acceptance. Plan 01-06 first captures the fresh pinned checker inventory before its S1/S2 edits; plans 01-07 through 01-09 then run in parallel with disjoint ownership, covering the remaining S3-S7 paths and T1-T4 files. Together plans 01-06 through 01-09 divide the 84 warning paths into seven 12-file batches and the 47 target-lint files into batches of 12, 12, 12 and 11. Final plan 01-04 must run the post-edit build and explicit `assertBuildOutput.js`; fresh production and pinned checker warning inventories; all four non-mutating lint jobs; full Vitest JSON/status comparison (60 suites / 181 total / 179 passed / the same two baseline failures / zero skipped, while continuing other checks); Prettier and Stylelint comparisons; focused tests for changed TypeScript; source-hunk authorization against the exact 01-03 tip; and `output-render` with `--retries=0` (actually executed, 2 passed, 0 skipped, `maxDiffPixels: 0`, unchanged snapshot), followed by `cleanBuilds.js` and public HTML cleanliness. Any unsafe/unresolved over-baseline delta or failed gate remains blocking.
+
+## Fresh pinned svelte-check inventory before remediation
+
+Date: 2026-10-18 (UTC; checker completed at 2026-10-18T08:37:38Z)
+
+Source revision: `2ee3eae0e169f138c977221a8f2e25f52d698901`
+
+Source worktree status before checker/remediation (`git status --porcelain -- src`): empty (no tracked or untracked source changes).
+
+Pinned version: `4.7.7` — `package.json` devDependency `svelte-check: 4.7.7`, `package-lock.json` resolved `node_modules/svelte-check` version `4.7.7`, installed `node_modules` version `4.7.7`.
+
+Version command: `npx svelte-check --version` → `svelte-check, 4.7.7` (exit 0).
+
+Checker command: `npx svelte-check --tsconfig config/typescript/tsconfig.svelte.json --output machine`
+
+Exit status: `1` (expected nonzero for known checker errors; the complete output was retained rather than filtered). Raw output: `/private/var/folders/ht/_t09b17d0p11tcppmbhzsry40000gn/T/opencode/phase1-remediation.5oVIXc/svelte-check-pre-remediation.raw`; separately captured status: `/private/var/folders/ht/_t09b17d0p11tcppmbhzsry40000gn/T/opencode/phase1-remediation.5oVIXc/svelte-check-pre-remediation.exit`.
+
+Fresh totals: `2174 FILES / 144 ERRORS / 291 WARNINGS / HINTS not reported by svelte-check 4.7.7` (`138 FILES_WITH_PROBLEMS`). Warning composition: 157 `element_invalid_self_closing_tag`; 129 `a11y_*`; 5 other warnings (4 `css_unused_selector`, 1 CSS compatibility warning for `appearance`). The target diagnostics below are frontend-scoped: 157 instances across 81 files. The separate pre-remediation production-build inventory remains authoritative for server Svelte paths and reports 161 target diagnostics overall (154 frontend across 78 files + 7 server across 6 files). These inventories have different compiler scopes/reachability and location columns; their totals are intentionally not merged. The 157 count in the earlier checker run remains historical and is not substituted for this fresh capture (the fresh count happens to also be 157).
+
+Every fresh checker `element_invalid_self_closing_tag` diagnostic (repo-relative file, current line:column, non-void tag):
+
+| Repo-relative file | Fresh checker diagnostic locations and non-void tags |
+|---|---|
+| `src/frontend/ai/components/floating/AiTranscription.svelte` | 94:21 `<div>` |
+| `src/frontend/components/draw/Draw.svelte` | 27:9 `<div>`, 29:9 `<div>` |
+| `src/frontend/components/draw/DrawSettings.svelte` | 129:9 `<div>` |
+| `src/frontend/components/draw/Fill.svelte` | 28:1 `<div>` |
+| `src/frontend/components/draw/Paint.svelte` | 146:1 `<canvas>` |
+| `src/frontend/components/draw/Particles.svelte` | 31:5 `<div>` |
+| `src/frontend/components/drawer/Card.svelte` | 37:13 `<div>`, 39:13 `<div>` |
+| `src/frontend/components/drawer/audio/Audio.svelte` | 416:9 `<div>`, 449:9 `<div>` |
+| `src/frontend/components/drawer/audio/AudioMeter.svelte` | 174:21 `<div>`, 175:21 `<span>`, 176:21 `<div>`, 180:21 `<span>` |
+| `src/frontend/components/drawer/audio/effects/AudioCompressor.svelte` | 162:13 `<div>`, 168:5 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioDelay.svelte` | 99:5 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioFilter.svelte` | 152:5 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioLimiter.svelte` | 134:13 `<div>`, 140:5 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioNoiseGate.svelte` | 108:5 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioReverb.svelte` | 101:5 `<div>` |
+| `src/frontend/components/drawer/audio/effects/AudioStereoShaper.svelte` | 105:5 `<div>` |
+| `src/frontend/components/drawer/bible/Scripture.svelte` | 1284:9 `<div>`, 1291:13 `<div>` |
+| `src/frontend/components/drawer/calendar/Calendar.svelte` | 239:37 `<span>` |
+| `src/frontend/components/drawer/calendar/CalendarsManagement.svelte` | 42:25 `<span>` |
+| `src/frontend/components/drawer/info/EffectsInfo.svelte` | 4:1 `<div>` |
+| `src/frontend/components/drawer/info/OverlayInfo.svelte` | 14:5 `<div>` |
+| `src/frontend/components/drawer/live/BMDStream.svelte` | 73:5 `<canvas>`, 77:13 `<canvas>` |
+| `src/frontend/components/drawer/live/Capture.svelte` | 89:13 `<canvas>` |
+| `src/frontend/components/drawer/live/Mic.svelte` | 105:21 `<div>`, 106:21 `<span>` |
+| `src/frontend/components/drawer/live/NDIStream.svelte` | 53:5 `<canvas>`, 58:13 `<canvas>` |
+| `src/frontend/components/drawer/live/OMTStream.svelte` | 53:5 `<canvas>`, 57:13 `<canvas>` |
+| `src/frontend/components/drawer/media/Media.svelte` | 584:21 `<div>` |
+| `src/frontend/components/drawer/pages/Interactions.svelte` | 422:25 `<div>` |
+| `src/frontend/components/drawer/pages/InteractionsInfo.svelte` | 54:13 `<div>` |
+| `src/frontend/components/drawer/player/Vimeo.svelte` | 178:9 `<iframe>` |
+| `src/frontend/components/edit/ItemAddMenu.svelte` | 125:25 `<div>` |
+| `src/frontend/components/edit/editbox/Editbox.svelte` | 275:9 `<div>` |
+| `src/frontend/components/edit/editbox/EditboxCropping.svelte` | 214:5, 215:5, 216:5, 217:5, 219:5, 220:5, 221:5, 222:5, 224:5, 225:5, 226:5, 227:5 `<div>` |
+| `src/frontend/components/edit/editbox/EditboxLines.svelte` | 757:13 `<div>` |
+| `src/frontend/components/edit/editors/AudioEditor.svelte` | 47:5 `<div>`, 48:5 `<div>` |
+| `src/frontend/components/edit/editors/MediaEditor.svelte` | 71:13 `<div>`, 75:13 `<div>` |
+| `src/frontend/components/inputs/MaterialButton.svelte` | 121:9 `<span>` |
+| `src/frontend/components/inputs/MaterialCheckbox.svelte` | 37:5 `<div>`, 38:5 `<div>`, 64:5 `<span>` |
+| `src/frontend/components/inputs/MaterialColorInput.svelte` | 206:9 `<div>`, 213:9 `<span>` |
+| `src/frontend/components/inputs/MaterialDropdown.svelte` | 282:5 `<div>`, 314:5 `<span>` |
+| `src/frontend/components/inputs/MaterialFilePicker.svelte` | 59:5 `<div>`, 101:5 `<span>` |
+| `src/frontend/components/inputs/MaterialFolderPicker.svelte` | 53:5 `<div>`, 75:5 `<span>` |
+| `src/frontend/components/inputs/MaterialNumberInput.svelte` | 155:5 `<div>`, 176:5 `<span>` |
+| `src/frontend/components/inputs/MaterialPopupButton.svelte` | 66:5 `<div>`, 111:5 `<span>` |
+| `src/frontend/components/inputs/MaterialRadialPicker.svelte` | 154:5 `<div>`, 182:5 `<span>` |
+| `src/frontend/components/inputs/MaterialTextInput.svelte` | 80:5 `<div>`, 90:5 `<span>` |
+| `src/frontend/components/inputs/MaterialTextarea.svelte` | 36:5 `<div>`, 37:5 `<textarea>`, 39:5 `<span>` |
+| `src/frontend/components/inputs/MaterialTimePicker.svelte` | 62:5 `<div>`, 72:5 `<span>` |
+| `src/frontend/components/inputs/MaterialToggleSwitch.svelte` | 38:5 `<div>`, 39:5 `<div>`, 57:9 `<div>`, 60:5 `<span>` |
+| `src/frontend/components/main/Loader.svelte` | 5:1 `<div>` |
+| `src/frontend/components/main/ProgressPanel.svelte` | 87:29 `<div>`, 109:29 `<div>` |
+| `src/frontend/components/main/Top.svelte` | 100:13 `<div>`, 155:13 `<div>` |
+| `src/frontend/components/main/popups/ChooseMediaInput.svelte` | 71:13 `<div>` |
+| `src/frontend/components/main/popups/ManageFonts.svelte` | 164:23 `<div>` |
+| `src/frontend/components/media/Video.svelte` | 233:9 `<video>`, 241:9 `<video>` |
+| `src/frontend/components/output/layers/BackgroundMedia.svelte` | 55:75 `<div>` |
+| `src/frontend/components/output/layers/PdfOutput.svelte` | 80:9 `<canvas>` |
+| `src/frontend/components/output/preview/PreviewCanvas.svelte` | 85:5 `<canvas>` |
+| `src/frontend/components/output/tools/MediaControls.svelte` | 119:17 `<div>`, 123:17 `<div>`, 142:17 `<div>` |
+| `src/frontend/components/show/AudioPreview.svelte` | 166:5 `<canvas>` |
+| `src/frontend/components/show/ProjectContentList.svelte` | 477:13 `<div>`, 494:13 `<div>` |
+| `src/frontend/components/show/Projects.svelte` | 539:21 `<div>`, 545:21 `<div>`, 556:25 `<div>` |
+| `src/frontend/components/show/VideoShow.svelte` | 371:21 `<video>`, 382:21 `<video>`, 421:17 `<div>`, 459:17 `<div>` |
+| `src/frontend/components/show/pdf/PdfPreview.svelte` | 210:17 `<canvas>` |
+| `src/frontend/components/show/tools/HighlightedNotes.svelte` | 65:5 `<textarea>` |
+| `src/frontend/components/show/tools/Notes.svelte` | 32:5 `<textarea>` |
+| `src/frontend/components/show/tools/SlideGroups.svelte` | 132:13 `<div>` |
+| `src/frontend/components/slide/Layouts.svelte` | 158:13 `<div>`, 144:17 `<div>` |
+| `src/frontend/components/slide/Reference.svelte` | 90:9 `<div>`, 99:9 `<div>`, 115:9 `<div>`, 126:9 `<div>`, 136:9 `<div>` |
+| `src/frontend/components/slide/SkeletonSlide.svelte` | 22:13 `<div>`, 33:9 `<div>`, 38:13 `<div>` |
+| `src/frontend/components/slide/Slide.svelte` | 280:9 `<div>`, 289:9 `<div>`, 415:29 `<div>`, 419:21 `<div>`, 425:29 `<div>`, 429:33 `<div>` |
+| `src/frontend/components/slide/views/Captions.svelte` | 85:13 `<webview>` |
+| `src/frontend/components/slide/views/MediaItem.svelte` | 191:17 `<video>`, 200:17 `<video>` |
+| `src/frontend/components/slide/views/Timer.svelte` | 151:5 `<div>`, 153:5 `<div>` |
+| `src/frontend/components/slide/views/Visualizer.svelte` | 243:1 `<canvas>` |
+| `src/frontend/components/slide/views/Website.svelte` | 87:9 `<div>` |
+| `src/frontend/components/stage/SkeletonStageSlide.svelte` | 20:13 `<div>` |
+| `src/frontend/components/system/Movebox.svelte` | 97:9 `<div>`, 101:13 `<div>` |
+| `src/frontend/components/system/SelectElem.svelte` | 338:17 `<span>`, 342:17 `<span>`, 345:17 `<span>`, 346:17 `<span>`, 349:17 `<span>`, 353:13 `<span>` |
+| `src/frontend/components/system/Snaplines.svelte` | 126:5 `<div>` |
+| `src/frontend/components/timeline/TimelineEasing.svelte` | 219:25 `<div>`, 222:25 `<div>`, 230:25 `<div>`, 253:25 `<div>` |
