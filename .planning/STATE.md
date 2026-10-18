@@ -1,19 +1,19 @@
 ---
 gsd_state_version: "1.0"
-current_phase: 1
+current_phase: 01
 current_phase_name: Toolchain Gate
 status: executing
-stopped_at: Executed the 01-04 final parity gate; acceptance remains blocked
-last_updated: "2026-10-18T10:22:13Z"
+stopped_at: Completed 01-10 residual remediation; 01-04 final parity gate remains pending
+last_updated: "2026-10-18T14:30:28Z"
 last_activity: 2026-10-18
-last_activity_desc: Ran the 01-04 post-remediation final gate and recorded unresolved parity blockers
-state_head: 6db378a8c66b912e05a813dfc719a8bffb825f4b
+last_activity_desc: Completed 01-10 residual parity remediation
+state_head: cc6144cd
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 31
-  completed_plans: 7
-  percent: 23
+  total_plans: 32
+  completed_plans: 8
+  percent: 25
 ---
 
 # Project State
@@ -23,34 +23,34 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-17)
 
 **Core value:** The show must not fail — during a live service the operator must be able to get lyrics, scripture, and media onto the output displays reliably and instantly, with no visible interruption.
-**Current focus:** Phase 1 — Toolchain Gate
+**Current focus:** Phase 01 — Toolchain Gate
 
 ## Current Position
 
-Phase: 1 of 7 (Toolchain Gate) — EXECUTING
-Plan: 01-04 of 9 (7 successful plans complete; final gate run captured, 01-04 remains blocked/pending)
-Status: In progress — 01-04 final post-remediation checks are recorded; acceptance remains blocked by checker-only warnings, four async lint deltas, and Prettier baseline drift
-Last activity: 2026-10-18 — Ran the 01-04 final parity gate; do not start 01-05
+Phase: 01 (Toolchain Gate) — EXECUTING
+Plan: 10 of 10 (Wave 6; next is the 01-04 final parity gate)
+Status: In progress — 01-10 complete; final parity gate remains pending
+Last activity: 2026-10-18 — Completed 01-10-PLAN.md
 
-Progress: [██░░░░░░░░] 23%
+Progress: [███░░░░░░░] 25%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 7
-- Average duration: 24 min across the six plans with recorded durations; 01-09 source start was not included in the continuation handoff
-- Total execution time: 146 min recorded across the first six plans; 01-09 duration not recoverable
+- Total plans completed: 8 (01-04 remains blocked and is not counted complete)
+- Average duration: 24 min across the six plans with recorded durations; 01-09 source start and 01-10 pre-commit start were not included in their continuation handoffs
+- Total execution time: 146 min recorded across the first six plans; 01-09 and 01-10 exact durations not recoverable
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-toolchain-gate | 7 | 146 min recorded | 24 min recorded |
+| 01-toolchain-gate | 8 | 146 min recorded | 24 min recorded |
 
 **Recent Trend:**
 
-- Last plans: 01-02 (28 min), 01-03 (47 min), 01-06 (14 min), 01-07 (9 min), 01-08 (17 min), 01-09 (duration unavailable from continuation)
+- Last plans: 01-02 (28 min), 01-03 (47 min), 01-06 (14 min), 01-07 (9 min), 01-08 (17 min), 01-09 and 01-10 (duration unavailable from continuation)
 - Trend: -
 
 *Updated after each plan completion*
@@ -62,7 +62,10 @@ Progress: [██░░░░░░░░] 23%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [01-04 final gate] Fresh production build and explicit output assertion pass with zero `element_invalid_self_closing_tag` build warnings; the exact 161-site source-hunk audit is authorized, and the Darwin output-render comparison passes 2/2 at `maxDiffPixels: 0` with the snapshot unchanged. The gate remains blocked by three fresh checker-only target warnings, four current-only `await-thenable` findings over their individual baselines, and 80 new Prettier-unformatted paths. Do not start 01-05.
+- [01-10] The three fresh checker-only sites are normalized and pinned svelte-check reports zero `element_invalid_self_closing_tag` records. The Drive and both import `await-thenable` findings were fixed only after retained differential probes; `scripture.ts:160:50` remains unchanged because custom thenable getter ordering differs.
+- [01-10] Formatting covered only the exact 80-path delta plus the three checker-only Svelte files; the full Prettier path set is restored to the exact 40-path baseline. No formatter hunk escaped the compiler/lint-authorized sites.
+
+- [01-04 final gate — pre-01-10 historical] Fresh production build and explicit output assertion passed with zero `element_invalid_self_closing_tag` build warnings; the exact 161-site source-hunk audit was authorized, and the Darwin output-render comparison passed 2/2 at `maxDiffPixels: 0` with the snapshot unchanged. At that time, the gate was blocked by three checker-only targets, four current-only awaits, and 80 new Prettier paths. Plan 01-10 has resolved the three checker targets, three await findings, and formatter delta; the full 01-04 gate must be rerun. Do not start 01-05.
 
 - [Roadmap] Svelte 5 in legacy mode, not the Svelte 4 legacy shadcn line — the toolchain gate is its own phase (P1) with zero component-syntax rewrites, ending on a packaged cross-OS smoke test and an output-window pixel-diff gate
 - [Roadmap] Omit Tailwind Preflight and scope everything to `[data-ds="v2"]` (P2) — main, output/projector, export and capture windows share one `bundle.css`, so any global CSS is an on-air regression risk
@@ -107,14 +110,14 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Resolve or obtain an explicit disposition for the three checker-only target warnings, four async lint deltas, and 80 Prettier baseline deltas; rerun affected final gates. Do not start plan 01-05 until plan 01-04 passes.
+- Rerun the full post-remediation 01-04 final parity gate. The only current residual async lint blocker is `src/frontend/components/drawer/bible/scripture.ts:160:50`; do not start 01-05 until 01-04 passes.
 
 ### Blockers/Concerns
 
 - [Roadmap] `REQUIREMENTS.md` v1 scope is **32** requirements (not 33) — the eight `A11Y-01`…`A11Y-08` ids contain digits and were missed by the original tally. Traceability records 32/32; resolved.
-- [Phase 1 / 01-04 final gate] The pre-remediation production inventory is 161 `element_invalid_self_closing_tag` warnings (154 frontend/78 files + 7 server/6 files); S1/S2, S3/S4, S5/S6 and S7 normalized all 161 production-inventoried source sites (37 + 53 + 49 + 22). The fresh checker inventory additionally has three checker-only sites outside the production-assigned batches: `src/frontend/components/drawer/info/EffectsInfo.svelte:4:1` and `src/frontend/components/drawer/info/OverlayInfo.svelte:14:5, 54:13`. Intermediate checker runs after S5/S6 reported 201 → 178 → 152 warnings; no post-S7 checker or final production build/inventory has run. Do not substitute or project a final count. Plan 01-09 is complete; plan 01-04 remains the final parity gate. No suppression is authorized.
-- [Phase 1 / T1 and T2] Four current-only `await-thenable` findings remain blockers: `src/electron/cloud/drive.ts:209:9` (`Promise.all` over synchronous values), `src/electron/data/import.ts:24:9`, `:36:9` (`for await` over `string[]`), and `src/frontend/components/drawer/bible/scripture.ts:160:50` (`Promise.all` over synchronous chapter values). Preserve Promise/microtask/rejection and async-iterator-close behavior unless a safe exact change is demonstrated. T2 assigned lint after edits reports the five matched findings plus this one retained await.
-- [Phase 1 / 01-04 final gate] Checker comparison: baseline **2244 FILES / 338 ERRORS / 47 WARNINGS / 598 HINTS**; fresh pre-remediation **2174 / 144 / 291** (HINTS not emitted by svelte-check 4.7.7); post-S1/S2 **2174 / 144 / 254**. The pre-remediation warning composition was 157 self-closing + 129 a11y + 5 other. The −70 FILES delta is attributed to the `@tsconfig/svelte@5`/module-resolution change with unchanged project includes; the full final parity gate remains pending.
+- [Phase 1 / 01-04 pre-01-10 inventory] The pre-remediation production inventory contained 161 `element_invalid_self_closing_tag` warnings (154 frontend + 7 server); S1/S2, S3/S4, S5/S6 and S7 normalized all 161 production-inventoried sites. The pre-01-10 checker inventory additionally had three checker-only sites at `EffectsInfo.svelte:4:1`, `OverlayInfo.svelte:14:5`, and output `PreviewCanvas.svelte:85:5`; plan 01-10 normalized them and its post-format checker reports zero target records. The final production build/inventory remains pending in 01-04. No suppression is authorized.
+- [Phase 1 / pre-01-10 historical] Four current-only `await-thenable` findings were initially present. Plan 01-10 resolved the Drive site and both import-loop sites after differential probes; only `scripture.ts:160:50` remains, with a documented custom thenable getter-order mismatch. The full 01-04 lint baseline comparison must be rerun.
+- [Phase 1 / 01-04 final gate] Baseline checker counts remain **2244 FILES / 338 ERRORS / 47 WARNINGS / 598 HINTS**; pre-01-10 fresh counts were **2174 / 144 / 291** (svelte-check 4.7.7 omits HINTS). Plan 01-10's post-format checker reports zero target self-closing-tag records, but the final full checker/baseline comparison has not been rerun. The −70 FILES delta is attributed to the `@tsconfig/svelte@5`/module-resolution change with unchanged project includes.
 - [Phase 1 / 01-04] `lint:svelte` is **185 err / 0 warn** vs 172 at 01-02 vs 167 at baseline (+13). Confirm this is TS-5.9 type-awareness on unchanged source, not check loss.
 - [Phase 1] Pre-existing, NOT regressions: 2 Vitest failures in `src/electron/cloud/syncManager.test.ts`, and 40 Prettier-unformatted files (20 of them `.svelte`). Both are recorded in `baseline/` and are the numbers 01-04 must not exceed — 01-03 held both at exact parity (40 files, identical set).
 - [Phase 2] `@theme inline` may still emit a `:root` block; confirm in the built CSS what lands on `:root` and that it changes nothing in an output window. This is the single most important item to verify before Phase 4.
@@ -127,15 +130,14 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-### Final 01-04 gate state (current; supersedes older interim counts above)
+### Current residual remediation and final-gate state
 
-- Fresh production build and separate output assertion passed; production target warning count is zero. Fresh checker result is `2174 FILES / 144 ERRORS / 137 WARNINGS`, with three target diagnostics remaining at `EffectsInfo.svelte:4:1`, `OverlayInfo.svelte:14:5`, and `output/preview/PreviewCanvas.svelte:85:5`.
-- The source hunk audit maps all 161 authorized production-inventoried tag changes; the Darwin output-render gate passed 2/2 with zero skipped at `maxDiffPixels: 0`, unchanged snapshot hash, successful `cleanBuilds.js`, and clean `public/index.html`.
-- All four lint jobs retain coverage and per-job total problems are at or below baseline; target `await-thenable` still exceeds baseline (Electron 6/3, frontend 1/0). The four current-only async findings remain unchanged.
-- Vitest remains at 60 suites / 181 tests / 179 passed / the same two baseline failures / zero skipped. Stylelint is 216/216. Prettier reports 120 unformatted files versus 40 baseline (80 new), with no formatter writes.
-- Plan 01-04 remains blocked and pending; do not start 01-05. The older interim checker/build counts above remain historical evidence, not the current result.
+- Plan 01-10 completed: fresh pinned checker has zero `element_invalid_self_closing_tag` target records; the exact 80 formatting paths plus three checker-only paths were formatted, and Prettier returned to the exact 40-file baseline.
+- Differential probes support the `drive.ts` and two `import.ts` fixes. The only current async blocker is `scripture.ts:160:50`, where candidate thenable getter ordering differs.
+- The historical 01-04 build/output checks and Darwin pixel comparison passed their recorded criteria, but they predate the 01-10 edits. The post-01-10 full 01-04 gate has not run and remains mandatory.
+- Keep plan 01-04 pending/blocked until that complete gate passes. Do not start 01-05.
 
-Last session: 2026-10-18 10:21 UTC
-Stopped at: Executed all three 01-04 final-gate tasks; build and output pixels pass, while checker-only target warnings, async lint deltas, and Prettier drift keep acceptance blocked.
+Last session: 2026-10-18 14:30 UTC
+Stopped at: Completed 01-10 residual remediation; the post-remediation 01-04 final gate is next.
 Resume file: None
-Next action: obtain an authorized safe disposition for the remaining parity blockers, rerun affected gates, and keep 01-05 pending until 01-04 passes.
+Next action: execute the complete 01-04 post-remediation parity gate and keep 01-05 pending until it passes.

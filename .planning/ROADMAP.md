@@ -63,7 +63,7 @@ Plans:
 
 **Wave 6** *(blocked on all Wave 5 remediation plans; residual checker/lint/format scope is bounded before the final gate)*
 
-- [ ] 01-10: Residual source remediation — normalize the three fresh checker-only tags, attempt only probe-proven async fixes for four current-only `await-thenable` findings, and format the exact 80-path Prettier delta plus the three newly changed checker-only files within authorized hunks
+- [x] 01-10: Residual source remediation — normalize the three fresh checker-only tags, attempt only probe-proven async fixes for four current-only `await-thenable` findings, and format the exact 80-path Prettier delta plus the three newly changed checker-only files within authorized hunks
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
@@ -219,7 +219,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Toolchain Gate | 7/10 | In progress | - |
+| 1. Toolchain Gate | 8/10 | In progress | - |
 | 2. Design-Token Foundation | 0/4 | Not started | - |
 | 3. Settings IA & Flows | 0/3 | Not started | - |
 | 4. Primitive Layer | 0/4 | Not started | - |
