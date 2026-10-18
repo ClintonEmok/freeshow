@@ -279,7 +279,7 @@
 </script>
 
 <div class="textfield {disabled ? 'disabled' : ''}" style={$$props.style || null} class:flags class:onlyArrow bind:this={dropdownEl}>
-    <div class="background" ></div>
+    <div class="background"></div>
 
     <div
         class="input edit dropdown-trigger"
@@ -311,7 +311,7 @@
     {#if !onlyArrow}
         <label for={id} class:selected={hasValue}>{@html translateText(label, $dictionary)}</label>
     {/if}
-    <span class="underline" ></span>
+    <span class="underline"></span>
 
     {#if allowEmpty && hasValue}
         <div class="remove">

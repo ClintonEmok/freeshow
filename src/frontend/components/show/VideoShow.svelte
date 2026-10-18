@@ -368,7 +368,7 @@
                 <!-- TODO: use Video.svelte element instead -->
                 <!-- TODO: on:error={videoError} - ERR_FILE_NOT_FOUND -->
                 {#if mediaStyle.fit === "blur"}
-                    <video style={mediaStyleBlurString} src={encodeFilePath(mediaPath)} bind:this={blurVideo} bind:paused={blurPausedState} loop={videoData.loop} muted ></video>
+                    <video style={mediaStyleBlurString} src={encodeFilePath(mediaPath)} bind:this={blurVideo} bind:paused={blurPausedState} loop={videoData.loop} muted></video>
                 {/if}
                 {@const mainVol = $audioChannelsData.main?.volume ?? 1}
                 <video style={mediaStyleString} src={encodeFilePath(mediaPath)} on:loadedmetadata={onLoad} on:playing={onPlay} bind:this={video} bind:currentTime={videoTime} bind:paused={videoData.paused} bind:duration={videoData.duration} bind:muted={videoData.muted} volume={Math.min(1, Math.max(0, mainVol))} loop={videoData.loop}>
@@ -379,7 +379,7 @@
                 </video>
 
                 {#if softLoopValue > 0 && videoData.loop}
-                    <video style="{mediaStyleString} position: absolute;top: 0;left: 0;transition: 0.2s opacity;opacity: {effectiveSoftLoopOpacity};pointer-events: none;" bind:this={softLoopVideo} src={encodeFilePath(mediaPath)} muted loop={videoData.loop} ></video>
+                    <video style="{mediaStyleString} position: absolute;top: 0;left: 0;transition: 0.2s opacity;opacity: {effectiveSoftLoopOpacity};pointer-events: none;" bind:this={softLoopVideo} src={encodeFilePath(mediaPath)} muted loop={videoData.loop}></video>
                 {/if}
             {/if}
         </HoverButton>
@@ -418,7 +418,7 @@
             {/if}
 
             {#if !playingInOutput}
-                <div class="divider" ></div>
+                <div class="divider"></div>
 
                 <MediaPicker id="subtitles" title={translateText("scripture.local")} filter={{ name: "Video Text Track", extensions: ["vtt", "srt"] }} on:picked={subtitlePicked} dark={false}>
                     <Icon id="add" right={!tracks.length} />
@@ -456,7 +456,7 @@
             {/if}
 
             {#if !playingInOutput}
-                <div class="diviver" ></div>
+                <div class="diviver"></div>
 
                 <MaterialButton icon="add" title="actions.add_time_marker" on:click={addMarker}>
                     {#if !$videoMarkers[showId]?.length}<T id="actions.add_time_marker" />{/if}

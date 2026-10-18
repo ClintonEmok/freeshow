@@ -68,11 +68,11 @@
                 <Icon id={videoData.paused ? "play" : "pause"} white={videoData.paused} size={1.3} />
             </MaterialButton>
 
-            <div class="divider" ></div>
+            <div class="divider"></div>
 
             <VideoSlider path={mediaPath} bind:videoData bind:videoTime big />
 
-            <div class="divider" ></div>
+            <div class="divider"></div>
 
             <MaterialButton title="media._loop" disabled>
                 <Icon id="loop" size={1.2} />

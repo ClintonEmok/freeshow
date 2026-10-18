@@ -131,13 +131,13 @@
 
         <!-- GR meter -->
         <div class="gr-meter" title="Gain Reduction">
-            <div class="gr-bar" style="height: {grBarHeight}px;" ></div>
+            <div class="gr-bar" style="height: {grBarHeight}px;"></div>
             <span class="gr-label">{grDisplay} dB</span>
             <span class="gr-title">GR</span>
         </div>
     </div>
 
-    <div style="height: 8px;" ></div>
+    <div style="height: 8px;"></div>
 
     <!-- Parameter inputs -->
     <InputRow>

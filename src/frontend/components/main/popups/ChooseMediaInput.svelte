@@ -68,7 +68,7 @@
             <Cameras on:click={selectCamera} showPlayOnHover={false} />
         {:else if activeType === "screens"}
             <Screens bind:streams on:click={(e) => selectStream(e, "screen")} />
-            <div style="width: 100%;height: 10px;" ></div>
+            <div style="width: 100%;height: 10px;"></div>
             <Windows bind:streams on:click={(e) => selectStream(e, "screen")} />
         {:else if activeType === "ndi"}
             <NDIStreams on:click={(e) => selectStream(e, "ndi")} />

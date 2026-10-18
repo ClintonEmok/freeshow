@@ -109,7 +109,7 @@
     {/if}
 
     {#each ripples as { x, y, size, id } (id)}
-        <span class="ripple" style="top: {y}px; left: {x}px; width: {size}px; height: {size}px;" on:animationend={() => handleAnimationEnd(id)} ></span>
+        <span class="ripple" style="top: {y}px; left: {x}px; width: {size}px; height: {size}px;" on:animationend={() => handleAnimationEnd(id)}></span>
     {/each}
 </button>
 

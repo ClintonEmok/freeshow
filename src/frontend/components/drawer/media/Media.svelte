@@ -581,7 +581,7 @@
                     <Cameras on:click={({ detail }) => clickInput(detail.event, detail.cam, "camera")} />
                 {:else if inputsTab === "screens"}
                     <Screens bind:streams on:click={({ detail }) => clickInput(detail.event, detail.screen, "screen")} />
-                    <div style="width: 100%;height: 10px;" ></div>
+                    <div style="width: 100%;height: 10px;"></div>
                     <Windows bind:streams {searchValue} on:click={({ detail }) => clickInput(detail.event, detail.screen, "screen")} />
                 {:else if inputsTab === "ndi"}
                     <NDIStreams on:click={({ detail }) => clickInput(detail.event, detail.screen, "ndi")} />

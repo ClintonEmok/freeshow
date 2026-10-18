@@ -161,7 +161,7 @@
 {/if}
 
 {#if newFontInput}
-    {#if fonts.length}<div style="padding: 5px;" ></div>{/if}
+    {#if fonts.length}<div style="padding: 5px;"></div>{/if}
 
     <MaterialTextInput label="settings.font_family" value={fontFamily} disabled={addingFont} on:change={(e) => updateFontFamily(e.detail)} />
 

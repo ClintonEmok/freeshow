@@ -882,3 +882,101 @@ npx eslint -c config/linting/eslint.frontend.json --ext .js,.ts src/frontend/com
 ```
 
 Before edits, Electron had 2 files / 5 errors / 0 warnings, including three current-only await findings; after the final adapter it had 2 / 2 / 0, with zero `await-thenable` findings. Frontend remained 1 file / 30 errors / 0 warnings, with the single scripture await unchanged. Both commands exited 1 for existing non-target findings; complete pre/post outputs and statuses are in `lint-electron-{pre,post-final}.*` and `lint-frontend-{pre,post-final}.*`. No change was made to `src/electron/data/backup.ts`; its three baseline-matched awaits remain untouched. `git diff --check` on the assigned async files exited 0.
+
+### Task 3 — Exact formatting scope, lint, and source-hunk audit
+
+The pre-format `npx prettier --config config/formatting/.prettierrc.yaml --check src scripts` run exited 1 with **123** unformatted paths: exactly the historical 40-path baseline, the exact 80 fenced remediation paths under the existing `Prettier path-set comparison`, and the three Task 1 checker-only Svelte files. There were no other paths. The formatter was invoked with explicit path arguments in eight batches: 12, 12, 12, 12, 12, 12, 8, and 3 paths. Batches 1–7 are the existing exact 80-path list in its fenced order; batch 8 is exactly `EffectsInfo.svelte`, `OverlayInfo.svelte`, and `src/frontend/components/output/preview/PreviewCanvas.svelte`. All eight `prettier --write` commands exited 0. Exact per-batch commands and complete outputs/statuses are retained as `prettier-batch-{1..8}.{command,stdout,stderr,exit}` under `/private/var/folders/ht/_t09b17d0p11tcppmbhzsry40000gn/T/opencode/phase1-01-10/`.
+
+Before any write, the exact 83-file source snapshot and SHA-256 manifest were retained under `phase1-01-10/prettier-before/`; the plan-base unified-zero diff is `source-hunks-before-prettier.raw`. The audited post-write source set is exactly those 83 paths (82 Svelte + `chords.ts`) and no other working-tree `src` path. `format-hunk-audit.txt` independently compares every formatted file to its pre-write copy: **157** Svelte hunks remove only the whitespace between an already-authorized opening tag and `>` before its existing closing tag; the sole TypeScript hunk is the authorized one-expression `.chords` reflow. There are no other formatting changes. The line/tag map below records every physical post-format site; the tag sites are the same authorized compiler diagnostic locations in the existing 01-04 source map above, plus the three Task 1 rows.
+
+| Path | Exact formatter hunk location(s) | Changed sites |
+|---|---|---:|
+| `src/frontend/ai/components/floating/AiTranscription.svelte` | 94 `<div>` | 1 |
+| `src/frontend/components/draw/Draw.svelte` | 27 `<div>`, 29 `<div>` | 2 |
+| `src/frontend/components/draw/DrawSettings.svelte` | 129 `<div>` | 1 |
+| `src/frontend/components/draw/Fill.svelte` | 28 `<div>` | 1 |
+| `src/frontend/components/draw/Paint.svelte` | 146 `<canvas>` | 1 |
+| `src/frontend/components/draw/Particles.svelte` | 31 `<div>` | 1 |
+| `src/frontend/components/drawer/Card.svelte` | 37 `<div>`, 39 `<div>` | 2 |
+| `src/frontend/components/drawer/audio/Audio.svelte` | 416 `<div>`, 449 `<div>` | 2 |
+| `src/frontend/components/drawer/audio/AudioMeter.svelte` | 174 `<div>`, 175 `<span>`, 176 `<div>`, 180 `<span>` | 4 |
+| `src/frontend/components/drawer/audio/effects/AudioCompressor.svelte` | 162 `<div>`, 168 `<div>` | 2 |
+| `src/frontend/components/drawer/audio/effects/AudioDelay.svelte` | 99 `<div>` | 1 |
+| `src/frontend/components/drawer/audio/effects/AudioFilter.svelte` | 152 `<div>` | 1 |
+| `src/frontend/components/drawer/audio/effects/AudioLimiter.svelte` | 134 `<div>`, 140 `<div>` | 2 |
+| `src/frontend/components/drawer/audio/effects/AudioNoiseGate.svelte` | 108 `<div>` | 1 |
+| `src/frontend/components/drawer/audio/effects/AudioReverb.svelte` | 101 `<div>` | 1 |
+| `src/frontend/components/drawer/audio/effects/AudioStereoShaper.svelte` | 105 `<div>` | 1 |
+| `src/frontend/components/drawer/bible/Scripture.svelte` | 1284 `<div>`, 1291 `<div>` | 2 |
+| `src/frontend/components/drawer/calendar/Calendar.svelte` | 239 `<span>` | 1 |
+| `src/frontend/components/drawer/calendar/CalendarsManagement.svelte` | 42 `<span>` | 1 |
+| `src/frontend/components/drawer/live/BMDStream.svelte` | 73 `<canvas>`, 77 `<canvas>` | 2 |
+| `src/frontend/components/drawer/live/Capture.svelte` | 89 `<canvas>` | 1 |
+| `src/frontend/components/drawer/live/Mic.svelte` | 105 `<div>`, 106 `<span>` | 2 |
+| `src/frontend/components/drawer/live/NDIStream.svelte` | 53 `<canvas>`, 58 `<canvas>` | 2 |
+| `src/frontend/components/drawer/live/OMTStream.svelte` | 53 `<canvas>`, 57 `<canvas>` | 2 |
+| `src/frontend/components/drawer/media/Media.svelte` | 584 `<div>` | 1 |
+| `src/frontend/components/drawer/pages/Interactions.svelte` | 422 `<div>` | 1 |
+| `src/frontend/components/drawer/pages/InteractionsInfo.svelte` | 54 `<div>` | 1 |
+| `src/frontend/components/edit/ItemAddMenu.svelte` | 125 `<div>` | 1 |
+| `src/frontend/components/edit/editbox/EditboxCropping.svelte` | 214, 215, 216, 217, 219, 220, 221, 222, 224, 225, 226, 227 `<div>` | 12 |
+| `src/frontend/components/edit/editors/AudioEditor.svelte` | 47 `<div>`, 48 `<div>` | 2 |
+| `src/frontend/components/edit/editors/MediaEditor.svelte` | 71 `<div>`, 75 `<div>` | 2 |
+| `src/frontend/components/edit/scripts/chords.ts` | 18–19: one authorized `.chords` expression reflow | 1 |
+| `src/frontend/components/inputs/MaterialButton.svelte` | 121 `<span>` | 1 |
+| `src/frontend/components/inputs/MaterialCheckbox.svelte` | 37 `<div>`, 38 `<div>`, 64 `<span>` | 3 |
+| `src/frontend/components/inputs/MaterialColorInput.svelte` | 206 `<div>`, 213 `<span>` | 2 |
+| `src/frontend/components/inputs/MaterialDropdown.svelte` | 282 `<div>`, 314 `<span>` | 2 |
+| `src/frontend/components/inputs/MaterialFilePicker.svelte` | 59 `<div>`, 101 `<span>` | 2 |
+| `src/frontend/components/inputs/MaterialFolderPicker.svelte` | 53 `<div>`, 75 `<span>` | 2 |
+| `src/frontend/components/inputs/MaterialNumberInput.svelte` | 155 `<div>`, 176 `<span>` | 2 |
+| `src/frontend/components/inputs/MaterialPopupButton.svelte` | 66 `<div>`, 111 `<span>` | 2 |
+| `src/frontend/components/inputs/MaterialRadialPicker.svelte` | 154 `<div>`, 182 `<span>` | 2 |
+| `src/frontend/components/inputs/MaterialTextInput.svelte` | 80 `<div>`, 90 `<span>` | 2 |
+| `src/frontend/components/inputs/MaterialTextarea.svelte` | 36 `<div>`, 37 `<textarea>`, 39 `<span>` | 3 |
+| `src/frontend/components/inputs/MaterialTimePicker.svelte` | 62 `<div>`, 72 `<span>` | 2 |
+| `src/frontend/components/inputs/MaterialToggleSwitch.svelte` | 38 `<div>`, 39 `<div>`, 57 `<div>`, 60 `<span>` | 4 |
+| `src/frontend/components/main/Loader.svelte` | 5 `<div>` | 1 |
+| `src/frontend/components/main/ProgressPanel.svelte` | 87 `<div>`, 109 `<div>` | 2 |
+| `src/frontend/components/main/Top.svelte` | 100 `<div>`, 155 `<div>` | 2 |
+| `src/frontend/components/main/popups/ChooseMediaInput.svelte` | 71 `<div>` | 1 |
+| `src/frontend/components/main/popups/ManageFonts.svelte` | 164 `<div>` | 1 |
+| `src/frontend/components/media/Video.svelte` | 233 `<video>`, 241 `<video>` | 2 |
+| `src/frontend/components/output/layers/BackgroundMedia.svelte` | 55 `<div>` | 1 |
+| `src/frontend/components/output/layers/PdfOutput.svelte` | 80 `<canvas>` | 1 |
+| `src/frontend/components/output/tools/MediaControls.svelte` | 119 `<div>`, 123 `<div>`, 142 `<div>` | 3 |
+| `src/frontend/components/show/AudioPreview.svelte` | 166 `<canvas>` | 1 |
+| `src/frontend/components/show/ProjectContentList.svelte` | 477 `<div>`, 494 `<div>` | 2 |
+| `src/frontend/components/show/Projects.svelte` | 539 `<div>`, 545 `<div>`, 556 `<div>` | 3 |
+| `src/frontend/components/show/VideoShow.svelte` | 371 `<video>`, 382 `<video>`, 421 `<div>`, 459 `<div>` | 4 |
+| `src/frontend/components/show/pdf/PdfPreview.svelte` | 210 `<canvas>` | 1 |
+| `src/frontend/components/show/tools/HighlightedNotes.svelte` | 65 `<textarea>` | 1 |
+| `src/frontend/components/show/tools/Notes.svelte` | 32 `<textarea>` | 1 |
+| `src/frontend/components/show/tools/SlideGroups.svelte` | 132 `<div>` | 1 |
+| `src/frontend/components/slide/Layouts.svelte` | 144 `<div>`, 158 `<div>` | 2 |
+| `src/frontend/components/slide/Reference.svelte` | 90 `<div>`, 99 `<div>`, 115 `<div>`, 126 `<div>`, 136 `<div>` | 5 |
+| `src/frontend/components/slide/SkeletonSlide.svelte` | 22 `<div>`, 33 `<div>`, 38 `<div>` | 3 |
+| `src/frontend/components/slide/Slide.svelte` | 280 `<div>`, 289 `<div>`, 415 `<div>`, 419 `<div>`, 425 `<div>`, 429 `<div>` | 6 |
+| `src/frontend/components/slide/views/Captions.svelte` | 85 `<webview>` | 1 |
+| `src/frontend/components/slide/views/MediaItem.svelte` | 191 `<video>`, 200 `<video>` | 2 |
+| `src/frontend/components/slide/views/Timer.svelte` | 151 `<div>`, 153 `<div>` | 2 |
+| `src/frontend/components/slide/views/Visualizer.svelte` | 243 `<canvas>` | 1 |
+| `src/frontend/components/stage/SkeletonStageSlide.svelte` | 20 `<div>` | 1 |
+| `src/frontend/components/system/Movebox.svelte` | 97 `<div>`, 101 `<div>` | 2 |
+| `src/frontend/components/system/SelectElem.svelte` | 338, 342, 345, 346, 349, 353 `<span>` | 6 |
+| `src/frontend/components/timeline/TimelineEasing.svelte` | 219 `<div>`, 222 `<div>` | 2 |
+| `src/server/common/components/Checkbox.svelte` | 5 `<div>` | 1 |
+| `src/server/common/components/Loader.svelte` | 5 `<div>` | 1 |
+| `src/server/output_stream/App.svelte` | 172 `<canvas>` | 1 |
+| `src/server/remote/components/MaterialButton.svelte` | 112 `<span>` | 1 |
+| `src/server/stage/components/PreviewCanvas.svelte` | 66 `<canvas>` | 1 |
+| `src/server/stage/components/Timer.svelte` | 74 `<div>`, 76 `<div>` | 2 |
+| `src/frontend/components/drawer/info/EffectsInfo.svelte` | 4 `<div>` | 1 |
+| `src/frontend/components/drawer/info/OverlayInfo.svelte` | 14 `<div>` | 1 |
+| `src/frontend/components/output/preview/PreviewCanvas.svelte` | 85 `<canvas>` | 1 |
+
+Non-mutating Svelte ESLint covered the same eight batches, exactly 82 Svelte files (the `chords.ts` member was omitted from batch 3). JSON/stderr/status are `eslint-svelte-batch-{1..8}.{json,stderr,exit}`. Counts by batch were: 12 files / 12 errors / exit 1; 12 / 15 / 1; 11 / 9 / 1; 12 / 4 / 1; 12 / 5 / 1; 12 / 8 / 1; 8 / 7 / 1; and 3 / 0 / 0. Total: 82 files, 60 existing errors, zero warnings. Commands had no `--fix`. The three added checker-only Svelte files were linted in batch 8 and have zero ESLint findings.
+
+The Task 2 Electron/frontend targeted commands were rerun after formatting, and `chords.ts` received its separate frontend lint command; all JSON, stderr, and independent statuses are retained as `eslint-electron-final.*`, `eslint-frontend-final.*`, and `eslint-chords-final.*`. Electron: 2 files / 2 errors / 0 warnings / exit 1, zero await findings. Scripture: 1 / 30 / 0 / exit 1, its single await blocker remains. `chords.ts`: 1 / 0 / 0 / exit 0. No ESLint autofix or rule change occurred.
+
+The final repo-wide Prettier check exited 1 with **exactly the original 40 unformatted paths**: baseline/current set comparison is `missing=0, extra=0`; there are no new paths and no resolved baseline paths. Complete outputs/status/path set are `prettier-post.stdout`, `.stderr`, `.exit`, and `prettier-post-paths.txt`. The pinned post-format checker exited 1 for existing errors but reported **zero** `element_invalid_self_closing_tag` records (`svelte-check-post-format.raw/.exit`). The 01-04 output threshold and committed snapshot were not run, updated, or changed here; the full output-render/build/test gate remains owned by 01-04. The historical blocked 01-04 record above is not rewritten; the scripture thenable-order finding remains the async blocker for its next rerun.

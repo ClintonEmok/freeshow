@@ -62,7 +62,7 @@
             {@html highlightedText}
         </div>
     </div>
-    <textarea placeholder={placeholder || translateText("empty.text...")} class="edit {$$props.class}" rows={lines} style={$$props.style || ""} bind:value on:input={input} on:change={change} on:keydown on:scroll={handleScroll} {disabled} {autofocus} ></textarea>
+    <textarea placeholder={placeholder || translateText("empty.text...")} class="edit {$$props.class}" rows={lines} style={$$props.style || ""} bind:value on:input={input} on:change={change} on:keydown on:scroll={handleScroll} {disabled} {autofocus}></textarea>
 </div>
 
 <style>

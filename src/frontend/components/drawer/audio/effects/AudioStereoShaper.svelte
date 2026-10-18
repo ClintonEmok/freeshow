@@ -102,7 +102,7 @@
         </div>
     </div>
 
-    <div style="height: 8px;" ></div>
+    <div style="height: 8px;"></div>
 
     <InputRow>
         <MaterialNumberInput label="audio.width" value={config.width} min={0} max={200} step={1} maxDecimals={0} showSlider sliderValues={{ min: 0, max: 200, step: 1 }} on:change={(e) => handleChange("width", e.detail)} />

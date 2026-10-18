@@ -419,7 +419,7 @@
                     </MaterialButton>
 
                     {#if hasAnswer(openedInteraction?.inputs[inputIndex]) && (currentAnswer === null || currentAnswer === undefined || currentAnswer === "")}
-                        <div class="divider" ></div>
+                        <div class="divider"></div>
                         <MaterialButton on:click={() => getInteraction(openedId)?.revealAnswer()}>
                             <!-- <Icon size={1.3} id="next" white /> -->
                             <T id="interaction.reveal_answer" />

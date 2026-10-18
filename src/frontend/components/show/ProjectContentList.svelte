@@ -474,7 +474,7 @@
                 </div>
             </MaterialButton>
 
-            <div class="group-spacer" ></div>
+            <div class="group-spacer"></div>
 
             <MaterialButton
                 variant="outlined"
@@ -491,7 +491,7 @@
                 </div>
             </MaterialButton>
 
-            <div class="group-spacer" ></div>
+            <div class="group-spacer"></div>
 
             <MaterialButton variant="outlined" icon="section" title="new.section" disabled={currentProject?.sectionsLocked} on:click={addSection} white={lessVisibleSection}>
                 <div class="label">

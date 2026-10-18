@@ -143,7 +143,7 @@
     }
 </script>
 
-<canvas bind:this={canvas} width={resolution.width} height={resolution.height} ></canvas>
+<canvas bind:this={canvas} width={resolution.width} height={resolution.height}></canvas>
 
 <style>
     canvas {

@@ -413,7 +413,7 @@
             <Icon size={1.3} id={$activePlaylist?.id === active ? "stop" : "play"} white={$activePlaylist?.id !== active} />
         </MaterialButton>
 
-        <div class="divider" ></div>
+        <div class="divider"></div>
 
         <MaterialButton
             title="media.toggle_shuffle"
@@ -446,7 +446,7 @@
             <Icon size={1.1} id="auto" white={$audioPlaylists[active || ""]?.autoNext === false} />
         </MaterialButton>
 
-        <div class="divider" ></div>
+        <div class="divider"></div>
 
         <!-- total length of playlist -->
         <p class="time">

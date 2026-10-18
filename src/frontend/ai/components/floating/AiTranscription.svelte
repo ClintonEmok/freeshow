@@ -91,7 +91,7 @@
                         <ConfidenceMeter confidence={suggestion.confidence} />
                     {/if}
 
-                    <div class="fill" ></div>
+                    <div class="fill"></div>
 
                     {#if suggestion.action === "presented"}
                         <MaterialButton icon="check" title="ai.auto_present" style="padding: 6px;" disabled />
