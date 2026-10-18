@@ -67,7 +67,7 @@
         "@typescript-eslint/unified-signatures": "error",
         "@typescript-eslint/no-floating-promises": "off",
         "@typescript-eslint/no-misused-promises": "off",
-        "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
+        "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_", "caughtErrors": "none" }],
         "--TEMPORARILY-DISABLED": "off",
         // Phase 7 parity close-out: these v8-only rules add findings on frozen pre-migration code; re-evaluate after that debt is addressed.
         "@typescript-eslint/no-base-to-string": "off",
