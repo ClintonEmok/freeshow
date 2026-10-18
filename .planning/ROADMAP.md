@@ -67,7 +67,7 @@ Plans:
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 01-04: Final post-remediation parity gate — fresh production build and pinned svelte-check inventory, all four non-mutating lint jobs, exact Vitest/Prettier/Stylelint comparisons, changed-TypeScript focused tests, source-hunk authorization audit, and the actual zero-pixel output gate. **Blocked after the post-01-10 rerun only by frontend `await-thenable` 1 vs baseline 0 at `scripture.ts:160:50`; 01-05 remains pending.**
+- [x] 01-04: Final post-remediation parity gate — fresh production build and pinned svelte-check inventory, all four non-mutating lint jobs, exact Vitest/Prettier/Stylelint comparisons, changed-TypeScript focused tests, source-hunk authorization audit, and the actual zero-pixel output gate. **Passed after the authorized scripture fix (`6b9edb88`) and complete fresh Tasks 1–3 rerun: frontend awaits 0/0, Vitest exact baseline, output 2/2 at zero pixels with unchanged snapshot. Earlier blocked outcomes remain in PARITY.md and the summary. 01-05 remains pending and was not started.**
 
 **Wave 8** *(blocked on Wave 7 completion)*
 
@@ -219,7 +219,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Toolchain Gate | 8/10 | In progress | - |
+| 1. Toolchain Gate | 9/10 | In progress | - |
 | 2. Design-Token Foundation | 0/4 | Not started | - |
 | 3. Settings IA & Flows | 0/3 | Not started | - |
 | 4. Primitive Layer | 0/4 | Not started | - |

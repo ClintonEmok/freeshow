@@ -1079,4 +1079,60 @@ Scope of equivalence: installed local chapter objects, ordinary intrinsic API pr
 - `lint-target.json/.stderr/.exit`: non-mutating frontend ESLint reports **29 existing errors, zero await findings**, versus the prior 30/1; no finding exists in the new hunk. `prettier-target.raw/.exit` passes without writes. `git diff --check` passes.
 - `source-audit.py/.raw/.exit`, `source-hunks.raw`, `source-hunk-headers.tsv`, `source-hunk-audit.txt`: exact comparison against `88902f7b6b68de6885aa031a9b12873643d6f956`; all prior diagnostic-mapped hunks remain unchanged, plus exactly this authorized scripture hunk. Fresh `svelte-hunk-audit.txt` maps all **164** tag sites with **0 missing, 0 extra, 0 other changes**. Prior TypeScript review mappings remain applicable byte-for-byte; the new hunk's runtime review and probes are above. `src/frontend/tsconfig.json` remains separately classified as the pre-existing coverage configuration, not application-source remediation.
 
-The full 01-04 Tasks 1–3 rerun is in progress. These narrow checks alone do not close parity or start 01-05.
+At the source-fix commit, the full 01-04 Tasks 1–3 rerun was in progress; the narrow checks alone did not close parity or start 01-05. The completed rerun follows.
+
+### Post-scripture final verification — all 01-04 tasks
+
+Source fix: `6b9edb88`. Complete fresh commands, independent process exits, stdout and stderr are retained in the same evidence directory's `gate/` subdirectory; the executable runner is `gate.py`. These are new post-fix measurements, not reused historical results. All commands ran independently without autofix, snapshot updates, or baseline changes.
+
+#### Task 1 — build and pinned checker
+
+| Command | Exit | Result |
+|---|---:|---|
+| `npm run build` | 0 | Fresh renderer, server clients and Electron build; **0** `element_invalid_self_closing_tag` diagnostics across complete stdout/stderr. |
+| `node scripts/assertBuildOutput.js` | 0 | Fresh non-empty bundle assets, required CSS selectors, production HTML literal and Electron build pass. |
+| `npx svelte-check --tsconfig config/typescript/tsconfig.svelte.json --output machine` | 1 | **2174 FILES / 144 ERRORS / 134 WARNINGS / 82 FILES_WITH_PROBLEMS**; **0** target self-closing diagnostics. Existing errors explain exit 1. |
+
+Evidence: `gate/build.*`, `assert-build-output.*`, `svelte-check.*`, `summary.json`. Warning composition (`warning-composition.txt`) is unchanged: a11y autofocus 9; click/key 16; explicit-label 4; label/control 5; missing-attribute 2; noninteractive-interactions 3; noninteractive-tabindex 4; static-interactions 84; role-required-ARIA 2; unused-CSS 4; and one standard-appearance compatibility warning without a Svelte code URL. The existing `svelte/valid-compile` `ignoreWarnings: true` policy remains unchanged; no new suppression hides any target. Pinned coverage is credible and errors stay below 338. Compiler API inspection (`inspect-types.cjs/.raw/.exit`) independently confirms the chapter object/promise union, truthful `Iterable<Promise<ChapterInstance>>`, and **zero semantic diagnostics in the new hunk**.
+
+#### Task 2 — complete non-mutating baseline comparison
+
+The exact four lint commands are those recorded above in the prior gate and in each new `gate/lint-{electron,frontend,svelte,styles}.command`; none contains `--fix`. JSON, stderr, status and counts were captured even when the existing debt made a command exit nonzero.
+
+| Job | Files | Baseline problems | Fresh problems | Exit |
+|---|---:|---:|---:|---:|
+| `lint:electron` | 149 | 237 | **234** | 1 |
+| `lint:frontend` | 255 | 630 | **620** | 1 |
+| `lint:svelte` | 464 | 206 | **185** | 1 |
+| `lint:styles` | 464 | 216 | **216** | 2 |
+
+No coverage or rule configuration changed. The durable original per-file baseline inventory was recomputed against final JSON by `target-differential.py`; its normalized path/rule/source-range records and classification are `gate/target-differential.json` and `target-differential-summary.txt`. Source ranges were read directly from original baseline revision `136d77575ec1f853c66eba3a1f44be7401e9234c` and current files, ignoring location shifts. The retained outer `output.ts:2091` `text!` range includes the already-reviewed removal of its nested `lines!`; only that exact documented dependent range change is normalized. No diagnostic is accepted merely because its location or count matches. `summarize.py` also checks all target ranges against the immediately preceding full gate, accounting for scripture's seven-line shift; only the intended scripture await disappeared.
+
+| Scope / rule | Baseline | Fresh | Matched | Baseline-only | Current-only |
+|---|---:|---:|---:|---:|---:|
+| Electron assertion | 3 | 1 | 1 | 2 | **0** |
+| Electron await | 3 | 3 | 3 | 0 | **0** |
+| Frontend assertion | 26 | 23 | 23 | 3 | **0** |
+| Frontend await | 0 | **0** | 0 | 0 | **0** |
+
+All remaining Electron awaits are the untouched baseline `backup.ts:24,30,34` sites; its assertion remains `store.ts:215`. Electron's two absent assertions remain `NdiSender.ts:114` and `OmtSender.ts:125`; frontend's three absent assertions remain `IPC/responsesMain.ts:619–621`. All 23 remaining frontend assertions match the original inventory, including scripture's retained assertion now shifted from 1060 to 1067. No target-rule blocker remains.
+
+- Full command `npx vitest run --config config/testing/vitest.config.ts --reporter=json` exited **1**, exactly **60 suites / 181 tests / 179 passed / 2 known failures / zero skipped**. The two failures are the same `syncManager.test.ts` deleted-in-cloud and file-mtime fallback cases, with the same assertion outcomes. Skipped was derived across every assertion status: 179 `passed`, 2 `failed`, no other statuses; pending is 0. Complete JSON/status are `gate/vitest.*`, parsed counts and exact failure identities are `summary.json`.
+- `npx prettier --config config/formatting/.prettierrc.yaml --check src scripts` exited **1**, with **exactly the original 40 paths**, `missing=0 / extra=0`. Stylelint JSON remains exactly 216 warnings across 464 files, exit 2. These are existing red baselines, not clean-check claims. Full outputs are `gate/prettier.*` and `lint-styles.*`; comparison is in `summary.json`.
+- Focused TypeScript tests were rerun independently: `npx vitest run --config config/testing/vitest.config.ts src/electron/data/zip.test.ts` exited 0, **5/5**; `... src/electron/cloud/syncManager.test.ts` exited 1, **28 passed / same 2 failures**; `... src/frontend/utils/search.test.ts` exited 0, **39/39**. Commands/output/status are `gate/focused-{zip,syncManager,search}.*`. The same exact 32 changed-TypeScript file inventory from the preceding gate remains applicable; the other 29 files have no existing focused test, including scripture. For those, the full baseline suite is retained; scripture additionally has the independent probes above. Search mocks the array helper and is not a direct assertion-site test. No tests, skips, or expectations changed.
+
+#### Task 3 — fresh source audit, output pixels and cleanup
+
+The fresh complete application-source diff against **`88902f7b6b68de6885aa031a9b12873643d6f956`** is `source-hunks.raw`; exact paths/hunk ranges and classifications are `source-hunk-headers.tsv` and `source-hunk-audit.txt`. It covers the same **119 paths (87 Svelte / 32 TypeScript / 0 JavaScript)**, now **214 hunk ranges**. All historical hunks retain their previously recorded exact diagnostic mappings; `source-audit.py` verifies their old-range and changed-source content byte-for-byte rather than accepting by path count. Exactly one new hunk maps old scripture line 160 to new lines 160–167 and to the reviewed await finding and semantic probes above. All other TypeScript assertion/async reviews remain unchanged. The full Svelte map was rerun: **164 actual tag sites / 0 missing / 0 extra / 0 other changes**. The existing `src/frontend/tsconfig.json` change remains coverage configuration, separately from application-source remediation. No lint/build/test configuration was edited in this continuation.
+
+| Gate | Fresh result | Evidence |
+|---|---|---|
+| `npx playwright test --config config/testing/playwright.config.ts output-render --retries=0` | Exit **0**, **2 passed / 0 skipped**, actual seeded-output and committed-baseline tests run after the fresh successful build | `gate/output-render.*` |
+| Output threshold | Unchanged **`maxDiffPixels: 0`**; no retries or snapshot-update option | Existing test and exact `.command` |
+| Darwin 1920×1080 snapshot | Before/after SHA-256 unchanged: **`1f040b92c1ede6a4237e817bfc389fb2a694f0c3c43b70f675a7579f3ea49162`**; base comparison exits 0 | `gate/snapshot-{before,after,diff}.*` |
+| `node scripts/cleanBuilds.js` | Exit **0**; generated build assets cleaned | `gate/clean-builds.*` |
+| Development HTML restoration | Exit **0**, `/src/frontend/main.ts` restored; `git status --porcelain public/index.html` empty | `gate/public-html-check.*` |
+
+**Final verdict: Plan 01-04 PASSES all three tasks and every final parity criterion.** Historical blocked results remain above unchanged. This is not Phase 1 completion: packaged cross-OS validation remains pending. **Plan 01-05 was not started.** Protected-path diff evidence confirms no changes to tests, config, lockfile, CI, baselines or snapshots; no push occurred, and unrelated untracked workflow files remain untouched.
+
+Final debugger guardrail: temporarily restoring only the original scripture hunk on disk reproduces the exact enabled-rule finding at **160:50** (`revert-file-lint.*`); reapplying the fix restores **zero** await findings (`reapply-file-lint.*`). The final source is byte-identical to `6b9edb88` and therefore to the source used by the full gate (`reapply-identity.*`, source SHA-256 `5918c0fa754b365ddc81f7f17f18cbbc41c212ccd3638572704e53caa65711c6`). Stdin-only lint was not treated as revert proof because typed lint used the on-disk program. Stryker is not installed/configured, so mutation checking is explicitly skipped, not claimed passed. No branch, aggregate await, test assertion or lint rule was deleted to obtain parity.

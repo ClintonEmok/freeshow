@@ -1,7 +1,7 @@
 ---
 phase: 01-toolchain-gate
 plan: 04
-status: blocked
+status: completed
 subsystem: testing/toolchain
 tags: [svelte5, vite8, eslint, typescript, svelte-check, vitest, prettier, parity]
 
@@ -51,7 +51,9 @@ completed: 2026-10-18
 
 # Phase 1 Plan 4: Post-upgrade parity audit Summary
 
-**The post-remediation production build and zero-pixel output gate pass; final parity remains blocked by three checker-only Svelte warnings, four async lint deltas, and 80 newly unformatted paths.**
+**Final post-scripture continuation: 01-04 parity passes, including zero frontend await findings and the unchanged zero-pixel output gate. Phase 1 remains in progress; 01-05 was not started.**
+
+Historical original synopsis (preserved): **The post-remediation production build and zero-pixel output gate pass; final parity remains blocked by three checker-only Svelte warnings, four async lint deltas, and 80 newly unformatted paths.**
 
 ## Performance
 
@@ -232,3 +234,20 @@ This continuation preserves the original blocked 01-04 narrative above and the e
 ### Final decision and next-phase readiness
 
 The build, fresh target-warning inventories, aggregate lint counts, Vitest/Prettier/Stylelint comparisons, source-hunk audit, and projector output/cleanup gates pass. The frontend `await-thenable` current-only finding is above baseline and cannot be safely changed because the thenable getter order is observably different. **Plan 01-04 remains BLOCKED, Phase 1 remains in progress, and Plan 01-05 remains pending. Do not start 01-05 until an authorized resolution is demonstrated and the complete final gate passes.**
+
+## Final post-scripture continuation — parity passed
+
+This additive continuation supersedes the current blocked status without rewriting any earlier blocked outcome. Source fix **`6b9edb88`** changes only the exact scripture await finding: keep chapter lookups eager, then lazily yield real promises through a typed synchronous iterable as `Promise.all` consumes each item. Local chapter objects and API native promises retain lookup, assimilation/reaction, rejection and completion ordering. The earlier eager normalization remains rejected: new exact-expression probes demonstrate actual microtask differences rather than relying on the old probe's artificial boundary.
+
+### Verification and evidence
+
+Complete commands, outputs, statuses and executable independent probes are retained under `/private/var/folders/ht/_t09b17d0p11tcppmbhzsry40000gn/T/opencode/scripture-await-parity/`; durable details are in `PARITY.md`, **“Scripture await parity — authorized debugger continuation”** and **“Post-scripture final verification — all 01-04 tasks”**.
+
+- Semantic probes: **860 lazy comparisons pass in Node and another 860 in Electron**, while eager normalization has 360 observable mismatches in each runtime. **225 actual-source/installed-library comparisons pass**. Types are truthful, without casts; compiler inspection reports no new-hunk diagnostic. No repository test was added or changed.
+- **Task 1 passes:** fresh production build and separate output assertion exit 0; fresh production/checker target self-closing diagnostics both **0**. Pinned checker remains **2174 files / 144 errors / 134 warnings**, exit 1 for existing errors, with unchanged prior `ignoreWarnings: true` policy and no new suppression.
+- **Task 2 passes:** Electron **149 files / 234 problems** (baseline 237), frontend **255 / 620** (630), Svelte **464 / 185** (206), Stylelint **464 / 216** (216). Target differential: Electron assertions **1/3**, awaits **3/3**; frontend assertions **23/26**, awaits **0/0**. All remaining targets are baseline matches, no current-only target. Direct original-source range matching accounts for the previously reviewed nested `output.ts` `lines!` removal within the retained outer `text!` diagnostic. Full Vitest: **60 suites / 181 tests / 179 passed / same 2 known failures / zero skipped**. Prettier exactly matches the **40-path baseline**, no missing/extra paths. Focused tests: zip 5/5, syncManager 28 plus the same 2 failures, search 39/39; unchanged 29-file no-focused-test inventory relies on the full suite and scripture's additional probes.
+- **Task 3 passes:** exact `88902f7b6b68de6885aa031a9b12873643d6f956` audit covers **119 source paths / 214 hunks**, with every historical hunk unchanged plus one authorized scripture hunk at old 160 → new 160–167. All **164** Svelte sites map with no missing/extra/other changes; the old coverage tsconfig hunk remains separate configuration. Fresh output test exits 0, **2 passed / 0 skipped** at **`maxDiffPixels: 0`**, retries 0, no snapshot updates. Snapshot SHA-256 remains `1f040b92c1ede6a4237e817bfc389fb2a694f0c3c43b70f675a7579f3ea49162`. Cleanup passes and restores clean development HTML.
+
+### Final decision
+
+**Plan 01-04 is complete.** The final rerun meets every parity acceptance criterion; expected existing checker/lint/test debt remains visible and is not described as a globally clean suite. No test/config/baseline/snapshot/CI change, suppression, autofix, unrelated source edit or push occurred. Untracked workflow files were preserved. **Phase 1 and the milestone remain in progress. Plan 01-05 remains pending and was not started; packaged cross-OS validation is still outstanding.**

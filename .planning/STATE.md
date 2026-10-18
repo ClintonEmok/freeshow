@@ -3,17 +3,17 @@ gsd_state_version: "1.0"
 current_phase: 01
 current_phase_name: Toolchain Gate
 status: executing
-stopped_at: Completed 01-04 post-01-10 final-gate rerun; gate remains blocked by the frontend await-thenable baseline delta
-last_updated: "2026-10-18T14:48:07Z"
-last_activity: 2026-10-18
-last_activity_desc: Completed the 01-04 final gate rerun; documented the remaining blocker
-state_head: cc6144cd
+stopped_at: Completed scripture fix and all 01-04 final parity gates; 01-05 remains pending and was not started
+last_updated: "2026-10-18T22:22:09Z"
+last_activity: 2026-10-19
+last_activity_desc: Resolved scripture await ordering with probes and completed the full 01-04 parity rerun
+state_head: 6b9edb88
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 32
-  completed_plans: 8
-  percent: 25
+  completed_plans: 9
+  percent: 28
 ---
 
 # Project State
@@ -28,17 +28,17 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 01 (Toolchain Gate) — EXECUTING
-Plan: 04 of 10 (Wave 7; post-01-10 final gate rerun is blocked; 01-05 remains pending)
-Status: In progress — 01-04 remains blocked by frontend `await-thenable` 1 vs baseline 0
-Last activity: 2026-10-18 — Completed all 01-04 final-gate checks; recorded residual blocker
+Plan: 04 of 10 COMPLETE (Wave 7 passed; 01-05 / Wave 8 remains pending and was not started)
+Status: Phase in progress — all 01-04 parity gates pass; packaged cross-OS validation remains outstanding
+Last activity: 2026-10-19 — Resolved scripture await finding and completed all three fresh 01-04 gate tasks
 
-Progress: [███░░░░░░░] 25%
+Progress: [███░░░░░░░] 28%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 8 (01-04 remains blocked and is not counted complete)
+- Total plans completed: 9 (01-04 now complete after the post-scripture gate; 01-05 still pending)
 - Average duration: 24 min across the six plans with recorded durations; 01-09 source start and 01-10 pre-commit start were not included in their continuation handoffs
 - Total execution time: 146 min recorded across the first six plans; 01-09 and 01-10 exact durations not recoverable
 
@@ -46,7 +46,7 @@ Progress: [███░░░░░░░] 25%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-toolchain-gate | 8 | 146 min recorded | 24 min recorded |
+| 01-toolchain-gate | 9 | 146 min historically recorded; continuation durations not aggregated | 24 min across the original six recorded plans |
 
 **Recent Trend:**
 
@@ -61,6 +61,8 @@ Progress: [███░░░░░░░] 25%
 
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
+
+- [01-04 post-scripture — current] Source commit `6b9edb88` preserves eager chapter lookup and lazily yields real promises through a typed synchronous iterable; 860 comparisons pass in each Node/Electron runtime and 225 installed-library comparisons pass. Eager normalization is independently disproved by real nested-microtask ordering differences. The full fresh Tasks 1–3 rerun passes: frontend awaits 0/0; no new target warnings; exact 179/2/0-skipped Vitest baseline; exact 40-file Prettier baseline; source audit and 2/2 zero-pixel output with unchanged snapshot. 01-04 is complete; 01-05 was not started. Earlier blocked decisions below are historical, superseded by this result.
 
 - [01-10] The three fresh checker-only sites are normalized and pinned svelte-check reports zero `element_invalid_self_closing_tag` records. The Drive and both import `await-thenable` findings were fixed only after retained differential probes; `scripture.ts:160:50` remains unchanged because custom thenable getter ordering differs.
 - [01-10] Formatting covered only the exact 80-path delta plus the three checker-only Svelte files; the full Prettier path set is restored to the exact 40-path baseline. No formatter hunk escaped the compiler/lint-authorized sites.
@@ -111,9 +113,11 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Keep Plan 01-04 blocked until an authorized resolution/disposition exists for the over-baseline `src/frontend/components/drawer/bible/scripture.ts:160:50` `await-thenable` finding; then rerun the complete final gate. Do not start Plan 01-05 before that gate passes.
+- Resolved: the former scripture await blocker is fixed with equivalence evidence and the complete 01-04 gate now passes. Plan 01-05 packaged cross-OS validation remains pending; this debugging continuation did not start it.
 
 ### Blockers/Concerns
+
+Current: no 01-04 parity blocker remains. Prior Phase 1 parity entries below are retained as historical evidence and superseded by the post-scripture result; packaged cross-OS validation remains outstanding in 01-05.
 
 - [Roadmap] `REQUIREMENTS.md` v1 scope is **32** requirements (not 33) — the eight `A11Y-01`…`A11Y-08` ids contain digits and were missed by the original tally. Traceability records 32/32; resolved.
 - [Phase 1 / 01-04 pre-01-10 inventory] The pre-remediation production inventory contained 161 `element_invalid_self_closing_tag` warnings (154 frontend + 7 server); S1/S2, S3/S4, S5/S6 and S7 normalized all 161 production-inventoried sites. The pre-01-10 checker inventory additionally had three checker-only sites at `EffectsInfo.svelte:4:1`, `OverlayInfo.svelte:14:5`, and output `PreviewCanvas.svelte:85:5`; plan 01-10 normalized them and its post-format checker reports zero target records. The final production build/inventory remains pending in 01-04. No suppression is authorized.
@@ -143,7 +147,13 @@ Recent decisions affecting current work:
 - Plan 01-04 Tasks 1–3 were all executed. Build and output assertion passed; fresh build/checker self-closing-tag inventories are zero; all four non-mutating lint jobs, full Vitest, Prettier, Stylelint, focused TypeScript evidence, exact source audit, projector comparison, and cleanup were captured under `/private/var/folders/ht/_t09b17d0p11tcppmbhzsry40000gn/T/opencode/phase1-01-04-final/post-01-10/`.
 - The gate is still blocked by the single current-only frontend `await-thenable` finding at `scripture.ts:160:50`, retained because the candidate changes custom thenable getter order. Keep Phase 1 in progress and Plan 01-05 pending; do not start it.
 
-Last session: 2026-10-18 14:48 UTC
-Stopped at: Completed 01-04 final-gate rerun; the plan remains blocked by one frontend await-thenable finding.
+### Post-scripture final gate — current result
+
+- Scripture fix `6b9edb88` and all three fresh 01-04 tasks pass; the historical blockers above no longer describe current acceptance. Electron/frontend/Svelte/Stylelint problem counts are 234/620/185/216 with full coverage; target awaits are Electron 3/3 baseline and frontend 0/0. Pinned checker remains 2174/144/134 with zero self-closing targets; fresh build/assertion pass.
+- Full Vitest is exactly 60 suites / 181 tests / 179 passed / same two known failures / zero skipped; Prettier is exactly the original 40 paths. Every source hunk maps to an authorized finding; only the new scripture hunk was added beyond the earlier audit. Output comparison is 2 passed / 0 skipped with retries 0, zero-pixel tolerance and unchanged snapshot hash. Cleanup restores clean development HTML.
+- Complete reproducible evidence: `/private/var/folders/ht/_t09b17d0p11tcppmbhzsry40000gn/T/opencode/scripture-await-parity/`; durable evidence and historical outcomes remain in PARITY.md and 01-04-SUMMARY.md. No rules weakened, no tests/config/baselines/snapshots changed, no push; unrelated untracked workflow files preserved.
+
+Last session: 2026-10-19 local (2026-10-18 22:22 UTC)
+Stopped at: Completed 01-04 parity after the scripture fix. Phase 1 remains in progress; 01-05 pending, not started.
 Resume file: None
-Next action: wait for an authorized behavior-preserving resolution/disposition of `scripture.ts:160:50`; rerun the full 01-04 gate afterward and keep 01-05 pending until it passes.
+Next action: Report completed debugging/parity results. Stop here; 01-05 packaged cross-OS validation remains pending and was not started by this continuation.
