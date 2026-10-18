@@ -171,13 +171,13 @@
                 {/if}
 
                 <span class="meter" class:isMuted class:vertical style={!vertical ? `height: ${detailed ? "6px" : "3px"};` : ""}>
-                    <div bind:this={maskEls[i]} style={vertical ? "width: 100%; top: 0; position: absolute;" : "height: inherit; right: 0; position: absolute;"} />
-                    <span class="meter" class:isMuted class:vertical style="position: absolute; opacity: 0.08; {vertical ? 'top: 0; width: 100%; height: 100%;' : 'right: 0; height: inherit; width: 100%;'}" />
-                    <div bind:this={peakEls[i]} class="highest" class:vertical style="display: none;" />
+                    <div bind:this={maskEls[i]} style={vertical ? "width: 100%; top: 0; position: absolute;" : "height: inherit; right: 0; position: absolute;"} ></div>
+                    <span class="meter" class:isMuted class:vertical style="position: absolute; opacity: 0.08; {vertical ? 'top: 0; width: 100%; height: 100%;' : 'right: 0; height: inherit; width: 100%;'}" ></span>
+                    <div bind:this={peakEls[i]} class="highest" class:vertical style="display: none;" ></div>
                 </span>
 
                 {#if vertical}
-                    <span bind:this={dotEls[i]} class="signal-dot vertical" />
+                    <span bind:this={dotEls[i]} class="signal-dot vertical" ></span>
                 {/if}
             </div>
         {/each}

@@ -149,7 +149,7 @@
         </div>
     </div>
 
-    <div style="height: 8px;" />
+    <div style="height: 8px;" ></div>
 
     <InputRow>
         <MaterialDropdown label="audio.filter_type" value={config.type} options={filterTypeOptions} on:change={handleTypeChange} />
