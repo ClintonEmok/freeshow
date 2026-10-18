@@ -87,7 +87,7 @@ export function sortByNameAndNumber<T extends Record<string, any>>(array: T[], d
         const prefix = (match?.[1] || "").toUpperCase()
         const suffix = (match?.[3] || "").toUpperCase()
         const hasDigits = !!match?.[2]
-        const number = hasDigits ? parseInt(match![2]!, 10) : Number.POSITIVE_INFINITY
+        const number = hasDigits ? parseInt(match![2], 10) : Number.POSITIVE_INFINITY
 
         return { empty: false, prefix, number, suffix, hasDigits }
     }

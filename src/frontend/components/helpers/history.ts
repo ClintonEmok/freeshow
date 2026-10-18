@@ -38,7 +38,7 @@ function isNoDataChange(obj: History) {
 
 export function history(obj: History, shouldUndo: null | boolean = null) {
     // let page: HistoryPages = obj.location?.page || "shows"
-    if (!obj.location) obj.location = { page: get(activePage) as any }
+    if (!obj.location) obj.location = { page: get(activePage) }
     if (!obj.oldData) obj.oldData = null
     if (!obj.newData) obj.newData = null
 
@@ -319,7 +319,7 @@ export const undo = () => {
 
     if (get(isDev)) console.info("UNDO", [...get(undoHistory)], [...get(redoHistory)])
 
-    history(lastUndo!, true)
+    history(lastUndo, true)
 }
 
 export const redo = () => {
@@ -357,7 +357,7 @@ export const redo = () => {
 
     if (get(isDev)) console.info("REDO", [...get(undoHistory)], [...get(redoHistory)])
 
-    history(lastRedo!, false)
+    history(lastRedo, false)
 }
 
 // {

@@ -46,7 +46,7 @@ export async function translateShow(showId: string, languageCode: string) {
 
             const toRemove = new Set<number>()
             const translations = await Promise.all(
-                items.map(async (item, i) => {
+                items.map(async (item, i): Promise<Item | null> => {
                     if (item.language) {
                         // mark for removal if same language already exists on slide
                         if (item.language === languageCode) toRemove.add(i)
@@ -77,7 +77,7 @@ export async function translateShow(showId: string, languageCode: string) {
                     })
 
                     changed = true
-                    return { ...item, language: languageCode, lines: newLines } as Item
+                    return { ...item, language: languageCode, lines: newLines }
                 })
             )
 

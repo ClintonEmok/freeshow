@@ -678,7 +678,7 @@ const slideDrop = {
                             name = videoType === "youtube" ? (await getYouTubeData(videoId)).name : (await getVimeoData(videoId)).name
                             rid = uid()
                             playerVideos.update((a) => {
-                                a[rid!] = { id: videoId, name, type: videoType! }
+                                a[rid!] = { id: videoId, name, type: videoType }
                                 return a
                             })
                         }

@@ -130,7 +130,7 @@ export function _show(id = "active") {
 
                     if (!a[id].slides) a[id].slides = {}
                     slideIds.forEach((slideId: string, i: number) => {
-                        a[id].slides[slideId] = slides![i] || slides![0]
+                        a[id].slides[slideId] = slides[i] || slides[0]
                     })
 
                     touchShowModified(a[id])

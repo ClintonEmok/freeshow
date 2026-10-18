@@ -2088,7 +2088,7 @@ export function getMetadata(show: Show | undefined, currentStyle: Styles, outSli
             return items
         } else {
             if (!items[textboxItem].lines?.[0].text?.[0]) items[textboxItem].lines = [{ align: "", text: [{ value, style: defaultMetadataTextStyle }] }]
-            else items[textboxItem].lines![0].text![0].value = value
+            else items[textboxItem].lines[0].text![0].value = value
         }
     }
 

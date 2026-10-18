@@ -1029,9 +1029,9 @@ const deleteActions = {
 
         media.update((a) => {
             if (a[id]?.tracks?.[index]) {
-                a[id].tracks!.splice(index, 1)
+                a[id].tracks.splice(index, 1)
                 // reset tracks if all deleted, so any embedded tracks can be readded
-                if (!a[id].tracks!.length) delete a[id].tracks
+                if (!a[id].tracks.length) delete a[id].tracks
             }
             return a
         })
@@ -1450,7 +1450,7 @@ function historyDelete(id, data, { updater } = { updater: "" }) {
         })
     }
 
-    data.forEach((a: any) => history({ id, newData: { id: a.id || a }, location: { page: get(activePage) as any, id: updater || undefined } }))
+    data.forEach((a: any) => history({ id, newData: { id: a.id || a }, location: { page: get(activePage), id: updater || undefined } }))
 }
 
 async function duplicateShows(selectedData: any) {

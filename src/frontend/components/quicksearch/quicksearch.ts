@@ -327,7 +327,7 @@ const triggerActions = {
         } else {
             const textVal = id === "text" && get(activeEdit).type === "template" ? translateText("example.text") : ""
             if (id === "text") {
-                addItem(id as any, null, {}, textVal)
+                addItem(id, null, {}, textVal)
             } else {
                 addItem(id as any)
             }
