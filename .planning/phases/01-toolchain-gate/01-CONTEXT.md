@@ -114,3 +114,13 @@ No specific requirements — infrastructure phase. Follow the five ROADMAP succe
 - Making the two non-blocking CI checks blocking — PITFALLS recommends flipping them for touched paths; confirm with the user before changing CI behaviour.
 
 </deferred>
+
+## User-authorized amendment — 2026-10-18
+
+The user selected **Authorize fixes** for the blocked 01-04 parity findings. This narrowly amends the source-change prohibition for plan 01-04 only; it does not authorize broader migration cleanup.
+
+1. Convert only Svelte non-void HTML elements identified by the Svelte 5 `element_invalid_self_closing_tag` compiler diagnostic to explicit opening and closing tags. The current recorded evidence is 161 production-build warnings across 84 source files (154 frontend warnings across 78 files; 7 server warnings across 6 files) and 157 matching `svelte-check` diagnostics. Re-inventory at execution time and record the exact file/line/tag list; those counts are evidence, not a hard-coded target. Do not alter component APIs, reactive syntax, styling, or unrelated markup.
+2. Review every remaining `@typescript-eslint/no-unnecessary-type-assertion` and `@typescript-eslint/await-thenable` lint finding. Fix only individual cases proven to preserve runtime and observable behavior. Preserve intentional async scheduling/microtask behavior and `for await` semantics. Do not disable, suppress, or weaken any lint rule. Any valid or unsafe-to-fix finding that prevents baseline parity must be recorded with exact evidence and keep plan 01-04 blocked.
+3. Retain the source/output safety gates: run the production build and relevant tests, and run the existing projector snapshot at `maxDiffPixels: 0` without updating snapshots. Any pixel difference is a hard stop; do not refresh the baseline.
+
+All other Phase 1 boundaries remain in force: no broad refactor or restyle, no unrelated source changes, no CI non-blocking changes, no warning suppression, no disabling existing checks, and no change to the snapshot or threshold. This amendment supersedes only the frozen-source clauses that directly prevent the three listed actions; the earlier 01-04 blocked result and its recorded counts remain historical evidence in `PARITY.md` and `01-04-SUMMARY.md`.
