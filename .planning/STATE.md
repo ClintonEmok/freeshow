@@ -3,17 +3,17 @@ gsd_state_version: "1.0"
 current_phase: 1
 current_phase_name: Toolchain Gate
 status: executing
-stopped_at: Completed 01-01 (baselines + pinned svelte-check + output-window pixel gate)
-last_updated: "2026-10-17T23:35:00.000Z"
-last_activity: 2026-10-17
-last_activity_desc: "01-01 complete: test:svelte pinned to its real tsconfig (2244 files/338 errors), five pre-upgrade baselines + RELEASE-SMOKE.md + COVERAGE.md recorded, 1920x1080 output-window pixel gate shipped and observed failing (27,544 px) before being trusted"
-state_head: fdc2ec5e
+stopped_at: Completed 01-02 (build-contract hardening + Svelte lint flat-config migration)
+last_updated: "2026-10-18T00:10:00.000Z"
+last_activity: 2026-10-18
+last_activity_desc: "01-02 complete: cssFileName + names-aware assetFileNames on both library-mode configs, scripts/assertBuildOutput.js wired into postbuild (observed failing 5 ways), terser declared, Svelte lint job migrated to eslint-plugin-svelte@3 flat config with svelte/valid-compile proven firing; all 464 .svelte byte-identical and the 1920x1080 pixel gate still 2/2 green"
+state_head: d3a0c668
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 5
-  completed_plans: 1
-  percent: 20
+  completed_plans: 2
+  percent: 40
 ---
 
 # Project State
@@ -28,29 +28,29 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 1 (Toolchain Gate) — EXECUTING
-Plan: 1 of 5 in current phase (01-01 complete)
+Plan: 2 of 5 in current phase (01-02 complete)
 Status: In progress
-Last activity: 2026-10-17 — Completed 01-01: pinned `test:svelte`, recorded five pre-upgrade baselines, shipped the output-window pixel gate with a committed 1920x1080 baseline
+Last activity: 2026-10-18 — Completed 01-02: hardened both library-mode build configs, added the `postbuild` build-output assertion, declared `terser`, and migrated the Svelte lint job to `eslint-plugin-svelte@3` flat config with the compiler check proven firing
 
-Progress: [██░░░░░░░░] 20%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 1
-- Average duration: 31 min
-- Total execution time: 31 min
+- Total plans completed: 2
+- Average duration: 30 min
+- Total execution time: 59 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-toolchain-gate | 1 | 31 min | 31 min |
+| 01-toolchain-gate | 2 | 59 min | 30 min |
 
 **Recent Trend:**
 
-- Last 5 plans: 01-01 (31 min)
+- Last 5 plans: 01-01 (31 min), 01-02 (28 min)
 - Trend: -
 
 *Updated after each plan completion*
@@ -75,6 +75,13 @@ Recent decisions affecting current work:
 - [01-01] The pixel gate's only capture path is `--update-snapshots=all` (a bare `--update-snapshots` sets mode `"changed"`, so the platform guard would skip the capture run). Baselines are per-OS; an unbaselined platform skips with a recorded reason and can never write its own baseline or lean on `retries`.
 - [01-01] The pixel gate requires a production build to run (`NODE_ENV=production` → `loadFile("public/index.html")` → `./build/bundle.js`), and `node scripts/cleanBuilds.js` must follow. The spec cannot run in the same instant as the "index.html is clean" assertion — build, run, then restore and assert.
 - [01-01] Deliberately untouched: `config/building/rollup.config.mjs` (dead code, zero references outside AGENTS.md) and `src/server/cam/main.ts` (the fifth `new App(` site, no build path; plan 01-03 updates it for grep-cleanliness only). `ci.yml` still has exactly **two** `continue-on-error: true` entries — flipping either is a CI-behaviour change and stays out of scope for Phase 1.
+- [01-02] The CSS name is now **stated** (`build.lib.cssFileName`: `bundle` renderer / `styles` per server) rather than derived, and the `assetFileNames` hook reads `assetInfo.names ?? (assetInfo.name ? [assetInfo.name] : [])`. On Vite 4.5.14 `cssFileName` is inert; the hook is the mechanism today and can no longer throw on Rollup 4.
+- [01-02] `scripts/assertBuildOutput.js` is chained into `postbuild`, so `npm run build` fails on a broken contract. It asserts: exactly one `bundle.css`; non-empty `bundle.css`/`bundle.js`; the **production** HTML literal present in `public/index.html`; three real component selectors (`.dragger`, `.mediaContainer`, `.attributionString`) in the built CSS; `build/electron/index.js`. Observed failing five separate ways.
+- [01-02] `lint:svelte` **must not** pass `--fix`: `eslint-plugin-svelte@3` declares `supportsAutofix: true` (svelte3 did not), so `--fix` rewrites `.svelte` sources — proven on a copy of `Top.svelte`. Criterion 1 (464 components source-unchanged) outranks the flag.
+- [01-02] `svelte/valid-compile` ships in **no** `eslint-plugin-svelte@3` preset (verified in the installed package: 0 occurrences in `base.js`/`recommended.js`/`all.js`), so it is enabled by hand with `ignoreWarnings: true`. The flat config uses `svelte.configs.base` (3 ids) and `ts.configs.recommendedTypeChecked`, and filters out the preset's `.ts`-scoped `eslint-recommended` entry plus everything non-`.svelte` via a global `ignores` list — flat config lints `.js`/`.mjs`/`.cjs` by default now that `--ext` is gone.
+- [01-02] typescript-eslint v8 dropped `no-inferrable-types` and `no-empty-function` from its presets (111 recorded findings) and renamed `no-var-requires` → `no-require-imports`, `ban-types` → `no-restricted-types`, `recommended-requiring-type-checking` → `recommended-type-checked`. All are handled explicitly in the configs; adopting the lower numbers would have been silent check loss.
+- [01-02] **The `lint` chain is red by construction** and always was: `npm-run-all -s` stops at `lint:electron`, which had 209 unfixable errors in the recorded baseline. Do not use `npm run lint`'s exit code as a gate, and do not run it while sources must stay frozen — it applies `--fix` to `src/electron/**` and `src/frontend/**` (7 `.ts` files in the observed run, restored immediately).
+- [01-02] Post-migration counts (measured `--format json`, no `--fix`): svelte 464 files **172 err / 0 warn** (baseline 167/39); electron 149 files **269 err / 0 warn** (baseline 212/25); frontend 255 files **677 err / 0 warn** (baseline 630/0); styles 464 files **216 err** (baseline 216 — unchanged). Electron and frontend totals **rise** because v8's presets check more (new rules, `no-unused-vars` moved from `warn` to `error`); all 39 a11y warnings the old Svelte job reported are still reported by `test:svelte` (39 of its 47 `WARNINGS`).
 
 ### Pending Todos
 
@@ -91,10 +98,13 @@ None yet.
 - [Phase 1 / 01-05] **The Linux electron window is created at the configured bounds**, so `playwright.yml`'s `xvfb-run --server-args="-screen 0 1280x960x24"` will clamp a 1920x1080 output window and the capture will not be 1920x1080 (`enableLargerThanScreen` is macOS-only). Plan 01-05 must widen it to `-screen 0 1920x1080x24`, add the `update_snapshots` `workflow_dispatch` input, and commit `-linux.png`/`-win32.png` baselines. Until a platform's baseline is committed its pixel comparison skips by design.
 - [Phase 1] Pre-existing, NOT regressions: 2 Vitest failures in `src/electron/cloud/syncManager.test.ts`, and 40 Prettier-unformatted files (20 of them `.svelte`). Both are recorded in `baseline/` and are the numbers 01-04 must not exceed.
 - [Phase 1] `npx playwright test` requires `npm run build` first (the harness boots the production `public/index.html`), and `node scripts/cleanBuilds.js` must restore the dev tags afterwards or `npm start` will load a deleted bundle.
+- [Phase 1 / 01-03] The Svelte lint job is now flat-config (`ESLINT_USE_FLAT_CONFIG=true` on ESLint 8.57.1, a deliberate bridge — eslintrc is removed in ESLint 10 and ESLint 9 is EOL). Two follow-ups: (a) `config/linting/eslint.svelte.flat.mjs` imports `svelte.config.mjs`, so 01-03 must keep that file importable from ESM; (b) the full flat migration of the two eslintrc jobs is deferred work — it forces `eslint-plugin-jsdoc@39` and `eslint-plugin-prefer-arrow@1.2.3` bumps.
+- [Phase 1 / 01-04] Post-upgrade comparisons must use the baseline's convention (`--format json`, **no** `--fix`) and must be read against 01-02's per-rule classification, not only the pre-plan baseline: electron/frontend totals intentionally rise under typescript-eslint v8's larger presets, and `restrict-plus-operands` fell to 0 in electron because v8 made that rule's default options permissive.
+- [Phase 1] One post-change Vitest full run flaked `src/electron/data/zip.test.ts` ("a file disappears while zipping", a filesystem race) under machine load; it passes 5/5 in isolation and the repeat full run matched the baseline (179 passed / 2 failed). Not a regression — do not re-baseline for it.
 
 ## Session Continuity
 
-Last session: 2026-10-17 23:33 UTC
-Stopped at: Completed 01-01 — baselines, pinned `test:svelte`, output-window pixel gate with committed 1920x1080 baseline and observed failure
-Resume file: .planning/phases/01-toolchain-gate/01-02-PLAN.md (wave 2, blocked on nothing now — 01-01 is complete)
-Next action: execute 01-02 (pre-bump hardening: `cssFileName` + `names`-aware `assetFileNames` on both library-mode configs, `scripts/assertBuildOutput.js` wired into `postbuild`, declare `terser`, migrate the Svelte lint job to `eslint-plugin-svelte@3` flat config with `svelte/valid-compile` kept alive)
+Last session: 2026-10-18 00:10 UTC
+Stopped at: Completed 01-02 — build contracts hardened (`cssFileName` + `names`-aware hook), `scripts/assertBuildOutput.js` in the `postbuild` chain, `terser` declared, Svelte lint job on `eslint-plugin-svelte@3` flat config with `svelte/valid-compile` proven firing; pixel gate still 2/2 green; all 464 `.svelte` byte-identical
+Resume file: .planning/phases/01-toolchain-gate/01-03-PLAN.md (wave 3 — the version bumps: Svelte 5.57.2 legacy mode, Vite 8 + plugin 7, TypeScript 5.9.3, svelte-check 4, Vitest 4)
+Next action: execute 01-03 (bump the framework/bundler/checking stack; switch the `a11y-` prefix to `a11y_` in both Vite configs; the 8 `verbatimModuleSyntax` type-import fixes; then re-run `npm run build`, the pixel gate and the four lint jobs and compare against `baseline/` + 01-02's classification)
