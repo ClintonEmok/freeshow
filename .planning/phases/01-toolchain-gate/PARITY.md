@@ -144,7 +144,7 @@ All checks were run individually, without `--fix`, with their recorded baseline 
 
 | Check | Baseline (`baseline/`) | Post-upgrade result | Verdict |
 |---|---|---|---|
-| `svelte-check` | `2244 FILES / 338 ERRORS / 47 WARNINGS / 598 HINTS` | `2174 FILES / 144 ERRORS / 291 WARNINGS / 0 reported HINTS`; 138 files with problems | Error count is below baseline; file count remains in the thousands with the same project `include`/`exclude`. **Warning delta +244 is an unresolved finding**, composed below. |
+| `svelte-check` | `2244 FILES / 338 ERRORS / 47 WARNINGS / 598 HINTS` | `2174 FILES / 144 ERRORS / 291 WARNINGS`; svelte-check 4 emits no HINTS field; 138 files with problems | Error count is below baseline; file count remains in the thousands with the same project `include`/`exclude`. **Warning delta +244 is an unresolved finding**, composed below. |
 | `lint:electron` | 149 files; 212 errors + 25 warnings = 237 problems | 149 files; 271 errors + 0 warnings = 271 problems (**+34**) | **BLOCKER:** existing-rule finding counts rose; see rule-by-rule attribution in Task 3. The baseline `restrict-plus-operands` behavior was restored explicitly. |
 | `lint:frontend` | 255 files; 630 errors + 0 warnings = 630 problems | 255 files; 684 errors + 0 warnings = 684 problems (**+54**) | **BLOCKER:** existing-rule finding counts rose; see Task 3. The v8 parser error on `simplex-noise.js` was fixed without dropping the file. |
 | `lint:svelte` | 464 files; 167 errors + 39 warnings = 206 problems | 464 files; 185 errors + 0 warnings = 185 problems (**−21**) | Problem total is lower. The 39 baseline Svelte compiler/a11y warnings are still surfaced by `svelte-check` (now 129 a11y warnings); v8 rule deltas and the compile-rule positive control are recorded below. |
@@ -272,3 +272,11 @@ No CI blocking behavior or check inventory was removed. The Electron/frontend ES
 ### Blocking outcome
 
 The planned parity gate is **not met**. The final Electron and frontend lint totals exceed their recorded baselines by 34 and 54 problems, respectively, under rules that were already part of the old checks. Reaching the baseline totals would require either modifying out-of-scope application source to address those findings or disabling existing rules; the latter is explicitly prohibited. In addition, the build now exposes 161 Svelte 5 `element_invalid_self_closing_tag` warnings (and svelte-check has 291 warnings versus 47 at baseline). These are intentionally not suppressed or rewritten because the user prohibited other `.svelte` edits and asked that warnings be investigated rather than hidden. The findings are classified, but remain unresolved; this plan must be reported **BLOCKED**, not complete.
+
+Final rerun after the Task 3 tsconfig/lint-config changes:
+
+```text
+npm run build: exit 0; bundle.css 257310 bytes; bundle.js 3930171 bytes; one CSS asset; four server styles.css files non-empty; assertBuildOutput passed; 161 self-closing warnings; EMPTY_IMPORT_META = 0
+npx playwright test --config config/testing/playwright.config.ts output-render: 2 passed (29.0s), maxDiffPixels = 0
+node scripts/cleanBuilds.js: exit 0; dev HTML literal restored; git status --porcelain public/index.html: empty
+```
