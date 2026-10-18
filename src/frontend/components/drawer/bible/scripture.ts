@@ -157,7 +157,14 @@ export async function getActiveScripturesContent(selectedVerses: (number | strin
                     bookName = Book.name
                     bookAbbr = Book.getAbbreviation()
                     selectedChapters = active?.chapters.map((c) => Number(c)) || []
-                    Chapters = await Promise.all(selectedChapters.map((c) => Book.getChapter(c)))
+                    const chapters = selectedChapters.map((c) => Book.getChapter(c))
+                    // Keep lookups eager, but normalize each value only when Promise.all installs its reaction.
+                    const chapterPromises: Iterable<Promise<ChapterInstance>> = {
+                        *[Symbol.iterator]() {
+                            for (const chapter of chapters) yield Promise.resolve(chapter)
+                        }
+                    }
+                    Chapters = await Promise.all(chapterPromises)
                 } catch (err) {
                     console.error("Error loading scripture book/chapter data:", id, err)
                     return null
