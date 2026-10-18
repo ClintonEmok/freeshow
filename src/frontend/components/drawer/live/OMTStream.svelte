@@ -50,11 +50,11 @@
 </script>
 
 {#if background}
-    <canvas bind:this={canvas} {style} />
+    <canvas bind:this={canvas} {style} ></canvas>
 {:else}
     <Card outlineColor={findMatchingOut(screen.id, $outputs)} active={findMatchingOut(screen.id, $outputs) !== null} on:click title={screen.name} label={screen.name} {loaded} icon="omt" white showPlayOnHover>
         <SelectElem style="display: flex;" id="omt" data={{ id: screen.id, type: "omt", name: screen.name }} draggable>
-            <canvas bind:this={canvas} />
+            <canvas bind:this={canvas} ></canvas>
         </SelectElem>
     </Card>
 {/if}

@@ -70,11 +70,11 @@
 </script>
 
 {#if background}
-    <canvas bind:this={canvas} {style} />
+    <canvas bind:this={canvas} {style} ></canvas>
 {:else}
     <Card outlineColor={findMatchingOut(screen.id, $outputs)} active={findMatchingOut(screen.id, $outputs) !== null} on:click label={screen.name} {loaded} icon="blackmagic" white showPlayOnHover>
         <SelectElem style="display: flex;" id="blackmagic" data={{ id: screen.id, type: "blackmagic", name: screen.name }} draggable>
-            <canvas bind:this={canvas} />
+            <canvas bind:this={canvas} ></canvas>
         </SelectElem>
     </Card>
 {/if}

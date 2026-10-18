@@ -102,8 +102,8 @@
             <div class="channel-row">
                 <span class="signal-dot" class:active={soundLevel > 0}></span>
                 <span class="meter">
-                    <div style="width: {100 - soundLevel}%;" />
-                    <span class="meter" style="position: absolute; opacity: 0.08; right: 0; height: inherit; width: 100%;" />
+                    <div style="width: {100 - soundLevel}%;" ></div>
+                    <span class="meter" style="position: absolute; opacity: 0.08; right: 0; height: inherit; width: 100%;" ></span>
                 </span>
             </div>
         {/if}

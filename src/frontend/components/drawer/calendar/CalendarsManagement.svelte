@@ -39,7 +39,7 @@
 
                 <div class="calendar-card context {cal.unassigned ? '#calendar_item_unlabeled' : '#calendar_item'}" id={cal.id}>
                     <div class="calendar-info">
-                        <span class="calendar-color-dot" style="background-color: {cal.unassigned ? 'rgb(255 255 255 / 0.2)' : cal.color || '#FF5733'};" />
+                        <span class="calendar-color-dot" style="background-color: {cal.unassigned ? 'rgb(255 255 255 / 0.2)' : cal.color || '#FF5733'};" ></span>
 
                         <div class="calendar-title-col">
                             <p class="calendar-name" data-title={cal.url || cal.name}>{cal.name}</p>
