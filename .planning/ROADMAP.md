@@ -57,7 +57,7 @@ Plans:
 
 **Wave 5** *(blocked on 01-06; source batches have disjoint file ownership and run in parallel)*
 
-- [ ] 01-07: Remediation batches S3/S4 and T1 — normalize the next 24 diagnosed Svelte files and review the first 12 target-lint files
+- [x] 01-07: Remediation batches S3/S4 and T1 — normalize the next 24 diagnosed Svelte files and review the first 12 target-lint files
 - [ ] 01-08: Remediation batches S5/S6 and T2 — normalize the next 24 diagnosed Svelte files and review the next 12 target-lint files
 - [ ] 01-09: Remediation batch S7 and T3/T4 — normalize the final 12 diagnosed Svelte files (including server sites) and review the final 23 target-lint files
 
@@ -215,7 +215,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Toolchain Gate | 4/9 | In progress | - |
+| 1. Toolchain Gate | 5/9 | In progress | - |
 | 2. Design-Token Foundation | 0/4 | Not started | - |
 | 3. Settings IA & Flows | 0/3 | Not started | - |
 | 4. Primitive Layer | 0/4 | Not started | - |

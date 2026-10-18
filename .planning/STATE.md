@@ -3,17 +3,17 @@ gsd_state_version: "1.0"
 current_phase: 1
 current_phase_name: Toolchain Gate
 status: executing
-stopped_at: Completed 01-06 (fresh checker inventory and S1/S2 warning normalization)
-last_updated: "2026-10-18T08:51:32Z"
+stopped_at: Completed 01-07 (S3/S4 warning normalization and T1 lint review)
+last_updated: "2026-10-18T09:03:03Z"
 last_activity: 2026-10-18
-last_activity_desc: Completed Phase 1 plan 01-06
-state_head: bac88d879defc54c55c8629ebeb4671733bb3afa
+last_activity_desc: Completed Phase 1 plan 01-07
+state_head: dc7741cebef56192dcb41682d33ebce5053fb98e
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 31
-  completed_plans: 4
-  percent: 13
+  completed_plans: 5
+  percent: 16
 ---
 
 # Project State
@@ -28,29 +28,29 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 1 of 7 (Toolchain Gate) — EXECUTING
-Plan: 01-06 of 9 (4 successful plans complete; 01-04 remains blocked pending final parity)
-Status: In progress — Wave 4 inventory and S1/S2 normalization complete
-Last activity: 2026-10-18 — Completed 01-06-PLAN.md
+Plan: 01-07 of 9 (5 successful plans complete; 01-04 remains blocked pending final parity)
+Status: In progress — Wave 5 S3/S4 normalization and T1 review complete
+Last activity: 2026-10-18 — Completed 01-07-PLAN.md
 
-Progress: [█░░░░░░░░░] 13%
+Progress: [██░░░░░░░░] 16%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 4
-- Average duration: 30 min
-- Total execution time: 120 min
+- Total plans completed: 5
+- Average duration: 26 min
+- Total execution time: 129 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-toolchain-gate | 4 | 120 min | 30 min |
+| 01-toolchain-gate | 5 | 129 min | 26 min |
 
 **Recent Trend:**
 
-- Last plans: 01-01 (31 min), 01-02 (28 min), 01-03 (47 min), 01-06 (14 min)
+- Last plans: 01-01 (31 min), 01-02 (28 min), 01-03 (47 min), 01-06 (14 min), 01-07 (9 min)
 - Trend: -
 
 *Updated after each plan completion*
@@ -98,6 +98,7 @@ Recent decisions affecting current work:
 - [01-03] **Plan defect:** the plan enumerated 8 ambiguous type imports; **11** were needed. The 3 extra — `src/frontend/ai/scripture/BibleCacheManager.ts`, `src/frontend/components/timeline/TimelineActions.ts`, `src/frontend/components/timeline/TimelinePlayback.ts` — were committed in `065c8c90` with justification (Rule 3, blocking).
 - [01-06] The fresh pinned checker inventory must precede source remediation. The captured source revision was `2ee3eae0`; the full 157-location frontend checker inventory and the separate production-build inventory remain distinct evidence sets.
 - [01-06] S1/S2 normalized only 37 exact `element_invalid_self_closing_tag` sites across 24 assigned Svelte files. Preserve the original whitespace and attributes; do not infer the refreshed production-build count before the final production build.
+- [01-07] S3/S4 normalized 53 exact sites with matching pre-edit production/checker path-line-tag keys; target lint review removed 17 current-only type assertions proven type/behavior-neutral, while preserving 4 matched and 5 baseline-only findings. Three current-only await findings remain because Promise/microtask and async-iterator semantics are not safe to change by inference.
 
 ### Pending Todos
 
@@ -106,7 +107,8 @@ None yet.
 ### Blockers/Concerns
 
 - [Roadmap] `REQUIREMENTS.md` v1 scope is **32** requirements (not 33) — the eight `A11Y-01`…`A11Y-08` ids contain digits and were missed by the original tally. Traceability records 32/32; resolved.
-- [Phase 1 / 01-04 final gate] The pre-remediation production inventory is 161 `element_invalid_self_closing_tag` warnings (154 frontend/78 files + 7 server/6 files); 37 assigned S1/S2 sites have now been normalized, but no post-edit production build has run, so do not project a fresh production total. The fresh checker moved from 157 frontend target warnings to 120 after S1/S2; its post-edit totals are 2174 FILES / 144 ERRORS / 254 WARNINGS. The remaining warning batches and final production inventory belong to 01-07/08/09 and final plan 01-04. No suppression is authorized.
+- [Phase 1 / 01-04 final gate] The pre-remediation production inventory is 161 `element_invalid_self_closing_tag` warnings (154 frontend/78 files + 7 server/6 files); 37 S1/S2 and 53 S3/S4 sites are normalized, but no post-01-07 production build/checker run has occurred, so do not project a fresh total. The post-S1/S2 checker had 120 target warnings and totals 2174 FILES / 144 ERRORS / 254 WARNINGS. 01-08/09 and the final production/checker inventory belong before plan 01-04 closes parity. No suppression is authorized.
+- [Phase 1 / T1] Three current-only `await-thenable` findings remain blockers: `src/electron/cloud/drive.ts:209:9` (`Promise.all` over synchronous values) and `src/electron/data/import.ts:24:9`, `:36:9` (`for await` over `string[]`). Preserve scheduling, rejection, and iterator-close behavior unless a safe exact change is demonstrated. Post-edit assigned lint still reports these alongside four matched findings.
 - [Phase 1 / 01-04 final gate] Checker comparison: baseline **2244 FILES / 338 ERRORS / 47 WARNINGS / 598 HINTS**; fresh pre-remediation **2174 / 144 / 291** (HINTS not emitted by svelte-check 4.7.7); post-S1/S2 **2174 / 144 / 254**. The pre-remediation warning composition was 157 self-closing + 129 a11y + 5 other. The −70 FILES delta is attributed to the `@tsconfig/svelte@5`/module-resolution change with unchanged project includes; the full final parity gate remains pending.
 - [Phase 1 / 01-04] `lint:svelte` is **185 err / 0 warn** vs 172 at 01-02 vs 167 at baseline (+13). Confirm this is TS-5.9 type-awareness on unchanged source, not check loss.
 - [Phase 1] Pre-existing, NOT regressions: 2 Vitest failures in `src/electron/cloud/syncManager.test.ts`, and 40 Prettier-unformatted files (20 of them `.svelte`). Both are recorded in `baseline/` and are the numbers 01-04 must not exceed — 01-03 held both at exact parity (40 files, identical set).
@@ -120,7 +122,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-18 08:51 UTC
-Stopped at: Completed 01-06 — fresh pinned pre-remediation checker inventory captured before source edits; S1/S2 normalized 37 exact non-void warning sites in 24 files. Post-check target count: 120 (down from 157); production inventory still needs a final fresh build.
+Last session: 2026-10-18 09:03 UTC
+Stopped at: Completed 01-07 — S3/S4 normalized 53 exact non-void warning sites in 24 files; T1 removed 17 safe current-only assertions and retained three async-semantics blockers. No post-01-07 checker/build count was measured.
 Resume file: None
-Next action: execute 01-07 (S3/S4 + T1), then 01-08 and 01-09; run final parity plan 01-04 only after all remediation batches complete. Do not start 01-05 or the final parity gate early.
+Next action: execute 01-08, then 01-09; run final parity plan 01-04 only after all remediation batches complete. Do not start 01-05 or the final parity gate early.
