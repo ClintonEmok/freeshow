@@ -138,8 +138,119 @@ The production build was run immediately before the pixel gate and cleaned after
 
 ## Task 2 — Check measurements
 
-Measurements and inventory checks are appended in Task 2 after all non-mutating jobs have been run against the recorded baselines.
+All checks were run individually, without `--fix`, with their recorded baseline command arguments. `npm run lint` was not run because its chain invokes `--fix` in the Electron/frontend jobs and is already red at baseline. The formatting check was run directly as a non-mutating measurement; its expected exit 1 is not treated as a regression by itself.
+
+### Baseline versus post-upgrade
+
+| Check | Baseline (`baseline/`) | Post-upgrade result | Verdict |
+|---|---|---|---|
+| `svelte-check` | `2244 FILES / 338 ERRORS / 47 WARNINGS / 598 HINTS` | `2174 FILES / 144 ERRORS / 291 WARNINGS / 0 reported HINTS`; 138 files with problems | Error count is below baseline; file count remains in the thousands with the same project `include`/`exclude`. **Warning delta +244 is an unresolved finding**, composed below. |
+| `lint:electron` | 149 files; 212 errors + 25 warnings = 237 problems | 149 files; 271 errors + 0 warnings = 271 problems (**+34**) | **BLOCKER:** existing-rule finding counts rose; see rule-by-rule attribution in Task 3. The baseline `restrict-plus-operands` behavior was restored explicitly. |
+| `lint:frontend` | 255 files; 630 errors + 0 warnings = 630 problems | 255 files; 684 errors + 0 warnings = 684 problems (**+54**) | **BLOCKER:** existing-rule finding counts rose; see Task 3. The v8 parser error on `simplex-noise.js` was fixed without dropping the file. |
+| `lint:svelte` | 464 files; 167 errors + 39 warnings = 206 problems | 464 files; 185 errors + 0 warnings = 185 problems (**−21**) | Problem total is lower. The 39 baseline Svelte compiler/a11y warnings are still surfaced by `svelte-check` (now 129 a11y warnings); v8 rule deltas and the compile-rule positive control are recorded below. |
+| `lint:styles` | 464 files; 216 errors = 216 problems | 464 files; 216 errors = 216 problems | Pass; exact count and rule population unchanged (`csstools/use-logical`: 216). |
+| Vitest | 12 files / 60 suites / 181 tests; 179 passed / 2 failed / 0 skipped / 0 todo | 60 suites / 181 tests; 179 passed / 2 failed / 0 pending / 0 todo; derived skipped = 0 | Pass; the only failures remain the two recorded `syncManager.test.ts` baseline failures. |
+| Prettier | 1039 candidates / 547 `.svelte` candidates; 40 unformatted / 20 `.svelte` | 1040 candidates / 547 `.svelte` candidates; 40 unformatted / 20 `.svelte`; the 40-file list is byte-for-byte the baseline list | Pass; the one extra candidate is newly added `scripts/assertBuildOutput.js`, which is formatted. No formatter writes were run. |
+
+### Raw command evidence
+
+**Svelte checker** — same command as baseline:
+
+```text
+npx svelte-check --tsconfig config/typescript/tsconfig.svelte.json --output machine
+exit 1
+COMPLETED 2174 FILES 144 ERRORS 291 WARNINGS 138 FILES_WITH_PROBLEMS
+TS5102 matches: 0
+TS7006 / TS7031 matches: 0
+warning composition: 157 element_invalid_self_closing_tag + 129 a11y_* + 5 other
+```
+
+`src/frontend/tsconfig.json` retains `include: ["."]` and `exclude: ["node_modules/*", "__sapper__/*", "public/*"]`; `svelte-check` continues to cover all 464 frontend Svelte files selected by that existing project scope. The 83 server Svelte files remain outside this checker, a pre-existing gap documented in 01-03. The reduced `FILES` number is the resolved TypeScript program population (primarily dependency declarations under the changed `@tsconfig/svelte`/TypeScript module-resolution defaults), not a narrowed include glob. The count is 70 below the baseline but still 2174, not a false-pass near-zero run. `allowJs: true` plus `noEmit: true` also keeps the JavaScript lint target in the TypeScript program without producing the TS5055 overwrite warning observed during the first probe.
+
+**Electron lint** — baseline command, non-mutating (no `--fix`):
+
+```text
+npx eslint -c config/linting/eslint.electron.json --ext .js,.ts src/electron --format json
+exit 1
+149 files / 271 errors / 0 warnings / 271 problems
+```
+
+**Frontend lint** — baseline command, non-mutating (no `--fix`):
+
+```text
+npx eslint -c config/linting/eslint.frontend.json --ext .js,.ts src/frontend --format json
+exit 1
+255 files / 684 errors / 0 warnings / 684 problems
+unnamed parser errors: 0
+```
+
+The first post-upgrade frontend run had one parser error for `src/frontend/components/output/effects/simplex-noise.js` because `allowJs` was false in the project. Adding `allowJs: true` and `noEmit: true` to the existing frontend tsconfig made the same 255-file lint job parse that file; it did not change source files or turn the error into an ignore.
+
+**Svelte lint** — required replacement for the baseline `eslint-plugin-svelte3` invocation; flat config is non-mutating and runs on all 464 `.svelte` files:
+
+```text
+ESLINT_USE_FLAT_CONFIG=true npx eslint -c config/linting/eslint.svelte.flat.mjs src/frontend --format json
+exit 1
+464 files / 185 errors / 0 warnings / 185 problems
+effective config: svelte/valid-compile = [2, {"ignoreWarnings":true}]
+source findings under svelte/valid-compile: 0
+```
+
+The absence of a compile-error finding in the source corpus is not a zero-file/inert job: it processed 464 files and reported 185 real TypeScript lint findings. A controlled stdin positive control with a warning-producing component and `ignoreWarnings:false` produced three `svelte/valid-compile` findings (a11y click/role and non-void self-closing diagnostics); production config intentionally ignores warning diagnostics, while `svelte-check` reports those compiler warnings. The positive control did not modify a file:
+
+```text
+printf '<div on:click={() => {}} />\\n' | ESLINT_USE_FLAT_CONFIG=true npx eslint -c config/linting/eslint.svelte.flat.mjs --stdin --stdin-filename src/frontend/components/main/Top.svelte --rule 'svelte/valid-compile: ["error", {"ignoreWarnings":false}]' --format json
+exit 1; svelte/valid-compile findings: 3
+```
+
+**Styles lint** — same command as baseline (Stylelint writes its JSON report to stderr in this CLI invocation):
+
+```text
+npx stylelint 'src/frontend/**/*.{css,scss,svelte}' --config config/linting/.stylelintrc.json --formatter json
+exit 2
+464 files / 216 errors / 216 problems; csstools/use-logical = 216
+```
+
+Exit 2 and 216 problems match the pre-upgrade red baseline; the JSON was parsed from stderr, not treated as empty output.
+
+**Vitest** — same command as baseline:
+
+```text
+npx vitest run --config config/testing/vitest.config.ts --reporter=json
+exit 1
+numTotalTestSuites=60; numTotalTests=181; numPassedTests=179; numFailedTests=2; numPendingTests=0; numTodoTests=0
+derived skipped = 181 - 179 - 2 = 0 (Vitest 4 JSON omits numSkippedTests; assertion statuses contain only passed/failed)
+```
+
+The two failing tests are the same baseline scenarios in `src/electron/cloud/syncManager.test.ts`; no test was skipped or added to a pending/todo state.
+
+**Prettier** — same command as baseline:
+
+```text
+npx prettier --config config/formatting/.prettierrc.yaml --check src scripts
+exit 1
+Code style issues found in 40 files.
+current unformatted list == baseline/format.txt unformatted list: true
+candidate count: 1040 (baseline 1039 + the one new tracked .js build assertion); .svelte candidates: 547; unformatted .svelte: 20
+```
+
+The one extra candidate does not change the unformatted set. No `--write` command was run.
+
+### Check inventory and non-blocking posture
+
+```text
+npm pkg get scripts.test:svelte scripts.test:unit scripts.test:playwright scripts.test:format scripts.lint:electron scripts.lint:frontend scripts.lint:svelte scripts.lint:styles
+all eight named scripts: non-empty
+scripts.lint members: lint:electron, lint:frontend, lint:svelte, lint:styles
+scripts.lint:svelte contains --fix: no
+
+grep -c 'continue-on-error: true' .github/workflows/ci.yml: 2
+git show "${BASE}:.github/workflows/ci.yml" | grep -c 'continue-on-error: true': 2
+git diff --name-only "$BASE"..HEAD -- .github/workflows/ci.yml: [no output]
+```
+
+No CI blocking behavior or check inventory was removed. The Electron/frontend ESLint jobs were invoked directly without their package-script `--fix` flags; the Svelte and style jobs were also run without autofix.
 
 ## Task 3 — Findings and resolutions
 
-Classifications, config adjustments, and any unresolved blockers are appended in Task 3. The new self-closing-tag compiler warnings will not be hidden; source-wide edits are outside this plan's authorized scope.
+Task 3 will append the per-rule deltas, the reasons for the two config changes, and explicit blockers. The new self-closing-tag compiler warnings will not be hidden; source-wide edits are outside this plan's authorized scope.
