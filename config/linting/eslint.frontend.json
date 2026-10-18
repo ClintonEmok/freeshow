@@ -69,6 +69,12 @@
         "@typescript-eslint/no-misused-promises": "off",
         "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }],
         "--TEMPORARILY-DISABLED": "off",
+        // Phase 7 parity close-out: these v8-only rules add findings on frozen pre-migration code; re-evaluate after that debt is addressed.
+        "@typescript-eslint/no-base-to-string": "off",
+        "@typescript-eslint/no-duplicate-type-constituents": "off",
+        "@typescript-eslint/no-array-delete": "off",
+        "@typescript-eslint/no-redundant-type-constituents": "off",
+        "@typescript-eslint/prefer-promise-reject-errors": "off",
         "@typescript-eslint/restrict-plus-operands": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/naming-convention": "off",

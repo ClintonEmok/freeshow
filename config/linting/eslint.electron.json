@@ -76,6 +76,12 @@
         "@typescript-eslint/naming-convention": "off",
         "@typescript-eslint/no-floating-promises": "off",
         "--TEMPORARILY-DISABLED": "off",
+        // Phase 7 parity close-out: these v8-only rules add findings on frozen pre-migration code; re-evaluate after that debt is addressed.
+        "@typescript-eslint/no-base-to-string": "off",
+        "@typescript-eslint/no-redundant-type-constituents": "off",
+        "@typescript-eslint/prefer-promise-reject-errors": "off",
+        // v8 changed this rule's defaults to allow all operand types; preserve v5's restrictive defaults and binary-only behavior.
+        "@typescript-eslint/restrict-plus-operands": ["error", { "allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false, "skipCompoundAssignments": true }],
         "@typescript-eslint/restrict-template-expressions": "off",
         "@typescript-eslint/no-unsafe-member-access": "off",
         "@typescript-eslint/no-unsafe-assignment": "off",

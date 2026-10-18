@@ -2,6 +2,9 @@
     "extends": "@tsconfig/svelte/tsconfig.json",
     "compilerOptions": {
         "types": ["node", "svelte", "vite/client"],
+        // ESLint's typed project includes this JS target; keep this checker-only config from emitting over input files.
+        "allowJs": true,
+        "noEmit": true,
         "sourceMap": true,
         "target": "ESNext",
         "module": "ESNext",
