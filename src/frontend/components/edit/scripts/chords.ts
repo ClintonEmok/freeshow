@@ -16,12 +16,12 @@ export function addChords(item: Item, showRef, itemIndex, line = 0, pos = 0, key
 
     // get first empty
     newLines[line]
-        .chords!.sort((a, b) => a.pos - b.pos)
+        .chords.sort((a, b) => a.pos - b.pos)
         .forEach((chord) => {
             if (chord.pos === pos) pos++
         })
 
-    newLines[line].chords!.push(createChord(pos, key || keys[0], id))
+    newLines[line].chords.push(createChord(pos, key || keys[0], id))
 
     _show(showRef.showId)
         .slides([showRef.id])

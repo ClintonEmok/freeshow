@@ -2466,7 +2466,7 @@ export async function format(id: string, obj: ObjData, data: any = null) {
         })
         newData.style.values = newItems
 
-        history({ id: "setItems", newData, location: { page: get(activePage) as any, show: get(activeShow)!, items, slide } })
+        history({ id: "setItems", newData, location: { page: get(activePage), show: get(activeShow)!, items, slide } })
 
         await wait(10)
     }

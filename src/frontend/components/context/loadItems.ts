@@ -242,7 +242,7 @@ const loadActions = {
         if (bg && showMedia[bg]?.name) {
             mediaList.push({
                 id: bg,
-                label: removeExtension(showMedia[bg].name!),
+                label: removeExtension(showMedia[bg].name),
                 translate: false,
                 icon: "image"
             })

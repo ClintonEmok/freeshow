@@ -22,7 +22,7 @@ export function handleKeydown(e: KeyboardEvent, contextActive: boolean, searchQu
             cancelable: true
         })
         Object.defineProperty(fakeEvent, "target", { value: lastTriggeredElem, enumerable: true })
-        onContextMenu(fakeEvent as any)
+        onContextMenu(fakeEvent)
         return null
     }
 

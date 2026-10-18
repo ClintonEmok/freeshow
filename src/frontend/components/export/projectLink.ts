@@ -4,7 +4,7 @@ import { overlays, playerVideos, showsCache } from "../../stores"
 import { newToast } from "../../utils/common"
 import { loadShows } from "../helpers/setShow"
 import { _show } from "../helpers/shows"
-import { type LinkGenericItem, type LinkOverlayItem, type LinkSectionItem, type LinkShowItem, type LinkSlide, type LinkSlideGenericItem, type LinkSlideItems, type LinkSlideLine, type LinkSlideMediaItem, type LinkSlideTextItem, type ProjectLink } from "./ProjectLinkTypes"
+import { type LinkGenericItem, type LinkOverlayItem, type LinkSectionItem, type LinkShowItem, type LinkSlide, type LinkSlideGenericItem, type LinkSlideItems, type LinkSlideLine, type LinkSlideTextItem, type ProjectLink } from "./ProjectLinkTypes"
 
 export async function exportProjectAsData(project: Project, projectId: string): Promise<ProjectLink | null> {
     if (!project) return null
@@ -104,7 +104,7 @@ export async function exportProjectAsData(project: Project, projectId: string): 
 }
 
 function mapSlideItems(slideItems: any[] = []): LinkSlideItems {
-    return slideItems.map((slideItem) => {
+    return slideItems.map<LinkSlideItems[number]>((slideItem) => {
         const type = slideItem.type || "text"
 
         if (type === "text") {
@@ -133,14 +133,14 @@ function mapSlideItems(slideItems: any[] = []): LinkSlideItems {
                 type,
                 style: encodeStyle(slideItem.style),
                 src: slideItem.customSvg || slideItem.src
-            } as LinkSlideMediaItem
+            }
         }
 
         return {
             type: slideItem.type,
             style: encodeStyle(slideItem.style)
         } as LinkSlideGenericItem
-    }) as LinkSlideItems
+    })
 }
 
 const keyMap = {

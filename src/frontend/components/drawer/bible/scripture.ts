@@ -189,7 +189,7 @@ export async function getActiveScripturesContent(selectedVerses: (number | strin
                 const offset = offsets[offsetId] || 0
 
                 const splitLongVerses = get(scriptureSettings).splitLongVerses
-                const expandedSelectedVerses: (number | string)[][] = clone(selectedVerses)!.map((chapterVs) => {
+                const expandedSelectedVerses: (number | string)[][] = clone(selectedVerses).map((chapterVs) => {
                     if (!offset) return [...chapterVs]
 
                     const vs = chapterVs.map((v) => {
@@ -1413,7 +1413,7 @@ export function getScriptureSlides({ biblesContent, selectedChapters, selectedVe
             // add reference to the main text if just one item or it's enabled!
             if (combineWithText) {
                 if (!slides[slideIndex][itemIndex]) slides[slideIndex][itemIndex] = { lines: [], style: "" }
-                if (get(scriptureSettings).referenceAtBottom && slides[slideIndex][itemIndex].lines) slides[slideIndex][itemIndex].lines!.push(...lines)
+                if (get(scriptureSettings).referenceAtBottom && slides[slideIndex][itemIndex].lines) slides[slideIndex][itemIndex].lines.push(...lines)
                 else slides[slideIndex][itemIndex].lines = [...lines, ...(slides[slideIndex][itemIndex].lines || [])]
             } else {
                 slides[slideIndex].push({

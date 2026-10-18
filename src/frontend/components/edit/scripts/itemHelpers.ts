@@ -195,7 +195,7 @@ export function getEditItems(onlyActive = false) {
     const editSlide = clone(getEditSlide())
     if (!Array.isArray(editSlide?.items)) return []
 
-    let editItems = editSlide!.items
+    let editItems = editSlide.items
     if (onlyActive) editItems = editItems.filter((_, i) => selectedItems.includes(i))
 
     return editItems || []

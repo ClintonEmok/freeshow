@@ -586,9 +586,9 @@ export async function setShowAPI(id: string, value: string) {
     }
 }
 
-export async function getPlainText(showId: string) {
+export async function getPlainText(showId: string): Promise<API_id_value> {
     await loadShows([showId])
-    return { id: showId, value: getPlainEditorText(showId) } as API_id_value
+    return { id: showId, value: getPlainEditorText(showId) }
 }
 
 export async function getShowGroups(id: string) {
