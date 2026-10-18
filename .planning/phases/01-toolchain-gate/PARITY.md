@@ -590,3 +590,115 @@ Fresh pinned-checker warning composition (137 total, extracted from all machine 
 | `src/frontend/components/output/preview/PreviewCanvas.svelte` | 85:5 | `<canvas>` |
 
 The first two paths match the previously noted checker-only area. The fresh output additionally reports `output/preview/PreviewCanvas.svelte:85:5`; it is unchanged from the exact source comparison revision and is recorded as an additional checker-only target finding rather than silently omitted. No `OverlayInfo.svelte:54` target finding appears in this fresh run. These three current checker diagnostics violate the zero-target checker requirement and block Task 1 acceptance; no source or warning-policy change is authorized here. The existing `svelte/valid-compile` `ignoreWarnings: true` a11y policy remains unchanged, and no new suppression was added.
+
+### Task 2 — non-mutating lint, tests, formatting, and focused test review
+
+Each command below ran independently, with complete stdout/stderr and exit status stored separately under `phase1-01-04-final/`. No autofix, snapshot update, baseline edit, `npm run lint`, or formatter write was invoked.
+
+| Job / exact command | Files | Errors / warnings / problems (baseline → current) | Exit | Raw output and independent status |
+|---|---:|---|---:|---|
+| Electron: `npx eslint -c config/linting/eslint.electron.json --ext .js,.ts src/electron --format json` | 149 / 149 | 212/25/237 → 237/0/237 | 1 | `lint-electron.stdout`, `lint-electron.stderr`, `lint-electron.exit` |
+| Frontend: `npx eslint -c config/linting/eslint.frontend.json --ext .js,.ts src/frontend --format json` | 255 / 255 | 630/0/630 → 621/0/621 | 1 | `lint-frontend.stdout`, `lint-frontend.stderr`, `lint-frontend.exit` |
+| Svelte: `ESLINT_USE_FLAT_CONFIG=true npx eslint -c config/linting/eslint.svelte.flat.mjs src/frontend --format json` | 464 / 464 | 167/39/206 → 185/0/185 | 1 | `lint-svelte.stdout`, `lint-svelte.stderr`, `lint-svelte.exit` |
+| Styles: `npx stylelint 'src/frontend/**/*.{css,scss,svelte}' --config config/linting/.stylelintrc.json --formatter json` | 464 / 464 | 216/0/216 → 216/0/216 | 2 | JSON is in `lint-styles.stderr` (`lint-styles.stdout` is empty); status `lint-styles.exit` |
+
+All four jobs retain nonzero file coverage. Per-job **problem totals** are at or below baseline. Target-rule comparison, read from the complete JSON (not aggregate totals): Electron `no-unnecessary-type-assertion` 1 vs 3 (within baseline), `await-thenable` 6 vs 3 (**over by 3**); frontend `no-unnecessary-type-assertion` 23 vs 26 (within baseline), `await-thenable` 1 vs 0 (**over by 1**). The six Electron await findings are the three unchanged baseline matches in `src/electron/data/backup.ts:24:13, 30:9, 34:9` plus current-only `src/electron/cloud/drive.ts:209:9` and `src/electron/data/import.ts:24:9, 36:9`; the frontend current-only finding is `src/frontend/components/drawer/bible/scripture.ts:160:50`. These four current-only async cases remain the exact unresolved parity blockers; no await or loop was changed. The unchanged Svelte flat config still enables `svelte/valid-compile` with `ignoreWarnings: true`; its source/file coverage remains 464, and the per-job total 185 is below its 206-problem baseline. Stylelint remains exactly 216 `csstools/use-logical` findings.
+
+#### Vitest baseline comparison
+
+Command: `npx vitest run --config config/testing/vitest.config.ts --reporter=json`; complete JSON/stdout `vitest.stdout`, stderr `vitest.stderr`, independent exit `vitest.exit` (`1`). Result: 60 suites; 181 total tests; 179 passed; 2 failed; 0 pending/todo; **0 skipped**. Vitest 4 omits `numSkippedTests`, so skipped count was derived by tallying every assertion status in all 12 `testResults`: exactly 179 `passed` + 2 `failed`, with no skipped/pending/todo/disabled status (and `numPendingTests=0`). The only failures are the exact baseline failures in `src/electron/cloud/syncManager.test.ts`: `Scenario 1: if not found locally, and marked as 'deleted' in cloud: skip` (`expected true to be false`) and `should fall back to file mtime when neither device has ever tracked a real edit time (backward compatibility)` (`expected 1 to be 2`). This exactly matches `baseline/vitest.json`; nonzero exit is expected and did not stop later checks.
+
+#### Prettier path-set comparison
+
+Command: `npx prettier --config config/formatting/.prettierrc.yaml --check src scripts`; exit `1`. Complete stdout/stderr and independent status are `prettier.stdout`, `prettier.stderr`, and `prettier.exit`. The baseline has 40 unformatted paths; the current run has 120: **80 new paths, zero resolved, and no formatter writes**. The exact new path set is:
+
+```text
+src/frontend/ai/components/floating/AiTranscription.svelte
+src/frontend/components/draw/Draw.svelte
+src/frontend/components/draw/DrawSettings.svelte
+src/frontend/components/draw/Fill.svelte
+src/frontend/components/draw/Paint.svelte
+src/frontend/components/draw/Particles.svelte
+src/frontend/components/drawer/Card.svelte
+src/frontend/components/drawer/audio/Audio.svelte
+src/frontend/components/drawer/audio/AudioMeter.svelte
+src/frontend/components/drawer/audio/effects/AudioCompressor.svelte
+src/frontend/components/drawer/audio/effects/AudioDelay.svelte
+src/frontend/components/drawer/audio/effects/AudioFilter.svelte
+src/frontend/components/drawer/audio/effects/AudioLimiter.svelte
+src/frontend/components/drawer/audio/effects/AudioNoiseGate.svelte
+src/frontend/components/drawer/audio/effects/AudioReverb.svelte
+src/frontend/components/drawer/audio/effects/AudioStereoShaper.svelte
+src/frontend/components/drawer/bible/Scripture.svelte
+src/frontend/components/drawer/calendar/Calendar.svelte
+src/frontend/components/drawer/calendar/CalendarsManagement.svelte
+src/frontend/components/drawer/live/BMDStream.svelte
+src/frontend/components/drawer/live/Capture.svelte
+src/frontend/components/drawer/live/Mic.svelte
+src/frontend/components/drawer/live/NDIStream.svelte
+src/frontend/components/drawer/live/OMTStream.svelte
+src/frontend/components/drawer/media/Media.svelte
+src/frontend/components/drawer/pages/Interactions.svelte
+src/frontend/components/drawer/pages/InteractionsInfo.svelte
+src/frontend/components/edit/ItemAddMenu.svelte
+src/frontend/components/edit/editbox/EditboxCropping.svelte
+src/frontend/components/edit/editors/AudioEditor.svelte
+src/frontend/components/edit/editors/MediaEditor.svelte
+src/frontend/components/edit/scripts/chords.ts
+src/frontend/components/inputs/MaterialButton.svelte
+src/frontend/components/inputs/MaterialCheckbox.svelte
+src/frontend/components/inputs/MaterialColorInput.svelte
+src/frontend/components/inputs/MaterialDropdown.svelte
+src/frontend/components/inputs/MaterialFilePicker.svelte
+src/frontend/components/inputs/MaterialFolderPicker.svelte
+src/frontend/components/inputs/MaterialNumberInput.svelte
+src/frontend/components/inputs/MaterialPopupButton.svelte
+src/frontend/components/inputs/MaterialRadialPicker.svelte
+src/frontend/components/inputs/MaterialTextInput.svelte
+src/frontend/components/inputs/MaterialTextarea.svelte
+src/frontend/components/inputs/MaterialTimePicker.svelte
+src/frontend/components/inputs/MaterialToggleSwitch.svelte
+src/frontend/components/main/Loader.svelte
+src/frontend/components/main/ProgressPanel.svelte
+src/frontend/components/main/Top.svelte
+src/frontend/components/main/popups/ChooseMediaInput.svelte
+src/frontend/components/main/popups/ManageFonts.svelte
+src/frontend/components/media/Video.svelte
+src/frontend/components/output/layers/BackgroundMedia.svelte
+src/frontend/components/output/layers/PdfOutput.svelte
+src/frontend/components/output/tools/MediaControls.svelte
+src/frontend/components/show/AudioPreview.svelte
+src/frontend/components/show/ProjectContentList.svelte
+src/frontend/components/show/Projects.svelte
+src/frontend/components/show/VideoShow.svelte
+src/frontend/components/show/pdf/PdfPreview.svelte
+src/frontend/components/show/tools/HighlightedNotes.svelte
+src/frontend/components/show/tools/Notes.svelte
+src/frontend/components/show/tools/SlideGroups.svelte
+src/frontend/components/slide/Layouts.svelte
+src/frontend/components/slide/Reference.svelte
+src/frontend/components/slide/SkeletonSlide.svelte
+src/frontend/components/slide/Slide.svelte
+src/frontend/components/slide/views/Captions.svelte
+src/frontend/components/slide/views/MediaItem.svelte
+src/frontend/components/slide/views/Timer.svelte
+src/frontend/components/slide/views/Visualizer.svelte
+src/frontend/components/stage/SkeletonStageSlide.svelte
+src/frontend/components/system/Movebox.svelte
+src/frontend/components/system/SelectElem.svelte
+src/frontend/components/timeline/TimelineEasing.svelte
+src/server/common/components/Checkbox.svelte
+src/server/common/components/Loader.svelte
+src/server/output_stream/App.svelte
+src/server/remote/components/MaterialButton.svelte
+src/server/stage/components/PreviewCanvas.svelte
+src/server/stage/components/Timer.svelte
+```
+
+This is a baseline-gate failure. These exact remediation-path formatting deltas are recorded, not auto-formatted, because this final gate authorizes no source write.
+
+#### Focused tests and changed TypeScript files
+
+The exact 01-03-tip-to-current audit identifies 30 changed `.ts` files. Repository-wide search of `src/**/*.test.ts` / `*.integration.test.ts` found focused tests for three changed modules: `src/electron/data/zip.ts` → `src/electron/data/zip.test.ts` (run: `npx vitest run --config config/testing/vitest.config.ts src/electron/data/zip.test.ts`, exit 0, 5/5 passed); `src/electron/data/store.ts` → `src/electron/cloud/syncManager.test.ts` (run: `npx vitest run --config config/testing/vitest.config.ts src/electron/cloud/syncManager.test.ts`, exit 1, 28 passed / same 2 baseline failures); and `src/frontend/components/helpers/array.ts` → nearest `src/frontend/utils/search.test.ts` (run: `npx vitest run --config config/testing/vitest.config.ts src/frontend/utils/search.test.ts`, exit 0, 39/39 passed; this test mocks the helper module rather than directly exercising its assertion site). Independent raw stdout/stderr and statuses are `focused-zip.*`, `focused-syncManager.*`, and `focused-search.*` in the evidence directory.
+
+Explicit absence evidence: no focused test/importing test was found for the remaining 27 changed TypeScript files: `src/electron/contentProviders/ContentProviderRegistry.ts`, `src/electron/contentProviders/canva/CanvaContentLibrary.ts`, `src/electron/contentProviders/onStage/connect.ts`, `src/electron/servers.ts`, `src/frontend/components/actions/apiHelper.ts`, `src/frontend/components/context/contextMenuSearch.ts`, `src/frontend/components/context/loadItems.ts`, `src/frontend/components/context/menuClick.ts`, `src/frontend/components/drawer/bible/scripture.ts`, `src/frontend/components/edit/scripts/chords.ts`, `src/frontend/components/edit/scripts/itemHelpers.ts`, `src/frontend/components/export/projectLink.ts`, `src/frontend/components/helpers/clipboard.ts`, `src/frontend/components/helpers/dropActions.ts`, `src/frontend/components/helpers/history.ts`, `src/frontend/components/helpers/output.ts`, `src/frontend/components/helpers/shows.ts`, `src/frontend/components/main/popups/localization/translation.ts`, `src/frontend/components/quicksearch/quicksearch.ts`, `src/frontend/components/show/formatTextEditor.ts`, `src/frontend/components/slide/views/websiteDomPool.ts`, `src/frontend/components/stage/stage.ts`, `src/frontend/components/timeline/TimelineActions.ts`, `src/frontend/converters/powerpoint/PowerPointHelper.ts`, `src/frontend/converters/songbeamer.ts`, `src/frontend/show/slides.ts`, and `src/frontend/utils/drive.ts`. Full Vitest remains the available suite-level evidence for these files; no test was created or changed.
