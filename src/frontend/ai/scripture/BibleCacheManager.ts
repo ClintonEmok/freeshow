@@ -1,4 +1,4 @@
-import { Bible } from "json-bible/lib/Bible"
+import type { Bible } from "json-bible/lib/Bible"
 import { get } from "svelte/store"
 import { loadJsonBible } from "../../components/drawer/bible/scripture"
 import { scriptures } from "../../stores"
