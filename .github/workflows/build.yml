@@ -26,6 +26,8 @@ jobs:
               run: npm run build
 
             - name: Package app
+              env:
+                  FS_SMOKE_SKIP_NOTARIZE: "true"
               run: npx electron-builder --config config/building/electron-builder.yaml --dir
               timeout-minutes: 30
 

@@ -167,16 +167,18 @@ Two-phase, and the order matters:
 
 **Success Criterion 4 on the same run:** re-read `.planning/phases/01-toolchain-gate/baseline/README.md` and confirm `svelte-check`, the four lint jobs, Vitest and Prettier report **no new** errors/failures, and that no `lint:*` / `test:*` script was dropped from `package.json`. Both `continue-on-error: true` entries in `.github/workflows/ci.yml` must still be **exactly two** — flipping either one is a CI-behaviour change and is out of scope for Phase 1.
 
-## On-device execution record — 2026-10-19
+## On-device execution record — initial run 2026-10-19; smoke-pack remediation 2026-10-23
 
-**Scope and honesty:** The macOS arm64 packaged flow and native-module calls below were exercised on this device. The packaging command itself did **not** complete successfully because no trusted, valid signing identity was available; the resulting app directory was still launchable and was smoke-tested, but this is not a successful release-packaging result. No GitHub Actions workflow was dispatched, so there are no CI run URLs, dates, or Windows/Linux results to report. Cross-platform evidence remains pending. Pixel evidence is per-OS only; this Darwin capture is not a Linux or Windows comparison baseline.
+**Scope and honesty:** The macOS arm64 packaged flow and native-module calls below were exercised on this device. The initial plain `npm run pack` attempt did **not** complete successfully: the custom `afterSign` notarization hook failed without a valid Developer ID signing identity. A later smoke-only environment flag bypassed only that custom hook, allowing the unpacked `--dir` smoke package to complete; this is not evidence of a signed/notarized release. No workflow run was dispatched. Windows/Linux evidence remains pending, and pixel evidence is per-OS only; this Darwin capture is not a Linux or Windows comparison baseline.
 
 ### Build and packaged app
 
 | Check | Observed result |
 |---|---|
 | `npm run build` | **PASS** — Vite production bundle, server apps, Electron TypeScript build, and `scripts/assertBuildOutput.js` completed; assertion reported `bundle.css` 257310 bytes and verified the bundle, production HTML, selectors, and Electron build. |
-| `npm run pack` | **FAIL / release blocker** — electron-builder 26.17.0 rebuilt the native dependencies for Electron 37.10.3 arm64 and produced `dist/mac-arm64/FreeShow.app`; signing then failed. The log reported zero valid signing identities (available identities were expired or untrusted), `Failed to codesign your application with code: 1`, and `FreeShow.app: code has no resources but signature indicates they must be present`. No signing workaround was applied. |
+| Initial `npm run pack` (2026-10-19) | **FAIL — initial attempt, not a passing package result** — electron-builder 26.17.0 rebuilt the native dependencies for Electron 37.10.3 arm64 and produced `dist/mac-arm64/FreeShow.app`; the custom macOS `afterSign` notarization hook then failed because there was no valid Developer ID identity. The log reported zero valid signing identities (available identities were expired or untrusted), `Failed to codesign your application with code: 1`, and `FreeShow.app: code has no resources but signature indicates they must be present`. |
+| Corrected smoke-only pack (2026-10-23) | **PASS for unpacked smoke packaging only** — after a fresh build, `FS_SMOKE_SKIP_NOTARIZE=true npm run pack` completed and produced `dist/mac-arm64/FreeShow.app`. The flag skipped only `scripts/macos/notarize.js`; electron-builder signing configuration was not changed. This does not establish signed/notarized release packaging. |
+| Fresh `npm run build` (2026-10-23) | **PASS** — Vite production bundle, server apps, Electron TypeScript build, and `scripts/assertBuildOutput.js` completed; fresh byte counts and transcript are recorded below. |
 | Resolved executable used by smoke test | `/Users/clintonemok/Work/freeshow/dist/mac-arm64/FreeShow.app/Contents/MacOS/FreeShow` |
 | Packaged page URL | `file:///Users/clintonemok/Work/freeshow/dist/mac-arm64/FreeShow.app/Contents/Resources/app.asar/public/index.html` (not the development server) |
 
@@ -216,20 +218,27 @@ FS_SMOKE_EXECUTABLE=/Users/clintonemok/Work/freeshow/dist/mac-arm64/FreeShow.app
 
 Both runs passed all 3 smoke tests. The first captured the Darwin baseline; the second ran without `--update-snapshots` and compared against the committed-per-plan Darwin baseline. Local transcripts are in `/private/var/folders/ht/_t09b17d0p11tcppmbhzsry40000gn/T/opencode/phase1-01-05-smoke/smoke-capture-fixed.log` and `smoke-compare-fixed.log`. The first pre-fix attempt failed on the Show-navigation selector, main-process `require` availability, and Retina capture dimensions; the spec now targets the Show navigation slot, constructs a resolver from Electron's packaged app path, and sets device scale factor 1. The passing results above are from the corrected runs, not the failed attempt.
 
+### Fresh smoke-pack verification — 2026-10-23
+
+This rerun is distinct from the earlier initial failure and from the earlier baseline-capture run. It used the smoke-only flag for packaging and ran the packaged smoke suite exactly once **without** snapshot-update flags, comparing against the existing Darwin baseline (no recapture).
+
+| Check | Observed result |
+|---|---|
+| `npm run build` | **PASS** — fresh production build and build-output assertion completed. Bundle sizes: `bundle.js` 3,930,245 bytes; `bundle.css` 257,310 bytes. |
+| `FS_SMOKE_SKIP_NOTARIZE=true npm run pack` | **PASS** — `dist/mac-arm64/FreeShow.app` generated and the app's inner executable resolved. The custom notarization hook logged that it was skipped; no release/signing settings were changed. |
+| Packaged smoke comparison | **PASS** — `FS_SMOKE_EXECUTABLE=/Users/clintonemok/Work/freeshow/dist/mac-arm64/FreeShow.app/Contents/MacOS/FreeShow npx playwright test --config config/testing/playwright.config.ts smoke` passed all 3 tests (52.5 s), including the operator flow, callable native modules, and a zero-diff comparison against `output-1920x1080-darwin.png` with `maxDiffPixels: 0`. No `--update-snapshots` flag was used. |
+| Darwin baseline | **UNCHANGED** — the existing PNG remained 1920×1080; SHA-256 before and after comparison: `afc29a12cd2f9729a881b1d11064ce2c9b7dfce0e5ad0e186d44b27313c1561c`. |
+| Cleanup | **PASS** — `node scripts/cleanBuilds.js` restored the development literal in `public/index.html`; `git status --porcelain public/index.html` was empty. |
+
+The fresh build, pack, and smoke transcripts are under `/private/var/folders/ht/_t09b17d0p11tcppmbhzsry40000gn/T/opencode/phase1-01-05-smoke-hook-bypass-20261023/`. This local result proves only the macOS arm64 unpacked smoke path; it does not resolve the cross-platform gate or the signed/notarized release requirement.
+
 ### Cross-platform CI evidence — pending
 
-No workflow was dispatched. Consequently, run URLs and dates are **unavailable**, not inferred from repository status. Windows and Linux packaged smoke/native-module claims remain unverified; no cross-OS pixel comparison is claimed. Dispatch only against the current work branch `gsd/m1-design-system`, never `main`, then record each returned Actions URL, actual run date, matrix conclusion, and native-module output here:
+No workflow was dispatched. A read-only GitHub check on 2026-10-23 found the remote `gsd/m1-design-system` branch absent (branch lookup returned 404; `git ls-remote` returned no ref). The observed Actions API currently lists six active workflows on the default branch, which differs from the prior checkpoint note that GitHub reported zero; those default-branch workflow records are not evidence that this local feature-branch implementation ran. No stale workflow was dispatched, and nothing was pushed or merged. Windows/Linux packaged smoke/native-module claims remain unverified; no cross-OS pixel comparison is claimed. This checkpoint remains blocked until the current workflow changes can run on Windows, macOS, and Linux and their evidence is reviewed/approved.
 
-```bash
-gh workflow run build.yml --ref gsd/m1-design-system
-gh workflow run ci.yml --ref gsd/m1-design-system
-gh workflow run playwright.yml --ref gsd/m1-design-system
-gh workflow run playwright.yml --ref gsd/m1-design-system -f update_snapshots=true
-```
+The Build matrix must succeed on Windows, macOS, and Linux with packaged smoke results before TOOL-04 is approved. Any Linux baseline must come from the documented `update_snapshots` capture path and be committed before a real comparison; the Linux checkout capture and packaged Build smoke use the same bundle and 1920×1080 xvfb geometry. A packaged diff is a finding to retain, not a reason to re-capture or relax the threshold.
 
-The last command is a baseline-capture run only. Download its `pixel-baselines` artifact with `gh run download <RUN_ID> --name pixel-baselines`, commit the generated `-linux.png` baseline on the work branch, and dispatch the Playwright comparison and Build matrix again. The Build matrix must succeed on Windows, macOS, and Linux with packaged smoke results before TOOL-04 is approved. The Linux checkout capture and packaged Build smoke use the same bundle and 1920×1080 xvfb geometry; a packaged diff is a finding to retain, not a reason to re-capture or relax the threshold.
-
-**On-device versus CI-only statement:** macOS arm64 operator flow, native-module calls, and Darwin pixel comparison were verified on-device against the generated unpacked app directory. The `npm run pack` result is still a signing failure, not a passing package gate. Windows/Linux packaging and smoke results, CI-only run evidence, and any Linux baseline comparison are pending because no Actions dispatch was run. A Darwin baseline says nothing about Windows or Linux rendering.
+**On-device versus CI-only statement:** macOS arm64 operator flow, native-module calls, and Darwin pixel comparison were verified on-device against the generated unpacked app directory. The plain initial `npm run pack` attempt failed in the custom notarization hook; the later smoke-only flag made the local `--dir` packaging and smoke comparison pass, but neither is a signed/notarized release result. Windows/Linux packaging and smoke results, CI run evidence, and any Linux baseline comparison are pending. A Darwin baseline says nothing about Windows or Linux rendering.
 
 ## Failure handling
 
